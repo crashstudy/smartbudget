@@ -4,7 +4,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ---- 1. MOBILE MENU TOGGLE ----
+    /* ==============================================
+       1. MOBILE MENU TOGGLE
+       ============================================== */
     const menuBtn  = document.getElementById('mobile-menu-btn');
     const navLinks = document.getElementById('nav-links');
 
@@ -23,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('active');
-                menuBtn.querySelectorAll('.bar').forEach((bar, i) => {
+                menuBtn.querySelectorAll('.bar').forEach((bar) => {
                     bar.style.transform = 'none';
                     bar.style.opacity   = '1';
                 });
@@ -43,7 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ---- 2. STICKY HEADER SHADOW ON SCROLL ----
+    /* ==============================================
+       2. STICKY HEADER SHADOW ON SCROLL
+       ============================================== */
     const header = document.getElementById('site-header');
     if (header) {
         window.addEventListener('scroll', () => {
@@ -56,7 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ---- 3. BACK TO TOP BUTTON ----
+    /* ==============================================
+       3. BACK TO TOP BUTTON
+       ============================================== */
     const backToTopBtn = document.getElementById('back-to-top');
     if (backToTopBtn) {
         window.addEventListener('scroll', () => {
@@ -73,11 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ---- 4. SEARCH FUNCTIONALITY ----
-    const searchInput = document.getElementById('search-input');
-    const searchBtn   = document.getElementById('search-btn');
+    /* ==============================================
+       4. GLOBAL SEARCH FUNCTIONALITY (Homepage)
+       ============================================== */
+    const mainSearchInput = document.getElementById('search-input');
+    const mainSearchBtn   = document.getElementById('search-btn');
 
-    // Sample search index — add your article titles/URLs here
     const searchIndex = [
         { title: 'Best Phone Under ₹15,000 India 2026', url: '#phones' },
         { title: 'Best Laptop Under ₹35,000 for Students', url: '#laptops' },
@@ -97,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
             item.title.toLowerCase().includes(q)
         );
 
-        // Remove existing results
         const existing = document.getElementById('search-results-box');
         if (existing) existing.remove();
 
@@ -105,17 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const box = document.createElement('div');
             box.id = 'search-results-box';
             box.style.cssText = `
-                position: absolute;
-                top: calc(100% + 8px);
-                left: 0; right: 0;
-                background: #fff;
-                border: 1.5px solid #e2e8f0;
-                border-radius: 16px;
-                box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-                z-index: 9999;
-                overflow: hidden;
-                max-height: 280px;
-                overflow-y: auto;
+                position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+                background: #fff; border: 1.5px solid #e2e8f0; border-radius: 16px;
+                box-shadow: 0 12px 28px rgba(0,0,0,0.1); z-index: 9999;
+                overflow: hidden; max-height: 280px; overflow-y: auto;
             `;
 
             results.forEach(item => {
@@ -123,19 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.href = item.url;
                 row.textContent = item.title;
                 row.style.cssText = `
-                    display: block;
-                    padding: 13px 18px;
-                    font-size: 0.9rem;
-                    color: #1e293b;
-                    border-bottom: 1px solid #f1f5f9;
-                    transition: background 0.15s;
-                    font-family: 'DM Sans', sans-serif;
+                    display: block; padding: 13px 18px; font-size: 0.9rem;
+                    color: #1e293b; border-bottom: 1px solid #f1f5f9;
+                    transition: background 0.15s; font-family: 'DM Sans', sans-serif;
                 `;
                 row.addEventListener('mouseenter', () => row.style.background = '#eff6ff');
                 row.addEventListener('mouseleave', () => row.style.background = '');
                 row.addEventListener('click', () => {
                     box.remove();
-                    if (searchInput) searchInput.value = '';
+                    if (mainSearchInput) mainSearchInput.value = '';
                 });
                 box.appendChild(row);
             });
@@ -148,14 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (searchInput) {
+    if (mainSearchInput) {
         let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
+        mainSearchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => doSearch(e.target.value), 300);
         });
 
-        searchInput.addEventListener('keydown', (e) => {
+        mainSearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') doSearch(e.target.value);
             if (e.key === 'Escape') {
                 const box = document.getElementById('search-results-box');
@@ -163,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Hide results when clicking outside search
         document.addEventListener('click', (e) => {
             const wrap = document.getElementById('search-wrap');
             if (wrap && !wrap.contains(e.target)) {
@@ -173,33 +167,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            if (searchInput) doSearch(searchInput.value);
+    if (mainSearchBtn) {
+        mainSearchBtn.addEventListener('click', () => {
+            if (mainSearchInput) doSearch(mainSearchInput.value);
         });
     }
 
 
-    // ---- 5. AFFILIATE LINK CLICK TRACKING ----
-    // Tracks which products people click — useful for analytics
+    /* ==============================================
+       5. AFFILIATE LINK CLICK TRACKING
+       ============================================== */
     document.querySelectorAll('.affiliate-link').forEach(link => {
         link.addEventListener('click', (e) => {
             const product  = link.dataset.product || 'unknown';
             const platform = link.classList.contains('btn-amazon') ? 'Amazon' : 'Flipkart';
-
-            // Log to console (replace with Google Analytics or your tracker)
             console.log(`[SmartBudget] Affiliate Click → ${product} on ${platform}`);
-
-            // If you add Google Analytics (gtag), uncomment below:
-            // gtag('event', 'affiliate_click', {
-            //     'product': product,
-            //     'platform': platform
-            // });
         });
     });
 
 
-    // ---- 6. SMOOTH SCROLL FOR ANCHOR LINKS ----
+    /* ==============================================
+       6. SMOOTH SCROLL FOR ANCHOR LINKS
+       ============================================== */
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', (e) => {
             const targetId = anchor.getAttribute('href').slice(1);
@@ -215,7 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // ---- 7. CARD ENTRANCE ANIMATION (Intersection Observer) ----
+    /* ==============================================
+       7. CARD ENTRANCE ANIMATION (Intersection Observer)
+       ============================================== */
     const cards = document.querySelectorAll('.product-card, .cat-card, .guide-card, .trust-item');
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
@@ -237,21 +228,124 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ---- 8. CURRENT YEAR IN FOOTER ----
+    /* ==============================================
+       8. CURRENT YEAR IN FOOTER
+       ============================================== */
     const yearEl = document.querySelector('.footer-bottom p');
     if (yearEl) {
         yearEl.innerHTML = yearEl.innerHTML.replace('2026', new Date().getFullYear());
     }
 
 
-    // ---- 9. PRICE ALERT (Future Feature Placeholder) ----
-    // When you add a backend, replace this with real logic
+    /* ==============================================
+       9. PRICE ALERT (Placeholder)
+       ============================================== */
     window.setPriceAlert = function(productId, targetPrice) {
         console.log(`[SmartBudget] Price alert set for ${productId} at ₹${targetPrice}`);
         alert(`We'll notify you when the price drops to ₹${targetPrice}! (Feature coming soon)`);
     };
 
+
+    /* ==============================================
+       10. DYNAMIC BLOG HUB & SEARCH (For allposts.html)
+       ============================================== */
+    
+    // Blog Data Array - Add your new blogs here
+    const blogPosts = [
+        {
+            id: 1,
+            title: "Best Budget Mic for YouTube in India (2026)",
+            excerpt: "We compared Fifine, JBL, and Boya. Find out which mic is the absolute best for beginners under ₹1000.",
+            category: "Gadgets & Audio",
+            date: "May 26, 2026",
+            image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+            link: "budget-mic-review.html"
+        },
+        // Template for next blog:
+        // {
+        //     title: "Title Here",
+        //     excerpt: "Short description...",
+        //     category: "Laptops",
+        //     date: "June 2026",
+        //     image: "image_url_here.jpg",
+        //     link: "your-page-name.html"
+        // }
+        
+        {
+          id: 2,
+          title: "Offer Mini Cooler",
+          excerpt: "Mini Cooler is the best For Summer in India Nowadays",
+          category: "Home Appliances",
+          date: "28 May, 2026",
+          image: "https://m.media-amazon.com/images/I/41XSPcfIs8L._SY300_SX300_QL70_FMwebp_.jpg",
+          link: "minicooler.html"
+          
+        }
+    ];
+
+    const blogGrid = document.getElementById('blog-grid');
+    const blogSearchInput = document.getElementById('blog-search');
+    const noResults = document.getElementById('no-results');
+
+    function displayBlogs(blogsToDisplay) {
+        if(!blogGrid) return; // Only runs on allposts.html
+        
+        blogGrid.innerHTML = ''; 
+
+        if(blogsToDisplay.length === 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+            
+            blogsToDisplay.forEach(blog => {
+                const cardHTML = `
+                    <article class="product-card blog-card" style="opacity: 1; transform: translateY(0);">
+                        <img src="${blog.image}" alt="${blog.title}" class="product-img" loading="lazy">
+                        <div class="card-content">
+                            <span class="category" style="color: #2563eb; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">${blog.category}</span>
+                            <span class="blog-date" style="font-size: 0.8rem; color: #64748b; display: block; margin: 4px 0 8px;">${blog.date}</span>
+                            <h3 class="product-title" style="font-size: 1.15rem; margin-bottom: 10px;">${blog.title}</h3>
+                            <p class="short-review" style="font-size: 0.95rem; color: #64748b; margin-bottom: 15px; line-height: 1.5;">${blog.excerpt}</p>
+                            <a href="${blog.link}" class="btn btn-accent btn-full">Read Full Guide →</a>
+                        </div>
+                    </article>
+                `;
+                blogGrid.innerHTML += cardHTML;
+            });
+        }
+    }
+
+    if(blogGrid) {
+        displayBlogs([...blogPosts].reverse()); 
+    }
+
+    if(blogSearchInput) {
+        blogSearchInput.addEventListener('keyup', (e) => {
+            const searchString = e.target.value.toLowerCase();
+            const filteredBlogs = blogPosts.filter(blog => {
+                return blog.title.toLowerCase().includes(searchString) || 
+                       blog.category.toLowerCase().includes(searchString) ||
+                       blog.excerpt.toLowerCase().includes(searchString);
+            });
+            displayBlogs(filteredBlogs.reverse());
+        });
+    }
+
 });
+
+
+/* ==============================================
+   11. REVEAL AFFILIATE PLATFORMS (Viral Tiles)
+   ============================================== */
+function revealPlatforms(button) {
+    // Buy Now button ko chhupao
+    button.style.display = 'none';
+    
+    // Usi tile ke andar wale 3 platforms ko dikhao
+    const platformsDiv = button.nextElementSibling;
+    platformsDiv.style.display = 'flex';
+}
+
 // ===========================================
 // END OF SCRIPT
 // ===========================================

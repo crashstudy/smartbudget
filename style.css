@@ -856,3 +856,309 @@ h1,h2,h3,h4 { font-family: var(--font-head); line-height: 1.2; letter-spacing: -
     max-width: 70vw; /* Logo section screen ke 70% se zyada bada nahi hoga */
     overflow: hidden;
 }
+
+.wishlink-section {
+    background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+    border-top: 1px solid #dbeafe;
+    border-bottom: 1px solid #dbeafe;
+    padding: 64px 20px;
+    margin-top: 80px;
+}
+.wishlink-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+.wl-tag {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 50px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+}
+.wishlink-text { flex: 1; min-width: 280px; }
+.wishlink-text h2 { font-size: 1.8rem; margin-bottom: 12px; }
+.wishlink-text p  { color: #64748b; margin-bottom: 24px; }
+.wishlink-preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    flex-shrink: 0;
+}
+.wl-card {
+    background: white;
+    border: 1.5px solid #dbeafe;
+    border-radius: 14px;
+    padding: 18px 22px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(59,130,246,0.08);
+}
+@media(max-width: 768px) {
+    .wishlink-inner { flex-direction: column; }
+    .wishlink-preview { width: 100%; }
+}
+
+/* =========================================
+   TEXT PAGES & CONTACT FORM (New Pages)
+   ========================================= */
+.page-content {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.text-document h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.last-updated {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+.doc-body h2 {
+    font-size: 1.5rem;
+    margin: 30px 0 15px 0;
+}
+
+.doc-body p {
+    margin-bottom: 16px;
+    font-size: 1.05rem;
+    color: #334155;
+}
+
+/* Contact Form UI */
+.contact-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.contact-container {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.footer-logo-img {
+  
+  width: 100%;
+  max-width: 00px; /* Yeh image ki maximum width set karega */
+  height: auto;
+  display: block;
+
+}
+.bluetext {
+  color: var(--accent);
+  
+}
+
+/*----allposts.html ke liye */
+
+/* =========================================
+   ALL POSTS PAGE & SEARCH BAR
+   ========================================= */
+.blog-hub-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.blog-hub-header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.search-container {
+    max-width: 600px;
+    margin: 20px auto 0;
+    position: relative;
+}
+
+#blog-search {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    border: 2px solid #cbd5e1;
+    border-radius: 50px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+#blog-search:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+}
+
+/* Specific styling for blog cards */
+.blog-card .card-content {
+    padding: 20px;
+}
+
+.blog-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.highlight-link {
+    color: var(--accent-color) !important;
+    font-weight: 800 !important;
+}
+
+/* =========================================
+   VIRAL FINDS TILES (Loot Deals)
+   ========================================= */
+.viral-finds-section {
+    max-width: 1200px;
+    margin: 40px auto 20px;
+    padding: 0 15px;
+}
+
+.viral-grid {
+    display: grid;
+    /* Ye ek line me 3 tiles set karega, mobile par chote tiles dikhenge */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.viral-tile {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.viral-discount {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background: #ef4444; /* Bright Red */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 20px;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* Is naye code se purane wale ko replace kar do */
+.viral-tile img {
+  width: 100%;
+  /* Aspect ratio use karne se image humesha perfect shape mein rahegi */
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* Mobile screen par thoda aur compact dikhane ke liye */
+@media (max-width: 768px) {
+  .viral-tile img {
+    aspect-ratio: 1 / 1;
+    /* Mobile par perfect square */
+  }
+}
+
+.viral-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    flex-grow: 1; /* Name bada ho toh button adjust ho jayega */
+}
+
+/* Button & Platforms Animation Area */
+.viral-action {
+    min-height: 35px; 
+}
+
+.btn-viral-buy {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-viral-buy:hover {
+    background: #1d4ed8;
+}
+
+.viral-platforms {
+    display: none; /* Pehle chhupa rahega */
+    flex-direction: column;
+    gap: 5px;
+}
+
+.plat-btn {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    padding: 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: block;
+}
+
+.plat-btn.amazon { background: #f59e0b; }
+.plat-btn.flipkart { background: #2563eb; }
+.plat-btn.meesho { background: #ec4899; }
+
+/* Agar mobile ki screen bohot zyada choti ho (jaise iPhone SE), toh 2 tiles aayenge */
+@media (max-width: 380px) {
+    .viral-grid { grid-template-columns: repeat(2, 1fr); }
+}

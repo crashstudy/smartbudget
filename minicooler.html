@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Budget | Top Air Cooler Deals</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #059669; /* Smart budget green */
+            --primary-hover: #047857;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px; /* Replace with your actual logo size */
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        /* Main Post Banner */
+        .banner {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), #34d399);
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .banner h1 {
+            margin: 0 0 15px 0;
+            font-size: 2rem;
+        }
+
+        .banner .main-link-btn {
+            display: inline-block;
+            background-color: white;
+            color: var(--primary-color);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .banner .main-link-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Product Grid */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5%;
+            padding-bottom: 50px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .product-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            margin: 0 0 15px 0;
+            color: var(--text-main);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .buy-btn {
+            margin-top: auto;
+            display: block;
+            text-align: center;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .buy-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--card-bg);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                padding: 20px 0;
+                text-align: center;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+            }
+            
+            .banner h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <img src="logo.jpg" alt="Smart Budget Logo">
+                Smart Budget
+            </div>
+            <div class="hamburger" id="hamburger">&#9776;</div>
+            <nav class="nav-links" id="navLinks">
+                <a href="#">Home</a>
+                <a href="#deals">Today's Deals</a>
+                <a href="#">Categories</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="banner">
+        <h1>Summer Savings: Top Portable Air Coolers</h1>
+        <p>Check out the complete list of the best deals available right now.</p>
+        <a href="https://wishlink.com/bestdealwithme/post/6123345" target="_blank" class="main-link-btn">View Complete Wishlink Post</a>
+    </div>
+
+    <div class="container" id="deals">
+        <h2 class="section-title">Trending Mini Coolers</h2>
+        
+        <div class="product-grid">
+            
+            <div class="product-card">
+                <img src="https://m.media-amazon.com/images/I/41XSPcfIs8L._SY300_SX300_QL70_FMwebp_.jpg" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">LIVINH Mini Air Cooler Portable Personal Cooler Fan with 500ml Water Tank, 3 Speed Rapid Cooling</h3>
+                    <a href="https://www.wishlink.com/share/nsggtm" target="_blank" class="buy-btn">View Deal</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://images.meesho.com/images/products/946505027/xbckr_512.avif" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Portable Mini USB Air Cooler Fan with Water Cooling & Fragrance Feature</h3>
+                    <a href="https://www.wishlink.com/share/n86wwd" target="_blank" class="buy-btn">View Deal</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://images.meesho.com/images/products/864436578/7bygs_512.avif" alt="Mini Cooling Fan" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Mini Cooling Fan - Compact & Portable Design</h3>
+                    <a href="https://www.wishlink.com/share/n7cn9f" target="_blank" class="buy-btn">View Deal</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://via.placeholder.com/300x250/e2e8f0/64748b?text=LED+Air+Cooler" alt="LED Air Cooler" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Portable Mini Air Cooler Fan for Room | 7-Color LED Light, 3 Wind Speeds, 3 Spray Modes & Timer</h3>
+                    <a href="https://www.wishlink.com/share/nghrqx" target="_blank" class="buy-btn">View Deal</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://m.media-amazon.com/images/I/41uTCnrZmlL._SY300_SX300_QL70_FMwebp_.jpg" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Lipzie (10 Years Warranty) Rechargeable Portable Mini Air Cooler with High Speed Cooling</h3>
+                    <a href="https://www.wishlink.com/share/nb792x" target="_blank" class="buy-btn">View Deal</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', () => {
+            // Toggle the active class to show/hide the menu on mobile
+            navLinks.classList.toggle('active');
+            
+            // Change hamburger to an 'X' symbol when open, back to hamburger when closed
+            if (navLinks.classList.contains('active')) {
+                hamburger.innerHTML = '&#10005;'; // X symbol
+            } else {
+                hamburger.innerHTML = '&#9776;'; // Hamburger symbol
+            }
+        });
+    </script>
+
+</body>
+</html>
