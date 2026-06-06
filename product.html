@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | SmartBudget Store</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .product-detail-section {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+        .product-image-container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: sticky;
+            top: 100px; /* Scroll karne par image wahin rahegi */
+        }
+        .product-image-container img {
+            width: 100%;
+            border-radius: 12px;
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .product-info h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        .product-price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-dark);
+            margin-bottom: 20px;
+        }
+        .checkout-btn {
+            font-size: 1.1rem;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            display: block;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        /* Naya Section: Description, Specs & Reviews */
+        .details-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .details-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+        .details-box p {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .specs-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 0;
+        }
+        .specs-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            gap: 10px;
+        }
+        .specs-list li strong {
+            min-width: 120px;
+            color: var(--text);
+        }
+        
+        /* Reviews Section */
+        .review-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .review-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .review-stars { color: #f59e0b; margin-bottom: 5px; font-size: 1.1rem; }
+        .review-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 5px; display: block; }
+        .review-text { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+
+        @media (max-width: 768px) {
+            .product-detail-section { grid-template-columns: 1fr; gap: 30px; margin: 20px auto; }
+            .product-info h1 { font-size: 1.8rem; }
+            .product-image-container { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="logo-link">
+                <img src="logo.jpg" alt="Logo" class="nav-logo">
+                <span class="brand-text">SmartBudget<span class="brand-dot">.in</span></span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="store.html" style="color: var(--accent); font-weight: 800;">Store</a>
+                <a href="track.html">Track Order</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="product-detail-section">
+            
+            <!-- Left Column: Image -->
+            <div class="product-image-container">
+                <img id="prod-img" src="" alt="Product Image">
+            </div>
+            
+            <!-- Right Column: Details -->
+            <div class="product-info">
+                <span class="category-tag" style="background: #e0e7ff; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem;">Verified Deal</span>
+                <h1 id="prod-name">Loading...</h1>
+                <div class="product-price">₹<span id="prod-price">...</span></div>
+                
+                <a href="#" id="buy-btn" class="btn btn-primary checkout-btn">Proceed to Buy →</a>
+
+                <!-- Dynamic Description Box -->
+                <div class="details-box">
+                    <h3>📝 Description</h3>
+                    <p id="prod-desc">Loading description...</p>
+
+                    <h3>⚙️ Specifications</h3>
+                    <ul class="specs-list" id="prod-specs">
+                        <!-- Specs JS se aayenge -->
+                    </ul>
+                </div>
+
+                <!-- Dynamic Reviews Box -->
+                <div class="details-box">
+                    <h3>⭐ Customer Reviews</h3>
+                    <div id="prod-reviews">
+                        <!-- Reviews JS se aayenge -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            /* =========================================
+               1. PRODUCT DATABASE (JSON/Dictionary)
+               Yahan tum aage chal kar aur products add kar sakte ho unke ID ke hisaab se
+               ========================================= */
+            const productData = {
+                "M10-TWS": {
+                    description: "The M10 TWS Wireless Earbuds provide incredible HD sound quality with deep bass. It comes with a massive 2000mAh charging case that can also act as an emergency power bank for your smartphone. Features an LED digital display to show battery levels.",
+                    specs: {
+                        "Bluetooth": "Version 5.1",
+                        "Battery Life": "4-5 Hours (Continuous)",
+                        "Charging Case": "2000mAh",
+                        "Waterproof": "IPX7 Rated",
+                        "Mic": "Built-in HD Microphone"
+                    },
+                    reviews: [
+                        { name: "Rahul Sharma", rating: "⭐⭐⭐⭐⭐", text: "Bhai sound quality ekdum mast hai. Aur powerbank wala feature sach me kaam aata hai emergency me." },
+                        { name: "Amit Kumar", rating: "⭐⭐⭐⭐", text: "Good bass and clear vocals. Value for money under 400 rupees." }
+                    ]
+                },
+                "T800-SW": {
+                    description: "The T800 Ultra is the ultimate budget smartwatch featuring a massive 1.99-inch edge-to-edge HD display. It supports Bluetooth calling, so you can make and receive calls directly from your wrist. Comes with the iconic ocean loop strap.",
+                    specs: {
+                        "Display": "1.99 inch HD IPS",
+                        "Calling": "Bluetooth Calling Supported",
+                        "Health": "Heart Rate & SpO2 Monitor",
+                        "Strap": "Ocean Loop (Orange)",
+                        "Battery": "2-3 Days normal usage"
+                    },
+                    reviews: [
+                        { name: "Vikash Singh", rating: "⭐⭐⭐⭐⭐", text: "Looks exactly like the Apple Watch Ultra. Display is very bright even in sunlight." },
+                        { name: "Neha", rating: "⭐⭐⭐⭐", text: "Nice watch for daily use. Calling feature works perfectly." }
+                    ]
+                },
+                "SLING-BAG": {
+                    description: "Premium Men's Crossbody Sling Bag made with high-quality splash-proof material. Perfect for carrying your phone, power bank, wallet, and sunglasses securely while traveling or riding a bike.",
+                    specs: {
+                        "Material": "High-density Oxford Cloth",
+                        "Type": "Crossbody / Sling",
+                        "Compartments": "3 Zip Pockets",
+                        "Waterproof": "Splash-resistant",
+                        "Strap": "Adjustable & Comfortable"
+                    },
+                    reviews: [
+                        { name: "Suresh P.", rating: "⭐⭐⭐⭐⭐", text: "Quality is premium. Zips are very smooth. Perfect for bike riders." }
+                    ]
+                },
+                // Default data agar koi naya product ho jiska data upar na ho
+                "DEFAULT": {
+                    description: "High-quality premium product sourced directly from trusted manufacturers. We ensure 100% quality check before shipping.",
+                    specs: {
+                        "Quality": "Premium Grade",
+                        "Warranty": "7 Days Replacement",
+                        "Delivery": "Free Shipping Available"
+                    },
+                    reviews: [
+                        { name: "Verified Buyer", rating: "⭐⭐⭐⭐⭐", text: "Great product, highly recommended!" }
+                    ]
+                }
+            };
+
+            /* =========================================
+               2. URL SE DATA NIKALNA AUR RENDER KARNA
+               ========================================= */
+            const urlParams = new URLSearchParams(window.location.search);
+            const prodId = urlParams.get('id');
+            const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
+            const prodPrice = urlParams.get('price') || "0";
+            const prodImg = urlParams.get('img') || "logo.jpg";
+
+            // Redirect if no ID
+            if(!prodId) window.location.href = 'store.html';
+
+            // Set Basic Info
+            document.getElementById('prod-name').innerText = prodName;
+            document.getElementById('prod-price').innerText = prodPrice;
+            document.getElementById('prod-img').src = prodImg;
+
+            // Set Checkout Link
+            const checkoutUrl = `checkout.html?id=${prodId}&name=${encodeURIComponent(prodName)}&price=${prodPrice}`;
+            document.getElementById('buy-btn').href = checkoutUrl;
+
+            // Fetch Detailed Data from Dictionary
+            const data = productData[prodId] || productData["DEFAULT"];
+
+            // Render Description
+            document.getElementById('prod-desc').innerText = data.description;
+
+            // Render Specs
+            const specsContainer = document.getElementById('prod-specs');
+            specsContainer.innerHTML = "";
+            for (const [key, value] of Object.entries(data.specs)) {
+                specsContainer.innerHTML += `<li><strong>${key}:</strong> <span>${value}</span></li>`;
+            }
+
+            // Render Reviews
+            const reviewsContainer = document.getElementById('prod-reviews');
+            reviewsContainer.innerHTML = "";
+            data.reviews.forEach(review => {
+                reviewsContainer.innerHTML += `
+                    <div class="review-item">
+                        <div class="review-stars">${review.rating}</div>
+                        <span class="review-name">${review.name}</span>
+                        <p class="review-text">${review.text}</p>
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
