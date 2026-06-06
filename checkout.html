@@ -496,7 +496,7 @@
                                     <p><strong>📱 How to Pay via UPI:</strong></p>
                                     <p>1️⃣ Click "Pay Now" button below</p>
                                     <p>2️⃣ Complete payment in your UPI app</p>
-                                    <p>3️⃣ Copy the UTR number and paste it back here</p>
+                                    <p>3️⃣ Copy the UPI Transaction Id (UTR) and paste it back here</p>
                                     <p>💡 <strong>Your ₹25 discount will be automatically applied!</strong></p>
                                 </div>
                             </div>
@@ -595,7 +595,8 @@
             const prodPrice = parseInt(urlParams.get('price') || "0");
 
             // Resume section ALWAYS visible - don't hide it
-            if (!prodId) { window.location.href = 'store.html'; return; }
+            if (!prodId && !urlParams.get('resumeOrder')) { window.location.href = 'store.html'; return; }
+
 
             document.getElementById('summ-name').innerText = prodName;
             document.getElementById('summ-price').innerText = `₹${prodPrice}`;
@@ -773,7 +774,7 @@
                     const order = data[0];
                     
                     // Only allow resume for Awaiting Payment or Payment Under Review
-                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
+                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review' && order.status !== 'Payment Rejected') {
                         alert("❌ This order is already processed. You cannot resume it.");
                         return;
                     }
@@ -840,7 +841,7 @@
 
                     const order = data[0];
                     
-                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
+                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review' && order.status !== 'Payment Rejected') {
                         alert("❌ This order is already processed or delivered.\n\nYou cannot resume it.");
                         this.disabled = false;
                         this.innerHTML = originalText;
