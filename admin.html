@@ -646,7 +646,7 @@
         window.deleteOrder = deleteOrder;
 
         function openPaymentReview(orderId) {
-            reviewingOrder = allOrders.find(o => o.id === orderId);
+            reviewingOrder = allOrders.find(o => o.id == orderId);
             if (!reviewingOrder) {
                 alert("❌ Order not found!");
                 return;
@@ -809,7 +809,7 @@
 
         // Initial Load
         fetchOrders();
-        setInterval(fetchOrders, 5000); // Refresh every 5 seconds
+        setInterval(fetchOrders, 30000); // Refresh every 30 seconds
     </script>
 </body>
 </html>
