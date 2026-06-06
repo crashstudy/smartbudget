@@ -8,70 +8,407 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .track-section {
-            max-width: 600px;
+            max-width: 700px;
             margin: 60px auto;
             padding: 40px 20px;
             background: #fff;
             border-radius: 16px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             text-align: center;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
         }
-        .track-section h1 { color: var(--primary); margin-bottom: 15px; }
+
+        .track-section h1 { 
+            color: var(--primary); 
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .track-section p {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
         .track-input-group {
             display: flex;
             gap: 10px;
-            margin-top: 30px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
+
         .track-input-group input {
             flex: 1;
+            min-width: 200px;
             padding: 14px;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             outline: none;
-            transition: border-color 0.2s;
-        }
-        .track-input-group input:focus { border-color: var(--accent); }
-        .btn-track {
-            padding: 0 25px;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            transition: all 0.3s;
+            font-weight: 500;
         }
 
+        .track-input-group input:focus { 
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn-track {
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        /* Status & Results */
         #result-box {
             display: none;
             margin-top: 30px;
-            padding: 25px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fafc 0%, #ecf0f5 100%);
+            border: 2px solid #e2e8f0;
             border-radius: 12px;
             text-align: left;
+            animation: slideDown 0.3s ease-out;
         }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status Badge with Color Coding */
         .status-badge {
             display: inline-block;
-            background: #ecfdf5;
-            color: #10b981;
-            padding: 6px 15px;
+            padding: 10px 20px;
             border-radius: 50px;
             font-weight: 800;
             font-size: 1rem;
-            margin-bottom: 15px;
-            border: 1px solid #a7f3d0;
+            margin-bottom: 25px;
+            border: 2px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse 2s ease-in-out infinite;
         }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .status-badge.received {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #3b82f6;
+        }
+
+        .status-badge.processed {
+            background: #e0e7ff;
+            color: #3730a3;
+            border-color: #6366f1;
+        }
+
+        .status-badge.shipped {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .status-badge.delivery {
+            background: #fed7aa;
+            color: #9a3412;
+            border-color: #f97316;
+        }
+
+        .status-badge.delivered {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .status-badge.awaiting {
+            background: #fef08a;
+            color: #854d0e;
+            border-color: #eab308;
+        }
+
+        .status-badge.review {
+            background: #fed7aa;
+            color: #7c2d12;
+            border-color: #ea580c;
+        }
+
+        .status-badge.approved {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #22c55e;
+        }
+
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        /* Timeline Progress */
+        .timeline-progress {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #cbd5e1;
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background: #10b981;
+            box-shadow: 0 0 0 2px #d1fae5;
+        }
+
+        .timeline-item.current .timeline-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px #fef3c7;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .timeline-text {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .timeline-item.completed .timeline-text {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .timeline-item.current .timeline-text {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+
+        /* Detail Rows */
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px dashed #cbd5e1;
             font-size: 0.95rem;
         }
+
         .detail-row:last-child { border-bottom: none; }
-        
+
+        .detail-row span:first-child {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .detail-row strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Payment & UTR Section */
+        .payment-section {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #93c5fd;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .payment-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .payment-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .payment-badge.cod {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .payment-badge.upi {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .utr-display {
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+            color: #1e40af;
+            border: 2px solid #93c5fd;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        .utr-display.empty {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: normal;
+            letter-spacing: normal;
+        }
+
+        .payment-note {
+            font-size: 0.85rem;
+            color: #1e40af;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Loading & Error States */
+        #loading {
+            display: none; 
+            color: var(--accent); 
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #cbd5e1;
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #error-msg {
+            display: none; 
+            color: #ef4444; 
+            margin-top: 20px; 
+            font-weight: 700;
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn-action {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-action.primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-action.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-action.secondary {
+            background: #f1f5f9;
+            color: var(--primary);
+            border: 2px solid #cbd5e1;
+        }
+
+        .btn-action.secondary:hover {
+            border-color: var(--accent);
+            background: #eff6ff;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .track-input-group { flex-direction: column; }
-            .btn-track { padding: 14px; }
+            .track-section {
+                padding: 25px 15px;
+                margin: 40px auto;
+            }
+            .track-section h1 {
+                font-size: 1.5rem;
+            }
+            .track-input-group {
+                flex-direction: column;
+            }
+            .track-input-group input {
+                min-width: unset;
+            }
+            .btn-track {
+                width: 100%;
+            }
+            .detail-row {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn-action {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -92,22 +429,80 @@
     <main>
         <div class="track-section">
             <h1>📦 Track Your Order</h1>
-            <p style="color: var(--muted);">Enter your Order ID (e.g., SB-123456) to check the current delivery status.</p>
+            <p>Enter your Order ID (e.g., <strong>SB-123456</strong>) to check the current delivery status.</p>
             
             <form id="trackForm" class="track-input-group">
-                <input type="text" id="orderIdInput" required placeholder="Enter Order ID" autocomplete="off">
-                <button type="submit" class="btn btn-primary btn-track" id="trackBtn">Track</button>
+                <input type="text" id="orderIdInput" required placeholder="Enter Order ID" autocomplete="off" spellcheck="false">
+                <button type="submit" class="btn btn-primary btn-track" id="trackBtn">🔍 Track</button>
             </form>
 
-            <div id="loading" style="display: none; color: var(--accent); font-weight: bold; margin-top: 20px;">Fetching details...</div>
-            <div id="error-msg" style="display: none; color: red; margin-top: 20px; font-weight: bold;"></div>
+            <div id="loading" style="display: none;">
+                <span class="loading-spinner"></span>
+                <span>Fetching order details...</span>
+            </div>
+            
+            <div id="error-msg"></div>
 
+            <!-- Result Box -->
             <div id="result-box">
-                <div class="status-badge" id="res-status">...</div>
-                <div class="detail-row"><span style="color: var(--muted);">Product:</span><strong id="res-product">...</strong></div>
-                <div class="detail-row"><span style="color: var(--muted);">Customer Name:</span><strong id="res-name">...</strong></div>
-                <div class="detail-row"><span style="color: var(--muted);">Total Amount:</span><strong id="res-price">...</strong></div>
-                <div class="detail-row"><span style="color: var(--muted);">Order Date:</span><strong id="res-date">...</strong></div>
+                <!-- Status Badge -->
+                <div style="text-align: center;">
+                    <div class="status-badge" id="res-status">...</div>
+                </div>
+
+                <!-- Main Order Details -->
+                <div class="detail-row">
+                    <span>📦 Product:</span>
+                    <strong id="res-product">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span>👤 Customer:</span>
+                    <strong id="res-name">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span>💰 Amount:</span>
+                    <strong id="res-price">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span>📅 Order Date:</span>
+                    <strong id="res-date">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span>📍 Location:</span>
+                    <div>
+                        <strong id="res-address">...</strong>
+                        <br>
+                        <span style="font-size: 0.9rem; color: #94a3b8;" id="res-pincode">PIN: ...</span>
+                    </div>
+                </div>
+
+                <!-- Payment Section -->
+                <div class="payment-section" id="payment-section">
+                    <h3>💳 Payment Information</h3>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span class="payment-badge" id="res-payment-method">...</span>
+                        <span id="res-payment-status" style="font-size: 0.9rem; color: #1e40af; font-weight: 600;"></span>
+                    </div>
+                    
+                    <!-- UTR Display (Only for Prepaid) -->
+                    <div id="utr-section" style="display: none; margin-top: 15px;">
+                        <p style="color: #1e40af; font-size: 0.9rem; margin-bottom: 8px;">📝 <strong>UTR Number:</strong></p>
+                        <div class="utr-display" id="res-utr-number">—</div>
+                        <div class="payment-note" id="payment-note">⏳ Your payment is under review. We'll verify it within 1-2 hours.</div>
+                    </div>
+                </div>
+
+                <!-- Timeline Progress -->
+                <div class="timeline-progress" id="timeline-section" style="display: none;">
+                    <h3 style="text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 1rem;">📍 Delivery Timeline</h3>
+                    <div id="timeline-container"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-action secondary" onclick="location.reload()">🔄 Refresh Status</button>
+                    <a href="store.html" class="btn-action secondary">🏪 Continue Shopping</a>
+                </div>
             </div>
         </div>
     </main>
@@ -116,6 +511,61 @@
         const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
         const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const statusFlows = {
+            'Cash on Delivery': [
+                { status: 'Order Received', label: 'Order Confirmed' },
+                { status: 'Order Processed', label: 'Processing' },
+                { status: 'Shipped', label: 'Shipped' },
+                { status: 'Out for Delivery', label: 'Out for Delivery' },
+                { status: 'Delivered', label: 'Delivered' }
+            ],
+            'Prepaid UPI': [
+                { status: 'Awaiting Payment', label: 'Awaiting Payment' },
+                { status: 'Payment Under Review', label: 'Payment Review' },
+                { status: 'Payment Approved', label: 'Payment Confirmed' },
+                { status: 'Order Received', label: 'Order Confirmed' },
+                { status: 'Order Processed', label: 'Processing' },
+                { status: 'Shipped', label: 'Shipped' },
+                { status: 'Out for Delivery', label: 'Out for Delivery' },
+                { status: 'Delivered', label: 'Delivered' }
+            ]
+        };
+
+        function getStatusClass(statusValue) {
+            const classes = {
+                'Order Received': 'received',
+                'Order Processed': 'processed',
+                'Shipped': 'shipped',
+                'Out for Delivery': 'delivery',
+                'Delivered': 'delivered',
+                'Awaiting Payment': 'awaiting',
+                'Payment Under Review': 'review',
+                'Payment Approved': 'approved',
+                'Payment Rejected': 'rejected'
+            };
+            return classes[statusValue] || 'received';
+        }
+
+        function renderTimeline(paymentMethod, currentStatus) {
+            const flow = statusFlows[paymentMethod] || statusFlows['Cash on Delivery'];
+            const container = document.getElementById('timeline-container');
+            
+            container.innerHTML = flow.map((item, index) => {
+                const isCompleted = flow.slice(0, index + 1).some(s => s.status === currentStatus);
+                const isCurrent = item.status === currentStatus;
+                const className = isCurrent ? 'current' : isCompleted ? 'completed' : '';
+                
+                return `
+                    <div class="timeline-item ${className}">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-text">${item.label}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('timeline-section').style.display = 'block';
+        }
 
         document.getElementById('trackForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -138,29 +588,90 @@
                 trackBtn.disabled = false;
 
                 if (error) {
-                    document.getElementById('error-msg').innerText = "Supabase Error: " + error.message;
+                    document.getElementById('error-msg').innerText = "❌ Database Error: " + error.message;
                     document.getElementById('error-msg').style.display = 'block';
                     return;
                 }
 
                 if (!data || data.length === 0) {
-                    document.getElementById('error-msg').innerText = "Order not found! Please check your ID.";
+                    document.getElementById('error-msg').innerText = "❌ Order not found! Please check your Order ID and try again.";
                     document.getElementById('error-msg').style.display = 'block';
                     return;
                 }
 
                 const orderData = data[0];
+                const statusClass = getStatusClass(orderData.status);
+
+                // Populate basic details
+                document.getElementById('res-status').className = `status-badge ${statusClass}`;
                 document.getElementById('res-status').innerText = orderData.status;
                 document.getElementById('res-product').innerText = orderData.product_name;
                 document.getElementById('res-name').innerText = orderData.customer_name;
                 document.getElementById('res-price').innerText = `₹${orderData.price}`;
-                document.getElementById('res-date').innerText = new Date(orderData.created_at).toLocaleDateString('en-IN');
+                document.getElementById('res-date').innerText = new Date(orderData.created_at).toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('res-address').innerText = orderData.address;
+                document.getElementById('res-pincode').innerText = `PIN: ${orderData.pincode}`;
+
+                // Payment Info
+                const paymentMethod = orderData.payment_method || 'Cash on Delivery';
+                const isUPI = paymentMethod === 'Prepaid UPI';
+                
+                document.getElementById('res-payment-method').className = `payment-badge ${isUPI ? 'upi' : 'cod'}`;
+                document.getElementById('res-payment-method').innerText = isUPI ? '💳 Prepaid UPI' : '🚚 Cash on Delivery';
+
+                // Payment Status for UPI
+                if (isUPI) {
+                    document.getElementById('utr-section').style.display = 'block';
+                    
+                    if (orderData.utr_number) {
+                        document.getElementById('res-utr-number').className = 'utr-display';
+                        document.getElementById('res-utr-number').innerText = orderData.utr_number;
+                    } else {
+                        document.getElementById('res-utr-number').className = 'utr-display empty';
+                        document.getElementById('res-utr-number').innerText = 'Awaiting UTR submission';
+                    }
+
+                    // Update payment note based on status
+                    const noteEl = document.getElementById('payment-note');
+                    if (orderData.status === 'Payment Approved') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#10b981';
+                        noteEl.style.color = '#047857';
+                        noteEl.innerHTML = '✅ Payment verified! Your order is confirmed.';
+                    } else if (orderData.status === 'Payment Rejected') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#ef4444';
+                        noteEl.style.color = '#991b1b';
+                        noteEl.innerHTML = '❌ Payment rejected. <a href="checkout.html?resumeOrder=' + orderId + '" style="color: inherit; font-weight: 700;">Click here to resubmit payment</a>';
+                    } else if (orderData.status === 'Payment Under Review') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#f59e0b';
+                        noteEl.style.color = '#92400e';
+                        noteEl.innerHTML = '⏳ Payment under review. We\'ll verify within 1-2 hours. <br><small><a href="checkout.html?resumeOrder=' + orderId + '" style="color: inherit; font-weight: 700;">Resume if you need to resubmit UTR</a></small>';
+                    } else if (orderData.status === 'Awaiting Payment') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#f59e0b';
+                        noteEl.style.color = '#92400e';
+                        noteEl.innerHTML = '⏳ Waiting for your payment. <a href="checkout.html?resumeOrder=' + orderId + '" style="color: inherit; font-weight: 700;">Click here to complete payment</a>';
+                    }
+                } else {
+                    document.getElementById('utr-section').style.display = 'none';
+                }
+
+                // Render Timeline
+                renderTimeline(paymentMethod, orderData.status);
+
                 document.getElementById('result-box').style.display = 'block';
 
             } catch (err) {
                 document.getElementById('loading').style.display = 'none';
                 trackBtn.disabled = false;
-                document.getElementById('error-msg').innerText = "System Crash: " + err.message;
+                document.getElementById('error-msg').innerText = "❌ System Error: " + err.message;
                 document.getElementById('error-msg').style.display = 'block';
             }
         });

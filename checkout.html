@@ -5,27 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout | SmartBudget Store</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .checkout-section {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 40px auto;
             padding: 0 20px;
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
+            grid-template-columns: 1fr 1.3fr;
             gap: 30px;
         }
 
         /* Order Summary Card */
         .order-summary {
-            background: #f8fafc;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2f5 100%);
             padding: 30px;
             border-radius: 16px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        .order-summary h3 { margin-bottom: 20px; color: var(--primary); }
+
+        .order-summary h3 { 
+            margin-bottom: 20px; 
+            color: var(--primary);
+            font-size: 1.2rem;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 15px;
+        }
+
         .summary-item {
             display: flex;
             justify-content: space-between;
@@ -33,24 +43,62 @@
             padding-bottom: 15px;
             border-bottom: 1px dashed #cbd5e1;
         }
+
+        .summary-item:last-child { border-bottom: none; }
+
         .summary-total {
             display: flex;
             justify-content: space-between;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: var(--primary);
-            margin-top: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--accent);
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+            padding: 15px;
+            border-radius: 8px;
         }
 
-        /* Form Styling */
+        .discount-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Checkout Form Box */
         .checkout-form-box {
             background: #fff;
             padding: 30px;
             border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        .form-group { margin-bottom: 20px; }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .form-section:last-child { border-bottom: none; }
+
+        .form-section h2 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -58,27 +106,202 @@
             font-size: 0.9rem;
             color: var(--primary);
         }
-        .form-group input, .form-group textarea {
+
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #cbd5e1;
+            border: 2px solid #cbd5e1;
             border-radius: 8px;
             font-family: inherit;
             font-size: 1rem;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
+            background: #fff;
         }
-        .form-group input:focus, .form-group textarea:focus {
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
-        
-        .btn-place-order {
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Payment Options */
+        .payment-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payment-option {
+            padding: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: #fff;
+        }
+
+        .payment-option:hover {
+            border-color: var(--accent);
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+
+        .payment-option.active {
+            border-color: var(--accent);
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .payment-option-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .payment-option-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .payment-option-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .payment-option.active .payment-option-desc {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* UPI Payment Section */
+        .upi-payment-section {
+            display: none;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #93c5fd;
+            margin-bottom: 20px;
+        }
+
+        .upi-payment-section.active {
+            display: block;
+        }
+
+        .upi-instructions {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .upi-instructions p {
+            margin: 10px 0;
+            font-size: 0.95rem;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+
+        .upi-link-btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .upi-link-btn:hover {
+            background: #1d4ed8;
+            transform: scale(1.05);
+        }
+
+        #utr-submission-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed #93c5fd;
+        }
+
+        #utr-submission-box h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .utr-input {
             width: 100%;
             padding: 14px;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            text-align: center;
+            border: 2px solid #93c5fd;
             border-radius: 8px;
-            margin-top: 10px;
+            margin: 15px 0;
+            letter-spacing: 2px;
+            font-weight: 700;
+            background: #f0f9ff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .utr-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #fff;
+        }
+
+        /* Action Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-place-order, .btn-cod {
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-place-order {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-place-order:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-cod {
+            background: #1f2937;
+            color: white;
+        }
+
+        .btn-cod:hover:not(:disabled) {
+            background: #111827;
+            transform: translateY(-2px);
+        }
+
+        .btn-place-order:disabled, .btn-cod:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         /* Success Screen */
@@ -86,29 +309,84 @@
             display: none;
             text-align: center;
             padding: 60px 20px;
-            background: #fff;
+            background: linear-gradient(135deg, #f8fafc 0%, #ecf0f5 100%);
             border-radius: 16px;
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             max-width: 600px;
             margin: 40px auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
-        .success-icon { font-size: 4rem; margin-bottom: 20px; }
+
+        .success-icon { 
+            font-size: 4rem; 
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .success-screen h2 {
+            color: #10b981;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
         .order-id-box {
-            background: #f1f5f9;
-            padding: 15px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            padding: 20px;
             border-radius: 8px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: 2px;
-            color: var(--accent-dark);
-            margin: 20px 0;
+            color: var(--accent);
+            margin: 25px 0;
             display: inline-block;
+            border: 2px solid var(--accent);
+            font-family: 'Courier New', monospace;
+        }
+
+        .success-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* Loading & Status Indicators */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #cbd5e1;
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .checkout-section { grid-template-columns: 1fr; }
+            .order-summary { order: 2; position: relative; top: auto; }
+            .checkout-form-box { order: 1; }
+            .payment-options { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
-            .checkout-section { grid-template-columns: 1fr; }
-            .order-summary { order: 2; }
-            .checkout-form-box { order: 1; }
+            .checkout-section { gap: 20px; }
+            .checkout-form-box, .order-summary { padding: 20px; }
+            .form-section h2 { font-size: 1rem; }
+            .button-group { grid-template-columns: 1fr; }
+            .success-buttons { flex-direction: column; }
+            .success-buttons a { width: 100%; }
         }
     </style>
 </head>
@@ -116,160 +394,468 @@
 
     <header class="site-header">
         <div class="nav-container">
-            <a href="index.html" class="logo-link">
-                <img src="logo.jpg" alt="Logo" class="nav-logo">
-                <span class="brand-text">SmartBudget<span class="brand-dot">.in</span></span>
-            </a>
-            <nav class="nav-links">
-                <a href="store.html" style="color: var(--accent); font-weight: 800;">← Back to Store</a>
-            </nav>
+            <a href="index.html" class="logo-link"><img src="logo.jpg" alt="Logo" class="nav-logo"><span class="brand-text">SmartBudget<span class="brand-dot">.in</span></span></a>
+            <nav class="nav-links"><a href="store.html" style="color: var(--accent); font-weight: 800;">← Back to Store</a></nav>
         </div>
     </header>
 
     <main id="main-checkout">
+        <!-- Resume Payment Section (Hidden Initially) -->
+        <div id="resume-payment-section" style="display: none; max-width: 900px; margin: 30px auto; padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; border-left: 4px solid #f59e0b;">
+            <h3 style="color: #92400e; margin-bottom: 15px;">⏳ Resume Your Payment</h3>
+            <p style="color: #b45309; margin-bottom: 15px;">Looks like you didn't complete your payment last time. Enter your Order ID to continue:</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="resumeOrderId" placeholder="Enter Order ID (e.g., SB-123456)" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 1rem;">
+                <button type="button" id="resumePaymentBtn" style="padding: 12px 30px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Resume Payment</button>
+            </div>
+        </div>
+
         <div class="checkout-section">
             
-            <div class="checkout-form-box">
-                <h2 style="margin-bottom: 25px; color: var(--primary);">📍 Shipping Details</h2>
-                <form id="orderForm">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="custName" required placeholder="Enter your full name">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number (10 Digits)</label>
-                        <input type="tel" id="custPhone" required pattern="[0-9]{10}" placeholder="e.g. 9876543210">
-                    </div>
-                    <div class="form-group">
-                        <label>Complete Delivery Address</label>
-                        <textarea id="custAddress" required rows="3" placeholder="House no, Street, Area, City, State"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>PIN Code</label>
-                        <input type="text" id="custPin" required pattern="[0-9]{6}" placeholder="e.g. 110001">
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-place-order" id="submitBtn">Place Order (Cash on Delivery)</button>
-                </form>
-            </div>
-
+            <!-- Order Summary (Right Side) -->
             <div class="order-summary">
-                <h3>🛒 Order Summary</h3>
+                <h3>📦 Order Summary</h3>
                 <div class="summary-item">
-                    <span id="summ-name" style="font-weight: 600;">Loading...</span>
-                    <span id="summ-price" style="font-weight: 600;">₹0</span>
+                    <span style="font-weight: 600;">Product:</span>
+                    <strong style="color: var(--accent);" id="summ-name">Loading...</strong>
                 </div>
                 <div class="summary-item">
-                    <span>Delivery Charges</span>
-                    <span style="color: #10b981; font-weight: 700;">FREE</span>
+                    <span>Price:</span>
+                    <span style="font-weight: 600;" id="summ-price">₹0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Delivery</span>
+                    <span style="color: #10b981; font-weight: 700;">FREE 🚚</span>
+                </div>
+                <div class="summary-item" id="discount-row" style="display: none;">
+                    <span>Prepaid Discount</span>
+                    <span style="color: #10b981; font-weight: 700;">- ₹25</span>
                 </div>
                 <div class="summary-total">
-                    <span>Total Amount</span>
+                    <span>Total</span>
                     <span id="summ-total">₹0</span>
                 </div>
-                <p style="font-size: 0.8rem; color: var(--muted); margin-top: 20px; text-align: center;">
-                    🔒 100% Secure Checkout. Pay via Cash or UPI on delivery.
-                </p>
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 20px; text-align: center;">🔒 100% Secure & Verified Checkout</p>
             </div>
 
+            <!-- Checkout Form (Left Side) -->
+            <div class="checkout-form-box">
+                
+                <!-- Shipping Details -->
+                <div id="shipping-details-box">
+                    <form id="orderForm">
+                        <div class="form-section">
+                            <h2>📍 Shipping Details</h2>
+                            
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="custName" required placeholder="Enter your full name">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Phone Number (10 Digits) *</label>
+                                    <input type="tel" id="custPhone" required pattern="[0-9]{10}" placeholder="98765 43210" maxlength="10">
+                                </div>
+                                <div class="form-group">
+                                    <label>PIN Code (6 Digits) *</label>
+                                    <input type="text" id="custPin" required pattern="[0-9]{6}" placeholder="110001" maxlength="6">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Complete Delivery Address *</label>
+                                <textarea id="custAddress" required rows="3" placeholder="House no, Street, Area, City, State"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Selection -->
+                        <div class="form-section">
+                            <h2>💳 Payment Method</h2>
+                            
+                            <div class="payment-options">
+                                <div class="payment-option active" data-method="upi" onclick="selectPaymentMethod('upi')">
+                                    <div class="payment-option-icon">💰</div>
+                                    <div class="payment-option-title">Prepaid UPI</div>
+                                    <div class="payment-option-desc">Save ₹25!</div>
+                                </div>
+                                <div class="payment-option" data-method="cod" onclick="selectPaymentMethod('cod')">
+                                    <div class="payment-option-icon">🚚</div>
+                                    <div class="payment-option-title">Cash on Delivery</div>
+                                    <div class="payment-option-desc">Pay on delivery</div>
+                                </div>
+                            </div>
+
+                            <!-- UPI Payment Details -->
+                            <div id="upi-payment-section" class="upi-payment-section active">
+                                <div class="upi-instructions">
+                                    <p><strong>📱 How to Pay via UPI:</strong></p>
+                                    <p>1️⃣ Click "Pay Now" button below</p>
+                                    <p>2️⃣ Complete payment in your UPI app</p>
+                                    <p>3️⃣ Copy the UTR number and paste it back here</p>
+                                    <p>💡 <strong>Your ₹25 discount will be automatically applied!</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Action Buttons -->
+                    <div id="action-buttons-section" class="button-group">
+                        <button class="btn-place-order" id="upiPayBtn" style="grid-column: 1 / -1;">
+                            💳 Pay Now & Save ₹25
+                        </button>
+                        <button class="btn-cod" id="codBtn">
+                            🚚 Cash on Delivery
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Confirmation Box (Hidden Initially) -->
+                <div id="payment-confirmation-box" style="display: none;">
+                    <div class="form-section">
+                        <h2>✅ Payment Confirmation</h2>
+                        
+                        <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 20px;">
+                            <p style="color: #065f46; font-weight: 700; margin-bottom: 10px;">Order Created Successfully! 🎉</p>
+                            <p style="color: #047857; margin: 5px 0;"><strong>Order ID:</strong> <span id="upi-order-id" style="font-family: monospace; letter-spacing: 1px;">...</span></p>
+                            <p style="color: #047857; margin: 5px 0;"><strong>Amount to Pay:</strong> ₹<span id="upi-amount">0</span></p>
+                        </div>
+
+                        <!-- UPI Link Button -->
+                        <a id="upi-payment-link" class="upi-link-btn">📱 Open UPI App & Pay Now</a>
+
+                        <!-- UTR Submission -->
+                        <div id="utr-submission-box">
+                            <h3>📝 Confirm Your Payment</h3>
+                            <p style="color: #1e3a8a; margin-bottom: 15px;">Paste the UTR (Transaction Reference) number here:</p>
+                            
+                            <form id="utrForm">
+                                <div class="form-group">
+                                    <input type="text" id="utrInput" class="utr-input" placeholder="E.g. 123456789012" required>
+                                </div>
+                                
+                                <button type="submit" class="btn-place-order" id="confirmUtrBtn" style="width: 100%; margin-top: 0;">
+                                    ✅ Confirm Payment
+                                </button>
+                                
+                                <button type="button" class="btn-cod" id="cancelUpiBtn" style="width: 100%; margin-top: 10px;">
+                                    ❌ Cancel & Try Again
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
+    <!-- Success Screen -->
     <div id="success-screen">
         <div class="success-icon">✅</div>
-        <h2 style="color: #10b981; margin-bottom: 10px;">Order Placed Successfully!</h2>
-        <p>Thank you for shopping with SmartBudget. Your order has been received.</p>
-        
-        <p style="margin-top: 20px; font-weight: 600;">Please save your Order Tracking ID:</p>
+        <h2>Order Placed Successfully!</h2>
+        <p style="color: #475569; font-size: 1rem; margin-bottom: 20px;">Thank you for shopping with us. Your order details have been received.</p>
+        <p style="font-weight: 600; color: #1e293b;">Your Order Tracking ID is:</p>
         <div class="order-id-box" id="display-order-id">SB-XXXXXX</div>
-        
-        <p style="margin-bottom: 30px; font-size: 0.9rem; color: var(--muted);">We will deliver your product within 5-7 working days.</p>
-        
-        <a href="track.html" class="btn btn-primary">Track Your Order</a>
-        <a href="store.html" class="btn btn-ghost" style="margin-left: 10px;">Continue Shopping</a>
+        <p style="color: #64748b; font-size: 0.95rem; max-width: 400px; margin-left: auto; margin-right: auto; margin-bottom: 30px;">
+            🕐 For prepaid orders, we will verify your payment and confirm your order within 1-2 hours. You'll receive an update notification.
+        </p>
+        <div class="success-buttons">
+            <a href="track.html" class="btn btn-primary" style="text-decoration: none; padding: 12px 30px; border-radius: 8px; display: inline-block;">📦 Track Your Order</a>
+            <a href="store.html" class="btn btn-ghost" style="text-decoration: none; padding: 12px 30px; border-radius: 8px; display: inline-block; background: #f1f5f9; color: var(--primary);">🏪 Continue Shopping</a>
+        </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             
-            // 1. DATA NIKALNA AUR UI UPDATE KARNA (Sabse Pehle)
+            // Configuration
+            const YOUR_UPI_ID = "satyamkumar.pawna.108@oksbi";
+            const YOUR_NAME = "Satyam Kumar";
+            const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+
+            let generatedOrderId = null;
+            let selectedPaymentMethod = 'upi';
+
+            // UI Elements
+            const mainCheckout = document.getElementById('main-checkout');
+            const successScreen = document.getElementById('success-screen');
+            const shippingDetailsBox = document.getElementById('shipping-details-box');
+            const paymentConfirmationBox = document.getElementById('payment-confirmation-box');
+            
+            // URL Parameters
             const urlParams = new URLSearchParams(window.location.search);
             const prodId = urlParams.get('id');
             const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
-            const prodPrice = urlParams.get('price') || "0";
+            const prodPrice = parseInt(urlParams.get('price') || "0");
 
-            // Agar directly is page par aaya hai toh wapas bhej do
-            if (!prodId) {
-                window.location.href = 'store.html';
-                return; 
-            }
+            if (!prodId) { window.location.href = 'store.html'; return; }
 
-            // UI Turant Update Karo
             document.getElementById('summ-name').innerText = prodName;
             document.getElementById('summ-price').innerText = `₹${prodPrice}`;
             document.getElementById('summ-total').innerText = `₹${prodPrice}`;
 
-            // 2. SUPABASE DATABASE INITIALIZE (Safely)
             let dbClient = null;
             try {
-                if (typeof supabase !== 'undefined') {
-                    const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
-                    const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
-                    dbClient = supabase.createClient(supabaseUrl, supabaseKey);
-                } else {
-                    console.error("Supabase load nahi hua. Check ad-blockers or internet.");
-                }
+                dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             } catch (err) {
-                console.error("Connection Error: ", err);
+                console.error("Supabase Error: ", err);
+                alert("Critical error: Database connection failed. Please refresh.");
             }
 
-            // 3. FORM SUBMISSION
-            document.getElementById('orderForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
+            // Helper Functions
+            const isFormValid = () => document.getElementById('orderForm').reportValidity();
+
+            window.selectPaymentMethod = function(method) {
+                selectedPaymentMethod = method;
+                document.querySelectorAll('.payment-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                document.querySelector(`[data-method="${method}"]`).classList.add('active');
                 
-                if (!dbClient) {
-                    alert("System loading failed! Please refresh the page or turn off ad-blockers.");
-                    return;
+                if (method === 'upi') {
+                    document.getElementById('upi-payment-section').classList.add('active');
+                    document.getElementById('upiPayBtn').textContent = '💳 Pay Now & Save ₹25';
+                    document.getElementById('upiPayBtn').style.gridColumn = '1 / -1';
+                    document.getElementById('codBtn').style.display = 'block';
+                } else {
+                    document.getElementById('upi-payment-section').classList.remove('active');
+                    document.getElementById('upiPayBtn').textContent = '💳 Prepaid UPI (Save ₹25)';
+                    document.getElementById('upiPayBtn').style.gridColumn = 'auto';
+                    document.getElementById('codBtn').style.display = 'block';
                 }
+            };
 
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.innerText = "Processing Order...";
-                submitBtn.disabled = true;
+            // COD Button
+            document.getElementById('codBtn').addEventListener('click', async function() {
+                if (!isFormValid()) return;
+                
+                // Prevent duplicate clicks
+                if (this.disabled) return;
+                
+                this.innerHTML = '<span class="loading-spinner"></span> Processing...';
+                this.disabled = true;
+                document.getElementById('upiPayBtn').disabled = true;
 
-                const name = document.getElementById('custName').value;
-                const phone = document.getElementById('custPhone').value;
-                const address = document.getElementById('custAddress').value;
-                const pin = document.getElementById('custPin').value;
+                const orderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
+                const orderDetails = {
+                    order_id: orderId,
+                    product_name: prodName,
+                    price: prodPrice,
+                    customer_name: document.getElementById('custName').value,
+                    phone: document.getElementById('custPhone').value,
+                    address: document.getElementById('custAddress').value,
+                    pincode: document.getElementById('custPin').value,
+                    status: 'Order Received',
+                    payment_method: 'Cash on Delivery'
+                };
 
-                // Unique Order ID generate karo
-                const generatedOrderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
-
-                const { data, error } = await dbClient
-                    .from('orders')
-                    .insert([
-                        { 
-                            order_id: generatedOrderId, 
-                            product_name: prodName, 
-                            price: prodPrice,
-                            customer_name: name,
-                            phone: phone,
-                            address: address,
-                            pincode: pin,
-                            status: 'Order Received'
-                        }
-                    ]);
+                const { error } = await dbClient.from('orders').insert([orderDetails]);
 
                 if (error) {
-                    alert("Order processing failed! Supabase Error: " + error.message);
-                    submitBtn.innerText = "Place Order (Cash on Delivery)";
-                    submitBtn.disabled = false;
+                    alert("❌ Order failed! " + error.message);
+                    this.innerHTML = '🚚 Cash on Delivery';
+                    this.disabled = false;
+                    document.getElementById('upiPayBtn').disabled = false;
                 } else {
-                    // Success Screen dikhao
-                    document.getElementById('main-checkout').style.display = 'none';
-                    document.getElementById('success-screen').style.display = 'block';
+                    mainCheckout.style.display = 'none';
+                    successScreen.style.display = 'block';
+                    document.getElementById('display-order-id').innerText = orderId;
+                }
+            });
+
+            // UPI Pay Button
+            document.getElementById('upiPayBtn').addEventListener('click', async function() {
+                if (!isFormValid()) return;
+
+                // Prevent duplicate clicks
+                if (this.disabled) return;
+
+                this.innerHTML = '<span class="loading-spinner"></span> Creating Order...';
+                this.disabled = true;
+                document.getElementById('codBtn').disabled = true;
+
+                const discountedPrice = prodPrice - 25;
+                generatedOrderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
+                const orderDetails = {
+                    order_id: generatedOrderId,
+                    product_name: prodName,
+                    price: discountedPrice,
+                    customer_name: document.getElementById('custName').value,
+                    phone: document.getElementById('custPhone').value,
+                    address: document.getElementById('custAddress').value,
+                    pincode: document.getElementById('custPin').value,
+                    status: 'Awaiting Payment',
+                    payment_method: 'Prepaid UPI'
+                };
+                
+                const { error } = await dbClient.from('orders').insert([orderDetails]);
+
+                if (error) {
+                    alert("❌ Could not create order! " + error.message);
+                    this.innerHTML = '💳 Pay Now & Save ₹25';
+                    this.disabled = false;
+                    document.getElementById('codBtn').disabled = false;
+                } else {
+                    // Update UI
+                    document.getElementById('discount-row').style.display = 'flex';
+                    document.getElementById('summ-total').innerText = `₹${discountedPrice}`;
+                    const upiLink = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(YOUR_NAME)}&am=${discountedPrice}.00&cu=INR&tn=${encodeURIComponent('Order ' + generatedOrderId)}`;
+                    
+                    document.getElementById('upi-order-id').innerText = generatedOrderId;
+                    document.getElementById('upi-amount').innerText = discountedPrice;
+                    document.getElementById('upi-payment-link').href = upiLink;
+
+                    shippingDetailsBox.style.display = 'none';
+                    paymentConfirmationBox.style.display = 'block';
+                }
+            });
+
+            // UTR Form Submit
+            document.getElementById('utrForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const utrBtn = document.getElementById('confirmUtrBtn');
+                utrBtn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
+                utrBtn.disabled = true;
+
+                const utrValue = document.getElementById('utrInput').value.trim().toUpperCase();
+
+                const { error } = await dbClient
+                    .from('orders')
+                    .update({ utr_number: utrValue, status: 'Payment Under Review' })
+                    .eq('order_id', generatedOrderId);
+
+                if (error) {
+                    alert("❌ Submission Failed! " + error.message);
+                    utrBtn.innerHTML = '✅ Confirm Payment';
+                    utrBtn.disabled = false;
+                } else {
+                    mainCheckout.style.display = 'none';
+                    successScreen.style.display = 'block';
                     document.getElementById('display-order-id').innerText = generatedOrderId;
                 }
             });
+
+            // Cancel UPI Button
+            document.getElementById('cancelUpiBtn').addEventListener('click', function() {
+                shippingDetailsBox.style.display = 'block';
+                paymentConfirmationBox.style.display = 'none';
+                document.getElementById('upiPayBtn').innerHTML = '💳 Pay Now & Save ₹25';
+                document.getElementById('upiPayBtn').disabled = false;
+                document.getElementById('codBtn').disabled = false;
+            });
+
+            // ===== RESUME PAYMENT FUNCTIONALITY =====
+            // Check if user is trying to resume a payment
+            const resumeOrderIdParam = urlParams.get('resumeOrder');
+            if (resumeOrderIdParam) {
+                resumeExistingPayment(resumeOrderIdParam);
+            }
+
+            async function resumeExistingPayment(orderId) {
+                try {
+                    const { data, error } = await dbClient
+                        .from('orders')
+                        .select('*')
+                        .eq('order_id', orderId);
+
+                    if (error || !data || data.length === 0) {
+                        alert("❌ Order not found!");
+                        return;
+                    }
+
+                    const order = data[0];
+                    
+                    // Only allow resume for Awaiting Payment or Payment Under Review
+                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
+                        alert("❌ This order cannot be resumed (already processed)");
+                        return;
+                    }
+
+                    // Pre-fill form if needed
+                    document.getElementById('custName').value = order.customer_name || '';
+                    document.getElementById('custPhone').value = order.phone || '';
+                    document.getElementById('custAddress').value = order.address || '';
+                    document.getElementById('custPin').value = order.pincode || '';
+
+                    generatedOrderId = order.order_id;
+                    const discountedPrice = order.price;
+
+                    // Show payment confirmation
+                    document.getElementById('discount-row').style.display = 'flex';
+                    document.getElementById('summ-total').innerText = `₹${discountedPrice}`;
+                    
+                    const upiLink = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(YOUR_NAME)}&am=${discountedPrice}.00&cu=INR&tn=${encodeURIComponent('Order ' + generatedOrderId)}`;
+                    
+                    document.getElementById('upi-order-id').innerText = generatedOrderId;
+                    document.getElementById('upi-amount').innerText = discountedPrice;
+                    document.getElementById('upi-payment-link').href = upiLink;
+
+                    shippingDetailsBox.style.display = 'none';
+                    paymentConfirmationBox.style.display = 'block';
+
+                    alert("✅ Payment session resumed! Complete your payment.");
+                } catch (err) {
+                    console.error("Resume error:", err);
+                    alert("❌ Error resuming payment: " + err.message);
+                }
+            }
+
+            // Resume Payment Button
+            document.getElementById('resumePaymentBtn').addEventListener('click', async function() {
+                const orderId = document.getElementById('resumeOrderId').value.trim().toUpperCase();
+                
+                if (!orderId) {
+                    alert("❌ Please enter an Order ID!");
+                    return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = '<span class="loading-spinner"></span> Loading...';
+
+                try {
+                    const { data, error } = await dbClient
+                        .from('orders')
+                        .select('*')
+                        .eq('order_id', orderId);
+
+                    if (error || !data || data.length === 0) {
+                        alert("❌ Order not found! Please check the Order ID.");
+                        this.disabled = false;
+                        this.innerHTML = 'Resume Payment';
+                        return;
+                    }
+
+                    const order = data[0];
+                    
+                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
+                        alert("❌ This order is already processed or completed!");
+                        this.disabled = false;
+                        this.innerHTML = 'Resume Payment';
+                        return;
+                    }
+
+                    // Resume the payment
+                    await resumeExistingPayment(orderId);
+
+                    this.disabled = false;
+                    this.innerHTML = 'Resume Payment';
+                    document.getElementById('resume-payment-section').style.display = 'none';
+
+                } catch (err) {
+                    alert("❌ Error: " + err.message);
+                    this.disabled = false;
+                    this.innerHTML = 'Resume Payment';
+                }
+            });
+
+            // Show resume section if coming from track page or similar
+            // Check if page was accessed and user might have pending payment
+            const showResume = sessionStorage.getItem('showResumePayment');
+            if (showResume) {
+                document.getElementById('resume-payment-section').style.display = 'block';
+                sessionStorage.removeItem('showResumePayment');
+            }
         });
     </script>
 </body>
