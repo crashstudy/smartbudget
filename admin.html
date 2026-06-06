@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SmartBudget</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7fb; margin: 0; padding: 20px; }
+        .dashboard { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; color: #475569; }
+        
+        .status-select { padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1; }
+        .btn-update { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .btn-update:hover { background: #2563eb; }
+        
+        .address-box { max-width: 250px; font-size: 0.85rem; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <script>
+        // SIMPLE SECURITY: Page load hote hi password mangega
+        const pass = prompt("Enter Admin Password to access Control Room:");
+        if (pass !== "Satyam@123") {
+            document.body.innerHTML = "<h2 style='text-align:center; color:red; margin-top:50px;'>Access Denied! Galat Password.</h2>";
+            throw new Error("Unauthorized access."); // Code rok dega
+        }
+    </script>
+
+    <div class="dashboard">
+        <h1>🛠️ Orders Control Room (Admin)</h1>
+        <p style="color: #64748b;">Yahan se customer details copy karke Meesho par order lagao, aur status update karo.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order Date</th>
+                    <th>Order ID</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Customer Name & Phone</th>
+                    <th>Address & PIN</th>
+                    <th>Action (Update Status)</th>
+                </tr>
+            </thead>
+            <tbody id="orders-table-body">
+                <tr><td colspan="7" style="text-align: center;">Loading Orders...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+        const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function fetchOrders() {
+            // Naye orders sabse upar dikhenge
+            const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+            
+            const tbody = document.getElementById('orders-table-body');
+            tbody.innerHTML = ""; // Clear loading text
+
+            if (error || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='7' style='text-align: center;'>No orders found.</td></tr>";
+                return;
+            }
+
+            data.forEach(order => {
+                const date = new Date(order.created_at).toLocaleString('en-IN');
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td><strong>${order.order_id}</strong></td>
+                    <td style="color: #3b82f6; font-weight: bold;">${order.product_name}</td>
+                    <td>₹${order.price}</td>
+                    <td>
+                        <strong>${order.customer_name}</strong><br>
+                        📞 ${order.phone}
+                    </td>
+                    <td>
+                        <div class="address-box">${order.address} <br><strong>PIN: ${order.pincode}</strong></div>
+                    </td>
+                    <td>
+                        <select id="status-${order.id}" class="status-select">
+                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
+                            <option value="Order Processed" ${order.status === 'Order Processed' ? 'selected' : ''}>Order Processed</option>
+                            <option value="Shipped (Tracking SMS Sent)" ${order.status === 'Shipped (Tracking SMS Sent)' ? 'selected' : ''}>Shipped</option>
+                            <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                        <button class="btn-update" onclick="updateStatus('${order.id}')">Save</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Status update karne ka function
+        async function updateStatus(id) {
+            const newStatus = document.getElementById(`status-${id}`).value;
+            const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
+            
+            if (error) alert("Error updating status: " + error.message);
+            else alert("Status Updated Successfully!");
+        }
+
+        // Page load hote hi orders fetch karo
+        fetchOrders();
+    </script>
+</body>
+</html>
