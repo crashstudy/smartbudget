@@ -644,10 +644,11 @@
                         noteEl.style.color = '#047857';
                         noteEl.innerHTML = '✅ Payment verified! Your order is confirmed.';
                     } else if (orderData.status === 'Payment Rejected') {
-                        noteEl.className = 'payment-note';
-                        noteEl.style.borderLeftColor = '#ef4444';
-                        noteEl.style.color = '#991b1b';
-                        noteEl.innerHTML = '❌ Payment rejected. <a href="checkout.html?resumeOrder=' + orderId + '" style="color: inherit; font-weight: 700;">Click here to resubmit payment</a>';
+    noteEl.className = 'payment-note';
+    noteEl.style.borderLeftColor = '#ef4444';
+    noteEl.style.color = '#991b1b';
+    // Yahan admin_note ko rendering mein add kar diya hai
+    noteEl.innerHTML = `❌ <strong>Payment Rejected Reason:</strong> ${orderData.admin_note || 'Invalid UTR Number'} <br><br> <a href="checkout.html?resumeOrder=${orderId}" style="color: inherit; font-weight: 700;">Click here to resubmit payment</a>`;
                     } else if (orderData.status === 'Payment Under Review') {
                         noteEl.className = 'payment-note';
                         noteEl.style.borderLeftColor = '#f59e0b';
