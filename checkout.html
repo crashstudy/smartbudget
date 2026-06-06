@@ -81,7 +81,7 @@
             margin-top: 10px;
         }
 
-        /* Success Screen (Hidden by default) */
+        /* Success Screen */
         #success-screen {
             display: none;
             text-align: center;
@@ -92,10 +92,7 @@
             max-width: 600px;
             margin: 40px auto;
         }
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
+        .success-icon { font-size: 4rem; margin-bottom: 20px; }
         .order-id-box {
             background: #f1f5f9;
             padding: 15px;
@@ -110,7 +107,7 @@
 
         @media (max-width: 768px) {
             .checkout-section { grid-template-columns: 1fr; }
-            .order-summary { order: 2; } /* Mobile par form pehle dikhega */
+            .order-summary { order: 2; }
             .checkout-form-box { order: 1; }
         }
     </style>
@@ -132,7 +129,6 @@
     <main id="main-checkout">
         <div class="checkout-section">
             
-            <!-- Delivery Details Form -->
             <div class="checkout-form-box">
                 <h2 style="margin-bottom: 25px; color: var(--primary);">📍 Shipping Details</h2>
                 <form id="orderForm">
@@ -157,7 +153,6 @@
                 </form>
             </div>
 
-            <!-- Order Summary -->
             <div class="order-summary">
                 <h3>🛒 Order Summary</h3>
                 <div class="summary-item">
@@ -180,7 +175,6 @@
         </div>
     </main>
 
-    <!-- Success Screen -->
     <div id="success-screen">
         <div class="success-icon">✅</div>
         <h2 style="color: #10b981; margin-bottom: 10px;">Order Placed Successfully!</h2>
@@ -196,68 +190,86 @@
     </div>
 
     <script>
-        // --- 1. SUPABASE INITIALIZATION ---
-        const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
-        const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // --- 2. URL SE DATA NIKALNA ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const prodId = urlParams.get('id');
-        const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
-        const prodPrice = urlParams.get('price') || "0";
-
-        if(!prodId) window.location.href = 'store.html'; // Agar link me product nahi hai toh wapas bhej do
-
-        // Summary me data dikhana
-        document.getElementById('summ-name').innerText = prodName;
-        document.getElementById('summ-price').innerText = `₹${prodPrice}`;
-        document.getElementById('summ-total').innerText = `₹${prodPrice}`;
-
-        // --- 3. FORM SUBMIT HANDLE KARNA ---
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Page refresh hone se rokna
+        document.addEventListener("DOMContentLoaded", () => {
             
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "Processing Order...";
-            submitBtn.disabled = true;
+            // 1. DATA NIKALNA AUR UI UPDATE KARNA (Sabse Pehle)
+            const urlParams = new URLSearchParams(window.location.search);
+            const prodId = urlParams.get('id');
+            const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
+            const prodPrice = urlParams.get('price') || "0";
 
-            // Form ki values uthana
-            const name = document.getElementById('custName').value;
-            const phone = document.getElementById('custPhone').value;
-            const address = document.getElementById('custAddress').value;
-            const pin = document.getElementById('custPin').value;
-
-            // Unique Order ID Banana (e.g. SB-482910)
-            const generatedOrderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
-
-            // Supabase Database me Insert karna
-            const { data, error } = await supabase
-                .from('orders')
-                .insert([
-                    { 
-                        order_id: generatedOrderId, 
-                        product_name: prodName, 
-                        price: prodPrice,
-                        customer_name: name,
-                        phone: phone,
-                        address: address,
-                        pincode: pin,
-                        status: 'Order Received'
-                    }
-                ]);
-
-            if (error) {
-                console.error("Database Error:", error);
-                alert("Failed to place order. Please check your internet connection and try again.");
-                submitBtn.innerText = "Place Order (Cash on Delivery)";
-                submitBtn.disabled = false;
-            } else {
-                // SUCCESS: Checkout hide karo, Success screen dikhao
-                document.getElementById('main-checkout').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'block';
-                document.getElementById('display-order-id').innerText = generatedOrderId;
+            // Agar directly is page par aaya hai toh wapas bhej do
+            if (!prodId) {
+                window.location.href = 'store.html';
+                return; 
             }
+
+            // UI Turant Update Karo
+            document.getElementById('summ-name').innerText = prodName;
+            document.getElementById('summ-price').innerText = `₹${prodPrice}`;
+            document.getElementById('summ-total').innerText = `₹${prodPrice}`;
+
+            // 2. SUPABASE DATABASE INITIALIZE (Safely)
+            let dbClient = null;
+            try {
+                if (typeof supabase !== 'undefined') {
+                    const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+                    const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+                    dbClient = supabase.createClient(supabaseUrl, supabaseKey);
+                } else {
+                    console.error("Supabase load nahi hua. Check ad-blockers or internet.");
+                }
+            } catch (err) {
+                console.error("Connection Error: ", err);
+            }
+
+            // 3. FORM SUBMISSION
+            document.getElementById('orderForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!dbClient) {
+                    alert("System loading failed! Please refresh the page or turn off ad-blockers.");
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.innerText = "Processing Order...";
+                submitBtn.disabled = true;
+
+                const name = document.getElementById('custName').value;
+                const phone = document.getElementById('custPhone').value;
+                const address = document.getElementById('custAddress').value;
+                const pin = document.getElementById('custPin').value;
+
+                // Unique Order ID generate karo
+                const generatedOrderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
+
+                const { data, error } = await dbClient
+                    .from('orders')
+                    .insert([
+                        { 
+                            order_id: generatedOrderId, 
+                            product_name: prodName, 
+                            price: prodPrice,
+                            customer_name: name,
+                            phone: phone,
+                            address: address,
+                            pincode: pin,
+                            status: 'Order Received'
+                        }
+                    ]);
+
+                if (error) {
+                    alert("Order processing failed! Supabase Error: " + error.message);
+                    submitBtn.innerText = "Place Order (Cash on Delivery)";
+                    submitBtn.disabled = false;
+                } else {
+                    // Success Screen dikhao
+                    document.getElementById('main-checkout').style.display = 'none';
+                    document.getElementById('success-screen').style.display = 'block';
+                    document.getElementById('display-order-id').innerText = generatedOrderId;
+                }
+            });
         });
     </script>
 </body>
