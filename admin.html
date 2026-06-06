@@ -572,11 +572,15 @@
                                     `
                                     : `
                                         <select id="status-${order.id}" class="status-select">
-                                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
-                                            <option value="Order Processed" ${order.status === 'Order Processed' ? 'selected' : ''}>Order Processed</option>
-                                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
-                                            <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
-                                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                            <option value="Awaiting Payment" ${order.status === 'Awaiting Payment' ? 'selected' : ''}>⏳ Awaiting Payment</option>
+                                            <option value="Payment Under Review" ${order.status === 'Payment Under Review' ? 'selected' : ''}>🔍 Payment Under Review</option>
+                                            <option value="Payment Approved" ${order.status === 'Payment Approved' ? 'selected' : ''}>✅ Payment Approved</option>
+                                            <option value="Payment Rejected" ${order.status === 'Payment Rejected' ? 'selected' : ''}>❌ Payment Rejected</option>
+                                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>📦 Order Received</option>
+                                            <option value="Order Processed" ${order.status === 'Order Processed' ? 'selected' : ''}>⚙️ Order Processed</option>
+                                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>🚚 Shipped</option>
+                                            <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>🏃 Out for Delivery</option>
+                                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>✔️ Delivered</option>
                                         </select>
                                         <button class="btn-update" onclick="updateStatus('${order.id}')">Save</button>
                                         <button class="btn-reject" onclick="deleteOrder('${order.id}', '${order.order_id}')" style="margin-top: 5px;">🗑️ Delete</button>
