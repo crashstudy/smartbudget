@@ -448,16 +448,6 @@
                 <!-- Shipping Details -->
                 <div id="shipping-details-box">
                     <form id="orderForm">
-                      
-                      <!-- Add this right above the Shipping Details heading -->
-<div style="text-align: right; margin-bottom: 10px;">
-  <a href="javascript:void(0)" id="toggleResume" style="color: var(--accent); font-size: 0.9rem; font-weight: 700; text-decoration: none;">
-    Already have an Order ID? Resume Payment →
-  </a>
-</div>
-
-                      
-                      
                         <div class="form-section">
                             <h2>📍 Shipping Details</h2>
                             
@@ -604,11 +594,7 @@
             const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
             const prodPrice = parseInt(urlParams.get('price') || "0");
 
-            // If coming with product ID, hide resume section
-            if (prodId) {
-                resumeSection.style.display = 'none';
-            }
-
+            // Resume section ALWAYS visible - don't hide it
             if (!prodId) { window.location.href = 'store.html'; return; }
 
             document.getElementById('summ-name').innerText = prodName;
@@ -765,108 +751,117 @@
                 document.getElementById('codBtn').disabled = false;
             });
 
-           // ===== IMPROVED RESUME PAYMENT FUNCTIONALITY =====
+            // ===== RESUME PAYMENT FUNCTIONALITY =====
+            // Check if user is trying to resume a payment
+            const resumeOrderIdParam = urlParams.get('resumeOrder');
+            if (resumeOrderIdParam) {
+                resumeExistingPayment(resumeOrderIdParam);
+            }
 
-const resumeSection = document.getElementById('resume-payment-section');
-const toggleBtn = document.getElementById('toggleResume');
+            async function resumeExistingPayment(orderId) {
+                try {
+                    const { data, error } = await dbClient
+                        .from('orders')
+                        .select('*')
+                        .eq('order_id', orderId);
 
-// 1. Manual Toggle
-toggleBtn.addEventListener('click', () => {
-    const isHidden = resumeSection.style.display === 'none' || resumeSection.style.display === '';
-    resumeSection.style.display = isHidden ? 'block' : 'none';
-    if(isHidden) resumeSection.scrollIntoView({ behavior: 'smooth' });
-});
+                    if (error || !data || data.length === 0) {
+                        alert("❌ Order not found! Please check the Order ID.");
+                        return;
+                    }
 
-// 2. Auto-detect from URL (From Track Page)
-const resumeOrderIdParam = urlParams.get('resumeOrder');
-if (resumeOrderIdParam) {
-    // Show the section and fill the input
-    resumeSection.style.display = 'block';
-    document.getElementById('resumeOrderId').value = resumeOrderIdParam;
-    // Automatically trigger the fetch
-    resumeExistingPayment(resumeOrderIdParam);
-}
+                    const order = data[0];
+                    
+                    // Only allow resume for Awaiting Payment or Payment Under Review
+                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
+                        alert("❌ This order is already processed. You cannot resume it.");
+                        return;
+                    }
 
-// 3. The Actual Resume Logic
-async function resumeExistingPayment(orderId) {
-    const resumeBtn = document.getElementById('resumePaymentBtn');
-    resumeBtn.disabled = true;
-    resumeBtn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                    generatedOrderId = order.order_id;
+                    const discountedPrice = order.price;
 
-    try {
-        const { data, error } = await dbClient
-            .from('orders')
-            .select('*')
-            .eq('order_id', orderId.trim().toUpperCase());
+                    // Show payment confirmation
+                    document.getElementById('discount-row').style.display = 'flex';
+                    document.getElementById('summ-total').innerText = `₹${discountedPrice}`;
+                    
+                    const upiLink = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(YOUR_NAME)}&am=${discountedPrice}.00&cu=INR&tn=${encodeURIComponent('Order ' + generatedOrderId)}`;
+                    
+                    document.getElementById('upi-order-id').innerText = generatedOrderId;
+                    document.getElementById('upi-amount').innerText = discountedPrice;
+                    document.getElementById('upi-payment-link').href = upiLink;
 
-        if (error || !data || data.length === 0) {
-            alert("❌ Order not found! Please check the ID.");
-            resetResumeBtn();
-            return;
-        }
+                    // Hide resume section & show payment
+                    resumeSection.style.display = 'none';
+                    shippingDetailsBox.style.display = 'none';
+                    paymentConfirmationBox.style.display = 'block';
 
-        const order = data[0];
-        
-        // Validation: Only allow if not already processed
-        const allowedStatuses = ['Awaiting Payment', 'Payment Under Review', 'Payment Rejected'];
-        if (!allowedStatuses.includes(order.status)) {
-            alert(`❌ This order is already "${order.status}" and cannot be edited.`);
-            resetResumeBtn();
-            return;
-        }
+                    // Scroll to payment section
+                    paymentConfirmationBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // Pre-fill Shipping Form
-        document.getElementById('custName').value = order.customer_name || '';
-        document.getElementById('custPhone').value = order.phone || '';
-        document.getElementById('custAddress').value = order.address || '';
-        document.getElementById('custPin').value = order.pincode || '';
+                    alert("✅ Payment session resumed! Complete your payment.");
+                } catch (err) {
+                    console.error("Resume error:", err);
+                    alert("❌ Error resuming payment: " + err.message);
+                }
+            }
 
-        generatedOrderId = order.order_id;
-        const currentPrice = order.price;
+            // Resume Payment Button
+            document.getElementById('resumePaymentBtn').addEventListener('click', async function() {
+                const orderId = document.getElementById('resumeOrderId').value.trim().toUpperCase();
+                
+                if (!orderId) {
+                    alert("❌ Please enter an Order ID!");
+                    return;
+                }
 
-        // Update Summary UI
-        document.getElementById('summ-name').innerText = order.product_name;
-        document.getElementById('summ-price').innerText = `₹${currentPrice + 25}`; // Assuming discount was applied
-        document.getElementById('discount-row').style.display = 'flex';
-        document.getElementById('summ-total').innerText = `₹${currentPrice}`;
-        
-        // Generate UPI Link
-        const upiLink = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(YOUR_NAME)}&am=${currentPrice}.00&cu=INR&tn=${encodeURIComponent('Order ' + generatedOrderId)}`;
-        
-        document.getElementById('upi-order-id').innerText = generatedOrderId;
-        document.getElementById('upi-amount').innerText = currentPrice;
-        document.getElementById('upi-payment-link').href = upiLink;
+                if (!orderId.startsWith('SB-')) {
+                    alert("❌ Order ID should start with 'SB-' (e.g., SB-123456)");
+                    document.getElementById('resumeOrderId').focus();
+                    return;
+                }
 
-        // Switch Views
-        shippingDetailsBox.style.display = 'none';
-        paymentConfirmationBox.style.display = 'block';
-        resumeSection.style.display = 'none'; // Hide resume box once successful
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.disabled = true;
+                const originalText = this.innerHTML;
+                this.innerHTML = '<span class="loading-spinner"></span> Finding order...';
 
-    } catch (err) {
-        console.error(err);
-        alert("❌ Error: " + err.message);
-    } finally {
-        resetResumeBtn();
-    }
-}
+                try {
+                    const { data, error } = await dbClient
+                        .from('orders')
+                        .select('*')
+                        .eq('order_id', orderId);
 
-function resetResumeBtn() {
-    const resumeBtn = document.getElementById('resumePaymentBtn');
-    resumeBtn.disabled = false;
-    resumeBtn.innerHTML = 'Resume Payment';
-}
+                    if (error || !data || data.length === 0) {
+                        alert("❌ Order not found!\n\nMake sure you entered the correct Order ID (e.g., SB-123456)");
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                        return;
+                    }
 
-// 4. Click listener for the Resume Button inside the yellow box
-document.getElementById('resumePaymentBtn').addEventListener('click', function() {
-    const orderId = document.getElementById('resumeOrderId').value.trim();
-    if (!orderId) {
-        alert("Please enter an Order ID");
-        return;
-    }
-    resumeExistingPayment(orderId);
-});
+                    const order = data[0];
+                    
+                    if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
+                        alert("❌ This order is already processed or delivered.\n\nYou cannot resume it.");
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                        return;
+                    }
+
+                    // Resume the payment
+                    await resumeExistingPayment(orderId);
+                    this.innerHTML = originalText;
+
+                } catch (err) {
+                    alert("❌ Error: " + err.message);
+                    this.disabled = false;
+                    this.innerHTML = originalText;
+                }
+            });
+
+            // Show resume section if coming from track page or similar
+            // Resume section is now ALWAYS visible by default
+            // No need for sessionStorage anymore
+        });
     </script>
 </body>
 </html>
