@@ -400,15 +400,19 @@
     </header>
 
     <main id="main-checkout">
-        <!-- Resume Payment Section (Hidden Initially) -->
-        <div id="resume-payment-section" style="display: none; max-width: 900px; margin: 30px auto; padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; border-left: 4px solid #f59e0b;">
-            <h3 style="color: #92400e; margin-bottom: 15px;">⏳ Resume Your Payment</h3>
-            <p style="color: #b45309; margin-bottom: 15px;">Looks like you didn't complete your payment last time. Enter your Order ID to continue:</p>
+        <!-- Resume Payment Section (Always Visible) -->
+        <div id="resume-payment-section" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; border-left: 4px solid #f59e0b; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);">
+            <h3 style="color: #92400e; margin-bottom: 15px; font-size: 1.1rem;">⏳ Did You Start Payment Earlier?</h3>
+            <p style="color: #b45309; margin-bottom: 15px; font-size: 0.95rem;">If you already made the payment but didn't fill the UTR, don't worry! Enter your Order ID here to continue:</p>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="text" id="resumeOrderId" placeholder="Enter Order ID (e.g., SB-123456)" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 1rem;">
-                <button type="button" id="resumePaymentBtn" style="padding: 12px 30px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Resume Payment</button>
+                <input type="text" id="resumeOrderId" placeholder="Enter Order ID (e.g., SB-123456)" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 1rem; font-weight: 500;">
+                <button type="button" id="resumePaymentBtn" style="padding: 12px 30px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.3s; white-space: nowrap;">▶️ Continue Payment</button>
             </div>
+            <p style="font-size: 0.85rem; color: #92400e; margin-top: 12px; margin-bottom: 0;">💡 <strong>Tip:</strong> You can find your Order ID in the last confirmation message you received.</p>
         </div>
+
+        <!-- OR Divider -->
+        <div style="max-width: 900px; margin: 20px auto; text-align: center; color: #94a3b8; font-weight: 700;">— OR NEW ORDER —</div>
 
         <div class="checkout-section">
             
@@ -582,12 +586,18 @@
             const successScreen = document.getElementById('success-screen');
             const shippingDetailsBox = document.getElementById('shipping-details-box');
             const paymentConfirmationBox = document.getElementById('payment-confirmation-box');
+            const resumeSection = document.getElementById('resume-payment-section');
             
             // URL Parameters
             const urlParams = new URLSearchParams(window.location.search);
             const prodId = urlParams.get('id');
             const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
             const prodPrice = parseInt(urlParams.get('price') || "0");
+
+            // If coming with product ID, hide resume section
+            if (prodId) {
+                resumeSection.style.display = 'none';
+            }
 
             if (!prodId) { window.location.href = 'store.html'; return; }
 
@@ -760,7 +770,7 @@
                         .eq('order_id', orderId);
 
                     if (error || !data || data.length === 0) {
-                        alert("❌ Order not found!");
+                        alert("❌ Order not found! Please check the Order ID.");
                         return;
                     }
 
@@ -768,15 +778,9 @@
                     
                     // Only allow resume for Awaiting Payment or Payment Under Review
                     if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
-                        alert("❌ This order cannot be resumed (already processed)");
+                        alert("❌ This order is already processed. You cannot resume it.");
                         return;
                     }
-
-                    // Pre-fill form if needed
-                    document.getElementById('custName').value = order.customer_name || '';
-                    document.getElementById('custPhone').value = order.phone || '';
-                    document.getElementById('custAddress').value = order.address || '';
-                    document.getElementById('custPin').value = order.pincode || '';
 
                     generatedOrderId = order.order_id;
                     const discountedPrice = order.price;
@@ -791,8 +795,13 @@
                     document.getElementById('upi-amount').innerText = discountedPrice;
                     document.getElementById('upi-payment-link').href = upiLink;
 
+                    // Hide resume section & show payment
+                    resumeSection.style.display = 'none';
                     shippingDetailsBox.style.display = 'none';
                     paymentConfirmationBox.style.display = 'block';
+
+                    // Scroll to payment section
+                    paymentConfirmationBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                     alert("✅ Payment session resumed! Complete your payment.");
                 } catch (err) {
@@ -810,8 +819,15 @@
                     return;
                 }
 
+                if (!orderId.startsWith('SB-')) {
+                    alert("❌ Order ID should start with 'SB-' (e.g., SB-123456)");
+                    document.getElementById('resumeOrderId').focus();
+                    return;
+                }
+
                 this.disabled = true;
-                this.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                const originalText = this.innerHTML;
+                this.innerHTML = '<span class="loading-spinner"></span> Finding order...';
 
                 try {
                     const { data, error } = await dbClient
@@ -820,42 +836,35 @@
                         .eq('order_id', orderId);
 
                     if (error || !data || data.length === 0) {
-                        alert("❌ Order not found! Please check the Order ID.");
+                        alert("❌ Order not found!\n\nMake sure you entered the correct Order ID (e.g., SB-123456)");
                         this.disabled = false;
-                        this.innerHTML = 'Resume Payment';
+                        this.innerHTML = originalText;
                         return;
                     }
 
                     const order = data[0];
                     
                     if (order.status !== 'Awaiting Payment' && order.status !== 'Payment Under Review') {
-                        alert("❌ This order is already processed or completed!");
+                        alert("❌ This order is already processed or delivered.\n\nYou cannot resume it.");
                         this.disabled = false;
-                        this.innerHTML = 'Resume Payment';
+                        this.innerHTML = originalText;
                         return;
                     }
 
                     // Resume the payment
                     await resumeExistingPayment(orderId);
-
-                    this.disabled = false;
-                    this.innerHTML = 'Resume Payment';
-                    document.getElementById('resume-payment-section').style.display = 'none';
+                    this.innerHTML = originalText;
 
                 } catch (err) {
                     alert("❌ Error: " + err.message);
                     this.disabled = false;
-                    this.innerHTML = 'Resume Payment';
+                    this.innerHTML = originalText;
                 }
             });
 
             // Show resume section if coming from track page or similar
-            // Check if page was accessed and user might have pending payment
-            const showResume = sessionStorage.getItem('showResumePayment');
-            if (showResume) {
-                document.getElementById('resume-payment-section').style.display = 'block';
-                sessionStorage.removeItem('showResumePayment');
-            }
+            // Resume section is now ALWAYS visible by default
+            // No need for sessionStorage anymore
         });
     </script>
 </body>
