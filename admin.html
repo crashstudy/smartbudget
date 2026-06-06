@@ -568,22 +568,16 @@
                                 ${order.status === 'Payment Under Review' 
                                     ? `
                                         <button class="btn-approve" onclick="openPaymentReview('${order.id}')">Review Payment</button>
-                                        <button class="btn-reject" onclick="deleteOrder('${order.id}', '${order.order_id}')">🗑️ Delete</button>
                                     `
                                     : `
                                         <select id="status-${order.id}" class="status-select">
-                                            <option value="Awaiting Payment" ${order.status === 'Awaiting Payment' ? 'selected' : ''}>⏳ Awaiting Payment</option>
-                                            <option value="Payment Under Review" ${order.status === 'Payment Under Review' ? 'selected' : ''}>🔍 Payment Under Review</option>
-                                            <option value="Payment Approved" ${order.status === 'Payment Approved' ? 'selected' : ''}>✅ Payment Approved</option>
-                                            <option value="Payment Rejected" ${order.status === 'Payment Rejected' ? 'selected' : ''}>❌ Payment Rejected</option>
-                                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>📦 Order Received</option>
-                                            <option value="Order Processed" ${order.status === 'Order Processed' ? 'selected' : ''}>⚙️ Order Processed</option>
-                                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>🚚 Shipped</option>
-                                            <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>🏃 Out for Delivery</option>
-                                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>✔️ Delivered</option>
+                                            <option value="Order Received" ${order.status === 'Order Received' ? 'selected' : ''}>Order Received</option>
+                                            <option value="Order Processed" ${order.status === 'Order Processed' ? 'selected' : ''}>Order Processed</option>
+                                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                            <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
                                         </select>
                                         <button class="btn-update" onclick="updateStatus('${order.id}')">Save</button>
-                                        <button class="btn-reject" onclick="deleteOrder('${order.id}', '${order.order_id}')" style="margin-top: 5px;">🗑️ Delete</button>
                                     `
                                 }
                             </div>
@@ -623,54 +617,18 @@
             }
         }
 
-        async function deleteOrder(id, orderId) {
-            const confirm = prompt(`⚠️ Type "${orderId}" to confirm deletion of this order:`);
-            if (confirm !== orderId) {
-                alert("❌ Deletion cancelled or incorrect Order ID!");
-                return;
-            }
-
-            const { error } = await supabaseClient
-                .from('orders')
-                .delete()
-                .eq('id', id);
-
-            if (error) {
-                alert("❌ Error deleting order: " + error.message);
-            } else {
-                alert("✅ Order deleted successfully!");
-                fetchOrders();
-            }
-        }
-
-        window.deleteOrder = deleteOrder;
-
         function openPaymentReview(orderId) {
             reviewingOrder = allOrders.find(o => o.id === orderId);
-            if (!reviewingOrder) {
-                alert("❌ Order not found!");
-                return;
-            }
+            if (!reviewingOrder) return;
 
-            // Populate modal fields
             document.getElementById('modalOrderId').value = reviewingOrder.order_id;
             document.getElementById('modalCustomerName').value = reviewingOrder.customer_name;
             document.getElementById('modalAmount').value = `₹${reviewingOrder.price}`;
             document.getElementById('modalPaymentMethod').value = reviewingOrder.payment_method || 'Unknown';
             document.getElementById('modalUtrNumber').value = reviewingOrder.utr_number || 'Not provided';
 
-            // Show modal
-            const modal = document.getElementById('paymentModal');
-            modal.style.display = 'block';
-            
-            // Reset button states
-            document.getElementById('approvePaymentBtn').disabled = false;
-            document.getElementById('approvePaymentBtn').innerHTML = '✅ Approve Payment';
-            document.getElementById('rejectPaymentBtn').disabled = false;
-            document.getElementById('rejectPaymentBtn').innerHTML = '❌ Reject Payment';
+            document.getElementById('paymentModal').style.display = 'block';
         }
-
-        window.openPaymentReview = openPaymentReview;
 
         async function approvePayment() {
             if (!reviewingOrder) return;
@@ -712,90 +670,17 @@
             }
         }
 
-        // Modal Control - Setup Event Listeners
-        const modal = document.getElementById('paymentModal');
-        const closeModalBtn = document.getElementById('closeModal');
-        const closeModalBtnBottom = document.getElementById('closeModalBtn');
-        const approveBtn = document.getElementById('approvePaymentBtn');
-        const rejectBtn = document.getElementById('rejectPaymentBtn');
+        // Modal Control
+        document.getElementById('closeModal').onclick = () => {
+            document.getElementById('paymentModal').style.display = 'none';
+        };
 
-        closeModalBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-            reviewingOrder = null;
-        });
+        document.getElementById('closeModalBtn').onclick = () => {
+            document.getElementById('paymentModal').style.display = 'none';
+        };
 
-        closeModalBtnBottom.addEventListener('click', () => {
-            modal.style.display = 'none';
-            reviewingOrder = null;
-        });
-
-        // Close modal when clicking outside of it
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-                reviewingOrder = null;
-            }
-        });
-
-        // Setup button listeners
-        approveBtn.addEventListener('click', async () => {
-            if (!reviewingOrder) return;
-            
-            const reason = prompt("Enter approval note (optional):");
-            approveBtn.disabled = true;
-            approveBtn.innerHTML = '<span class="loading-spinner"></span> Approving...';
-
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ 
-                    status: 'Payment Approved',
-                    admin_note: reason || ''
-                })
-                .eq('id', reviewingOrder.id);
-
-            if (error) {
-                alert("❌ Error approving payment: " + error.message);
-                approveBtn.disabled = false;
-                approveBtn.innerHTML = '✅ Approve Payment';
-            } else {
-                alert("✅ Payment Approved! Order moved to processing.");
-                modal.style.display = 'none';
-                approveBtn.innerHTML = '✅ Approve Payment';
-                fetchOrders();
-            }
-        });
-
-        rejectBtn.addEventListener('click', async () => {
-            if (!reviewingOrder) return;
-            
-            const reason = prompt("Enter rejection reason (visible to customer):");
-            if (!reason) {
-                alert("❌ Please provide a rejection reason!");
-                return;
-            }
-
-            rejectBtn.disabled = true;
-            rejectBtn.innerHTML = '<span class="loading-spinner"></span> Rejecting...';
-
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ 
-                    status: 'Payment Rejected',
-                    admin_note: reason
-                })
-                .eq('id', reviewingOrder.id);
-
-            if (error) {
-                alert("❌ Error rejecting payment: " + error.message);
-                rejectBtn.disabled = false;
-                rejectBtn.innerHTML = '❌ Reject Payment';
-            } else {
-                alert("✅ Payment Rejected! Customer will need to resubmit.");
-                modal.style.display = 'none';
-                rejectBtn.innerHTML = '❌ Reject Payment';
-                fetchOrders();
-            }
-        });
+        document.getElementById('approvePaymentBtn').onclick = approvePayment;
+        document.getElementById('rejectPaymentBtn').onclick = rejectPayment;
 
         // Filter Buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
