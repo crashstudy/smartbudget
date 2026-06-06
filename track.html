@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order | SmartBudget Store</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .track-section {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px 20px;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .track-section h1 { color: var(--primary); margin-bottom: 15px; }
+        .track-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        .track-input-group input {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .track-input-group input:focus { border-color: var(--accent); }
+        .btn-track {
+            padding: 0 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* Result Box */
+        #result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: left;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #ecfdf5;
+            color: #10b981;
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            border: 1px solid #a7f3d0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #cbd5e1;
+            font-size: 0.95rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        
+        @media (max-width: 768px) {
+            .track-input-group { flex-direction: column; }
+            .btn-track { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="logo-link">
+                <img src="logo.jpg" alt="Logo" class="nav-logo">
+                <span class="brand-text">SmartBudget<span class="brand-dot">.in</span></span>
+            </a>
+            <nav class="nav-links">
+                <a href="store.html" style="color: var(--accent); font-weight: 800;">← Back to Store</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="track-section">
+            <h1>📦 Track Your Order</h1>
+            <p style="color: var(--muted);">Enter your Order ID (e.g., SB-123456) to check the current delivery status.</p>
+            
+            <form id="trackForm" class="track-input-group">
+                <input type="text" id="orderIdInput" required placeholder="Enter Order ID" autocomplete="off">
+                <button type="submit" class="btn btn-primary btn-track" id="trackBtn">Track</button>
+            </form>
+
+            <div id="loading" style="display: none; color: var(--accent); font-weight: bold; margin-top: 20px;">Fetching details...</div>
+            <div id="error-msg" style="display: none; color: red; margin-top: 20px; font-weight: bold;">Order not found! Please check your ID.</div>
+
+            <!-- Tracker Result -->
+            <div id="result-box">
+                <div class="status-badge" id="res-status">Order Received</div>
+                
+                <div class="detail-row">
+                    <span style="color: var(--muted);">Product:</span>
+                    <strong id="res-product">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span style="color: var(--muted);">Customer Name:</span>
+                    <strong id="res-name">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span style="color: var(--muted);">Total Amount:</span>
+                    <strong id="res-price">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span style="color: var(--muted);">Order Date:</span>
+                    <strong id="res-date">...</strong>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+        const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('trackForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const trackBtn = document.getElementById('trackBtn');
+            const orderId = document.getElementById('orderIdInput').value.trim().toUpperCase();
+            
+            document.getElementById('result-box').style.display = 'none';
+            document.getElementById('error-msg').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            trackBtn.disabled = true;
+
+            // Supabase se order search karna
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('order_id', orderId);
+
+            document.getElementById('loading').style.display = 'none';
+            trackBtn.disabled = false;
+
+            if (error || data.length === 0) {
+                document.getElementById('error-msg').style.display = 'block';
+            } else {
+                const orderData = data[0];
+                
+                // Details UI mein update karna
+                document.getElementById('res-status').innerText = orderData.status;
+                document.getElementById('res-product').innerText = orderData.product_name;
+                document.getElementById('res-name').innerText = orderData.customer_name;
+                document.getElementById('res-price').innerText = `₹${orderData.price}`;
+                
+                // Date format theek karna
+                const orderDate = new Date(orderData.created_at).toLocaleDateString('en-IN');
+                document.getElementById('res-date').innerText = orderDate;
+
+                document.getElementById('result-box').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+
