@@ -40,7 +40,6 @@
             font-size: 1.1rem;
         }
 
-        /* Result Box */
         #result-box {
             display: none;
             margin-top: 30px;
@@ -101,28 +100,14 @@
             </form>
 
             <div id="loading" style="display: none; color: var(--accent); font-weight: bold; margin-top: 20px;">Fetching details...</div>
-            <div id="error-msg" style="display: none; color: red; margin-top: 20px; font-weight: bold;">Order not found! Please check your ID.</div>
+            <div id="error-msg" style="display: none; color: red; margin-top: 20px; font-weight: bold;"></div>
 
-            <!-- Tracker Result -->
             <div id="result-box">
-                <div class="status-badge" id="res-status">Order Received</div>
-                
-                <div class="detail-row">
-                    <span style="color: var(--muted);">Product:</span>
-                    <strong id="res-product">...</strong>
-                </div>
-                <div class="detail-row">
-                    <span style="color: var(--muted);">Customer Name:</span>
-                    <strong id="res-name">...</strong>
-                </div>
-                <div class="detail-row">
-                    <span style="color: var(--muted);">Total Amount:</span>
-                    <strong id="res-price">...</strong>
-                </div>
-                <div class="detail-row">
-                    <span style="color: var(--muted);">Order Date:</span>
-                    <strong id="res-date">...</strong>
-                </div>
+                <div class="status-badge" id="res-status">...</div>
+                <div class="detail-row"><span style="color: var(--muted);">Product:</span><strong id="res-product">...</strong></div>
+                <div class="detail-row"><span style="color: var(--muted);">Customer Name:</span><strong id="res-name">...</strong></div>
+                <div class="detail-row"><span style="color: var(--muted);">Total Amount:</span><strong id="res-price">...</strong></div>
+                <div class="detail-row"><span style="color: var(--muted);">Order Date:</span><strong id="res-date">...</strong></div>
             </div>
         </div>
     </main>
@@ -130,7 +115,7 @@
     <script>
         const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
         const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         document.getElementById('trackForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -143,34 +128,42 @@
             document.getElementById('loading').style.display = 'block';
             trackBtn.disabled = true;
 
-            // Supabase se order search karna
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('order_id', orderId);
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .eq('order_id', orderId);
 
-            document.getElementById('loading').style.display = 'none';
-            trackBtn.disabled = false;
+                document.getElementById('loading').style.display = 'none';
+                trackBtn.disabled = false;
 
-            if (error || data.length === 0) {
-                document.getElementById('error-msg').style.display = 'block';
-            } else {
+                if (error) {
+                    document.getElementById('error-msg').innerText = "Supabase Error: " + error.message;
+                    document.getElementById('error-msg').style.display = 'block';
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    document.getElementById('error-msg').innerText = "Order not found! Please check your ID.";
+                    document.getElementById('error-msg').style.display = 'block';
+                    return;
+                }
+
                 const orderData = data[0];
-                
-                // Details UI mein update karna
                 document.getElementById('res-status').innerText = orderData.status;
                 document.getElementById('res-product').innerText = orderData.product_name;
                 document.getElementById('res-name').innerText = orderData.customer_name;
                 document.getElementById('res-price').innerText = `₹${orderData.price}`;
-                
-                // Date format theek karna
-                const orderDate = new Date(orderData.created_at).toLocaleDateString('en-IN');
-                document.getElementById('res-date').innerText = orderDate;
-
+                document.getElementById('res-date').innerText = new Date(orderData.created_at).toLocaleDateString('en-IN');
                 document.getElementById('result-box').style.display = 'block';
+
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                trackBtn.disabled = false;
+                document.getElementById('error-msg').innerText = "System Crash: " + err.message;
+                document.getElementById('error-msg').style.display = 'block';
             }
         });
     </script>
 </body>
 </html>
-
