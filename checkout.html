@@ -427,10 +427,11 @@
                     <span>Price:</span>
                     <span style="font-weight: 600;" id="summ-price">₹0</span>
                 </div>
-                <div class="summary-item">
+                                <div class="summary-item">
                     <span>Delivery</span>
-                    <span style="color: #10b981; font-weight: 700;">FREE 🚚</span>
+                    <span id="delivery-fee-display" style="font-weight: 700;">Loading...</span>
                 </div>
+
                 <div class="summary-item" id="discount-row" style="display: none;">
                     <span>Prepaid Discount</span>
                     <span style="color: #10b981; font-weight: 700;" id="discount-amount-display">- ₹0</span>
@@ -595,6 +596,24 @@
             const prodPrice = parseInt(urlParams.get('price') || "0");
             // Dynamic UPI discount — comes from per-product setting in Supabase via product.html
             const upiDiscount = parseInt(urlParams.get('udiscount') || "0");
+            const deliveryCharge = parseInt(urlParams.get('delivery') || "0"); // ✅ SINGLE DECLARATION
+
+            // Resume section ALWAYS visible - don't hide it
+            if (!prodId && !urlParams.get('resumeOrder')) { window.location.href = 'store.html'; return; }
+
+            // ✅ Total Math calculate karna - CORRECT CALCULATION
+            const totalWithDelivery = prodPrice + deliveryCharge;
+
+            // ✅ UI update karna
+            document.getElementById('summ-name').innerText = prodName;
+            document.getElementById('summ-price').innerText = `₹${prodPrice}`;
+            document.getElementById('summ-total').innerText = `₹${totalWithDelivery}`;
+
+            if (deliveryCharge === 0) {
+                document.getElementById('delivery-fee-display').innerHTML = '<span style="color: #10b981;">FREE 🚚</span>';
+            } else {
+                document.getElementById('delivery-fee-display').innerHTML = `<span style="color: #ef4444;">+ ₹${deliveryCharge}</span>`;
+            }
 
             // Apply dynamic discount labels to UI
             if (upiDiscount > 0) {
@@ -608,13 +627,6 @@
                 document.getElementById('upiPayBtn').textContent         = '💳 Pay Now (Prepaid UPI)';
             }
 
-            // Resume section ALWAYS visible - don't hide it
-            if (!prodId && !urlParams.get('resumeOrder')) { window.location.href = 'store.html'; return; }
-
-
-            document.getElementById('summ-name').innerText = prodName;
-            document.getElementById('summ-price').innerText = `₹${prodPrice}`;
-            document.getElementById('summ-total').innerText = `₹${prodPrice}`;
 
             let dbClient = null;
             try {
@@ -662,7 +674,7 @@
                 const orderDetails = {
                     order_id: orderId,
                     product_name: prodName,
-                    price: prodPrice,
+                    price: prodPrice + deliveryCharge,
                     customer_name: document.getElementById('custName').value,
                     phone: document.getElementById('custPhone').value,
                     address: document.getElementById('custAddress').value,
@@ -696,7 +708,8 @@
                 this.disabled = true;
                 document.getElementById('codBtn').disabled = true;
 
-                const discountedPrice = upiDiscount > 0 ? prodPrice - upiDiscount : prodPrice;
+                const discountedPrice = upiDiscount > 0 ? (prodPrice + deliveryCharge) - upiDiscount : (prodPrice + deliveryCharge);
+
                 generatedOrderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
                 const orderDetails = {
                     order_id: generatedOrderId,

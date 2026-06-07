@@ -168,7 +168,7 @@
             border-bottom: 2px solid #f1f5f9;
             padding-bottom: 12px;
         }
-        .details-box p { color: #475569; line-height: 1.8; font-size: 1.05rem; white-space: pre-line;}
+        .details-box p { color: #475569; line-height: 1.8; font-size: 1.05rem; white-space: pre-line; }
 
         /* Specs List */
         .specs-list { list-style: none; padding: 0; }
@@ -327,6 +327,15 @@
 
             const loadingScreen = document.getElementById('loading-screen');
 
+            // ============================================================
+            //  MOCK PRODUCT DATA (FALLBACK)
+            // ============================================================
+            const mockProducts = {
+                'M10-TWS': { product_id: 'M10-TWS', name: 'M10 TWS Earbuds', price: 399, mrp: 799, discount: 50, description: 'Premium wireless earbuds with HD sound and 2000mAh powerbank charging case', image_url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%22100%22%3E🎧%3C/text%3E%3C/svg%3E', stock_status: 'in stock', upi_discount: 25, delivery_charge: 0 },
+                'T800-SW': { product_id: 'T800-SW', name: 'T800 Ultra Smartwatch', price: 549, mrp: 1299, discount: 58, description: 'Advanced smartwatch with calling, 100+ sports modes, AMOLED display', image_url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%22100%22%3E⌚%3C/text%3E%3C/svg%3E', stock_status: 'in stock', upi_discount: 30, delivery_charge: 0 },
+                'SLING-BAG': { product_id: 'SLING-BAG', name: 'Premium Sling Bag', price: 299, mrp: 599, discount: 50, description: 'Durable crossbody bag with waterproof material and 5 compartments', image_url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%22100%22%3E👜%3C/text%3E%3C/svg%3E', stock_status: 'in stock', upi_discount: 20, delivery_charge: 0 }
+            };
+
             try {
                 // ============================================================
                 //  FETCH PRODUCT FROM SUPABASE
@@ -336,7 +345,17 @@
                     .select('*')
                     .eq('product_id', prodId);
 
-                if (error || !products || products.length === 0) {
+                let product = null;
+
+                if (!error && products && products.length > 0) {
+                    // ✅ Supabase se mil gaya
+                    product = products[0];
+                } else if (mockProducts[prodId]) {
+                    // ✅ Mock data se use karega
+                    console.warn("Supabase failed, using mock data:", prodId);
+                    product = mockProducts[prodId];
+                } else {
+                    // ❌ Kuch bhi nahi mila
                     loadingScreen.innerHTML = `
                         <div style="color:#ef4444;">
                             ❌ Product not found in store registry!<br>
@@ -346,8 +365,6 @@
                         </div>`;
                     return;
                 }
-
-                const product = products[0];
 
                 // ============================================================
                 //  STOCK STATUS CHECK — Normalised (lowercase, trimmed)
@@ -390,7 +407,10 @@
                 // ============================================================
                 //  CHECKOUT URL & BUTTON STATES
                 // ============================================================
-                const checkoutUrl = `checkout.html?id=${product.product_id}&name=${encodeURIComponent(product.name.replace(/\s+/g, '-'))}&price=${product.price}&udiscount=${product.upi_discount || 0}`;
+                                const delivCharge = product.delivery_charge || 0;
+                
+                const checkoutUrl = `checkout.html?id=${product.product_id}&name=${encodeURIComponent(product.name.replace(/\s+/g, '-'))}&price=${product.price}&udiscount=${product.upi_discount || 0}&delivery=${delivCharge}`;
+
 
                 const desktopBtn = document.getElementById('buy-btn-desktop');
                 const mobileBtn  = document.getElementById('buy-btn-mobile');
@@ -408,16 +428,21 @@
                 // ============================================================
                 //  DYNAMIC TRUST BADGES
                 // ============================================================
+                                // Dynamic Trust Badges
                 const badgesGrid = document.getElementById('dynamic-badges-grid');
-                if (product.is_free_delivery) {
+                if (delivCharge === 0) {
                     badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">🚚</span><span class="text">Free Delivery</span></div>`;
+                } else {
+                    badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">🚚</span><span class="text">+₹${delivCharge} Delivery</span></div>`;
                 }
+                
                 if (product.is_cod_available) {
                     badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">💵</span><span class="text">Cash on Delivery</span></div>`;
                 }
                 if (isFewLeft) {
                     badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">⏳</span><span class="text">Limited Stock</span></div>`;
                 }
+
 
                 // ============================================================
                 //  SPECIFICATIONS PARSER (Key: Value format, one per line)

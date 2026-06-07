@@ -345,7 +345,7 @@
         <!-- Inventory Table -->
         <div class="table-wrap">
             <table>
-                <thead>
+                <                <thead>
                     <tr>
                         <th>🖼️ Image</th>
                         <th>Product Details</th>
@@ -353,10 +353,12 @@
                         <th>🏷️ MRP (₹)</th>
                         <th>%  Discount</th>
                         <th>💳 UPI Discount (₹)</th>
-                        <th>📊 Stock Status</th>
+                        <th>🚚 Delivery(₹) </th>
+                        <th> 📈Stock Status</th>
                         <th>💾 Save</th>
                     </tr>
                 </thead>
+
                 <tbody id="inv-tbody">
                     <tr><td colspan="7" style="text-align:center; padding:40px; color:#3b82f6; font-weight:700;">⏳ Loading inventory...</td></tr>
                 </tbody>
@@ -530,6 +532,19 @@
                             >
                             <div style="font-size:0.7rem;color:#94a3b8;margin-top:3px;">₹ off on UPI</div>
                         </td>
+                                                <td>
+                            <input
+                                class="inline-input"
+                                type="number"
+                                id="deliv-${p.id}"
+                                value="${p.delivery_charge ?? 0}"
+                                min="0"
+                                title="Delivery Charge in ₹"
+                                style="width:80px;border-color:#3b82f6;"
+                            >
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:3px;">0 = Free</div>
+                        </td>
+
                         <td>
                             <select class="stock-select" id="stock-${p.id}">
                                 <option value="In Stock"         ${clean === 'in stock'           ? 'selected' : ''}>✅ In Stock</option>
@@ -561,6 +576,7 @@
             const disc       = parseInt(document.getElementById(`disc-${id}`).value);
             const stock      = document.getElementById(`stock-${id}`).value;
             const udisc      = parseInt(document.getElementById(`udiscount-${id}`).value) || 0;
+            const deliv = parseInt(document.getElementById(`deliv-${id}`).value) || 0;
 
             // Basic validation
             if (!price || price < 1) { showToast('❌ Enter a valid selling price!', 'error'); return; }
@@ -579,7 +595,9 @@
                         mrp:          mrp,
                         discount:     disc,
                         stock_status: stock,
-                        upi_discount: udisc
+                        upi_discount: udisc,
+                        delivery_charge: deliv
+
                     })
                     .eq('id', id);
 
@@ -593,6 +611,8 @@
                     allProducts[idx].discount     = disc;
                     allProducts[idx].stock_status = stock;
                     allProducts[idx].upi_discount = udisc;
+                                        allProducts[idx].delivery_charge = deliv;
+
                 }
 
                 updateStats();
