@@ -3,138 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBudget Store | Direct Factory Deals India</title>
+    <meta name="description" content="Shop exclusive dropship products at factory prices. Free Delivery & Cash on Delivery on every order.">
+    <meta name="robots" content="index, follow">
 
-    <title>SmartBudget Store | Direct Dropship Deals</title>
-    <meta name="description" content="Shop exclusive products at factory prices directly from the SmartBudget Store.">
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="apple-touch-icon" href="logo.jpg">
-
     <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* ============================================
+           STORE-SPECIFIC STYLES
+           ============================================ */
+
+        /* Controls Bar */
+        .store-controls {
+            max-width: 1200px;
+            margin: 0 auto 25px;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .store-search-box {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+        }
+        .store-search-box input {
+            flex: 1;
+            padding: 11px 16px;
+            border: 2px solid #e2e8f0;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #fff;
+        }
+        .store-search-box input:focus { border-color: var(--accent); }
+        .store-search-box button {
+            padding: 11px 18px;
+            background: var(--accent);
+            color: white;
+            border: 2px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+        .store-search-box button:hover { background: #1d4ed8; }
+
+        /* Filter Pills */
+        .store-filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            padding: 8px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #475569;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+        .filter-pill.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Sort Dropdown */
+        .store-sort select {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .store-sort select:focus { border-color: var(--accent); }
+
+        /* Product count text */
+        .products-count {
+            font-size: 0.88rem;
+            color: var(--muted);
+            font-weight: 600;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: -10px auto 15px;
+        }
+
+        /* Tile Enhancements */
+        .tile-price-block { margin-bottom: 12px; }
+        .tile-price { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+        .tile-mrp {
+            font-size: 0.9rem;
+            text-decoration: line-through;
+            color: var(--muted);
+            margin-left: 8px;
+            font-weight: 500;
+        }
+        .tile-badge-few { color: #92400e; font-size: 0.8rem; font-weight: 700; margin-top: 4px; }
+
+        /* Out-of-stock tile dimming */
+        .viral-tile.out-of-stock { opacity: 0.6; position: relative; filter: grayscale(30%); }
+        .oos-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(239, 68, 68, 0.88);
+            color: white;
+            padding: 7px 18px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            z-index: 5;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+        }
+        .btn-sold-out {
+            width: 100%;
+            padding: 10px 0;
+            border-radius: 6px;
+            border: none;
+            background: #cbd5e1;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: not-allowed;
+        }
+
+        /* Status Messages */
+        .status-message {
+            text-align: center;
+            padding: 70px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--muted);
+            grid-column: 1 / -1;
+        }
+
+        /* Loading Skeleton */
+        .skeleton-tile {
+            background: #fff;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid #f1f5f9;
+            animation: shimmer 1.5s infinite;
+        }
+        .skel-img { height: 200px; background: #f1f5f9; border-radius: 12px; margin-bottom: 15px; }
+        .skel-line { height: 14px; background: #f1f5f9; border-radius: 6px; margin-bottom: 10px; }
+        .skel-line.short { width: 60%; }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* No-results state */
+        .no-results-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .no-results-state .emoji { font-size: 3rem; margin-bottom: 15px; }
+        .no-results-state h3 { color: var(--primary); margin-bottom: 10px; }
+        .no-results-state p { color: var(--muted); margin-bottom: 20px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .store-controls { flex-direction: column; align-items: stretch; }
+            .store-search-box { width: 100%; }
+            .store-filter-pills { justify-content: flex-start; }
+            .store-sort select { width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- ===== HEADER (Matched exactly with your site) ===== -->
+    <!-- ===== HEADER ===== -->
     <header class="site-header" id="site-header">
         <div class="nav-container">
-            <!-- Logo -->
             <a href="index.html" class="logo-link">
                 <img src="logo.jpg" alt="SmartBudget.in Logo" class="nav-logo">
                 <span class="brand-text">SmartBudget<span class="brand-dot">.in</span></span>
             </a>
 
-            <!-- Desktop Search -->
+            <!-- Desktop Search (wired to store search) -->
             <div class="search-wrap" id="search-wrap">
                 <input type="text" id="search-input" placeholder="Search store products..." aria-label="Search products">
                 <button class="search-btn" id="search-btn" aria-label="Search">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
                 </button>
             </div>
 
-            <!-- Mobile Menu Button -->
+            <!-- Mobile Hamburger -->
             <button class="menu-toggle" id="mobile-menu-btn" aria-label="Toggle Menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
             </button>
 
             <!-- Nav Links -->
             <nav class="nav-links" id="nav-links">
                 <a href="index.html">Home</a>
                 <a href="allposts.html">Guides</a>
-                <a href="store.html" style="color: var(--accent); font-weight: 800;">Store</a>
+                <a href="store.html" style="color: var(--accent); font-weight: 800;">🛍️ Store</a>
                 <a href="track.html">Track Order</a>
-                
-                <!-- Mobile search inside nav -->
                 <div class="mobile-search">
-                    <input type="text" placeholder="Search products..." aria-label="Search">
-                    <button aria-label="Search">🔍</button>
+                    <input type="text" id="mobile-search-inp" placeholder="Search products..." aria-label="Search">
+                    <button onclick="triggerMobileSearch()" aria-label="Search">🔍</button>
                 </div>
             </nav>
         </div>
     </header>
 
     <main>
-        <!-- ===== STORE HERO SECTION ===== -->
-        <section class="hero" style="padding: 60px 20px;">
+        <!-- ===== HERO ===== -->
+        <section class="hero" style="padding: 55px 20px;">
             <div class="hero-bg-glow"></div>
             <div class="hero-content">
                 <div class="hero-tag">🛍️ SmartBudget Official Store</div>
-                <h1>Exclusive <span class="highlight">Dropship Deals</span></h1>
-                <p>Direct from factory to your doorstep. Free Delivery & Best Prices guaranteed on every order.</p>
+                <h1>Direct <span class="highlight">Factory Deals</span></h1>
+                <p>From warehouse to your doorstep. Free Delivery + Pay on Delivery on every order.</p>
                 <div class="hero-actions">
-                    <a href="#store-products" class="btn btn-primary">Shop Now</a>
+                    <a href="#store-products" class="btn btn-primary">Shop Now ↓</a>
                     <a href="track.html" class="btn btn-ghost">🚚 Track Your Order</a>
                 </div>
             </div>
         </section>
 
-        <!-- ===== STORE PRODUCTS GRID ===== -->
-        <section class="viral-finds-section" id="store-products" style="margin-top: 20px; margin-bottom: 80px;">
-            <div class="section-header" style="margin-bottom: 25px;">
-                <h2>📦 Available Products</h2>
+        <!-- ===== TRUST BADGES STRIP ===== -->
+        <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 14px 20px; margin-bottom: 35px;">
+            <div style="max-width: 1200px; margin: 0 auto; display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center;">
+                <span style="font-size: 0.9rem; font-weight: 700; color: #475569;">✅ Verified Sellers</span>
+                <span style="font-size: 0.9rem; font-weight: 700; color: #475569;">🚚 Free Delivery</span>
+                <span style="font-size: 0.9rem; font-weight: 700; color: #475569;">💵 Cash on Delivery</span>
+                <span style="font-size: 0.9rem; font-weight: 700; color: #475569;">🔄 7-Day Returns</span>
+                <span style="font-size: 0.9rem; font-weight: 700; color: #475569;">🔒 Secure Checkout</span>
             </div>
-            
-            <div class="viral-grid">
-                
-                <!-- STORE ITEM 1 -->
-                <div class="viral-tile">
-                    <div class="viral-discount" style="background: var(--success);">Free Ship</div>
-                    <img src="https://images.unsplash.com/photo-1572569433114-46939987d605?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" loading="lazy" alt="M10 TWS Earbuds">
-                    <h3 class="viral-name">M10 TWS Wireless Earbuds</h3>
-                    <p style="font-weight: 800; font-size: 1.25rem; color: var(--primary); margin-bottom: 12px;">₹399 <del style="font-size:0.8rem; color:var(--muted); font-weight: 500;">₹999</del></p>
-                    <div class="viral-action">
-                        <!-- Pura product data URL mein pass kar rahe hain -->
-                        <a href="product.html?id=M10-TWS&name=M10-TWS-Wireless-Earbuds&price=399&img=https://images.unsplash.com/photo-1572569433114-46939987d605" class="btn btn-primary" style="width: 100%; border-radius: 6px; padding: 10px 0;">View Details</a>
-                    </div>
-                </div>
+        </div>
 
-                <!-- STORE ITEM 2 -->
-                <div class="viral-tile">
-                    <div class="viral-discount" style="background: var(--warning); color: #000;">Hot Seller</div>
-                    <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" loading="lazy" alt="T800 Smartwatch">
-                    <h3 class="viral-name">T800 Ultra Smartwatch</h3>
-                    <p style="font-weight: 800; font-size: 1.25rem; color: var(--primary); margin-bottom: 12px;">₹549 <del style="font-size:0.8rem; color:var(--muted); font-weight: 500;">₹1499</del></p>
-                    <div class="viral-action">
-                        <a href="product.html?id=T800-SW&name=T800-Ultra-Smartwatch&price=549&img=https://images.unsplash.com/photo-1546868871-7041f2a55e12" class="btn btn-primary" style="width: 100%; border-radius: 6px; padding: 10px 0;">View Details</a>
-                    </div>
-                </div>
+        <!-- ===== STORE CONTROLS (Search + Filter + Sort) ===== -->
+        <!-- Hidden initially, shown after products load -->
+        <div class="store-controls" id="store-controls" style="display: none;">
+            <div class="store-search-box">
+                <input type="text" id="store-search" placeholder="Search by product name...">
+                <button onclick="applyFilters()">🔍</button>
+            </div>
+            <div class="store-filter-pills">
+                <button class="filter-pill active" data-filter="all" onclick="setFilter('all', this)">All</button>
+                <button class="filter-pill" data-filter="in-stock" onclick="setFilter('in-stock', this)">✅ In Stock</button>
+                <button class="filter-pill" data-filter="few-left" onclick="setFilter('few-left', this)">⏳ Few Left</button>
+                <button class="filter-pill" data-filter="out-of-stock" onclick="setFilter('out-of-stock', this)">❌ Sold Out</button>
+            </div>
+            <div class="store-sort">
+                <select id="sort-select" onchange="applyFilters()">
+                    <option value="default">Sort: Default</option>
+                    <option value="price-asc">Price: Low → High</option>
+                    <option value="price-desc">Price: High → Low</option>
+                    <option value="discount-desc">Biggest Discount</option>
+                </select>
+            </div>
+        </div>
 
-                <!-- STORE ITEM 3 -->
-                <div class="viral-tile">
-                    <div class="viral-discount">-50% OFF</div>
-                    <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" loading="lazy" alt="Mens Sling Bag">
-                    <h3 class="viral-name">Premium Men's Sling Bag</h3>
-                    <p style="font-weight: 800; font-size: 1.25rem; color: var(--primary); margin-bottom: 12px;">₹299 <del style="font-size:0.8rem; color:var(--muted); font-weight: 500;">₹599</del></p>
-                    <div class="viral-action">
-                        <a href="product.html?id=SLING-BAG&name=Premium-Mens-Sling-Bag&price=299&img=https://images.unsplash.com/photo-1584916201218-f4242ceb4809" class="btn btn-primary" style="width: 100%; border-radius: 6px; padding: 10px 0;">View Details</a>
-                    </div>
-                </div>
+        <!-- ===== PRODUCTS GRID ===== -->
+        <section class="viral-finds-section" id="store-products" style="margin-top: 0; margin-bottom: 80px;">
+            <p class="products-count" id="products-count" style="display: none;"></p>
 
+            <div class="viral-grid" id="dynamic-products-grid">
+                <!-- Loading Skeletons (visible until data arrives) -->
+                <div class="skeleton-tile"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div><div class="skel-line short"></div></div>
+                <div class="skeleton-tile"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div><div class="skel-line short"></div></div>
+                <div class="skeleton-tile"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div><div class="skel-line short"></div></div>
+                <div class="skeleton-tile"><div class="skel-img"></div><div class="skel-line"></div><div class="skel-line short"></div><div class="skel-line short"></div></div>
             </div>
         </section>
     </main>
 
-    <!-- ===== FOOTER (Matched exactly with your site) ===== -->
-    <footer class="site-footer" id="about">
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-brand">
                 <img src="logo.jpg" alt="SmartBudget.in Logo" class="footer-logo-img">
                 <h3>SmartBudget.in</h3>
                 <p>India's trusted source for honest product reviews and smart buying decisions.</p>
                 <div class="social-links">
-                    <a href="https://www.instagram.com/smartbudget_in" class="social-btn">📸 Instagram</a>
-                    <a href="https://youtube.com/@smartbudget-in" class="social-btn">▶️ YouTube</a>
+                    <a href="https://www.instagram.com/smartbudget_in?igsh=ZWprejZhcDNpNXdh" class="social-btn">📸 Instagram</a>
+                    <a href="https://youtube.com/@smartbudget-in?si=fWKeNKhLxjTZG-qY" class="social-btn">▶️ YouTube</a>
                     <a href="https://whatsapp.com/channel/0029Vb7axdbG8l5GEMQ1WP29" class="social-btn">💬 WhatsApp</a>
                 </div>
             </div>
-
             <div class="footer-col">
                 <h4>Store Support</h4>
                 <a href="track.html">Track Order</a>
@@ -142,7 +325,6 @@
                 <a href="#">Shipping Policy</a>
                 <a href="#">Return Policy</a>
             </div>
-
             <div class="footer-col">
                 <h4>Quick Links</h4>
                 <a href="index.html">Back to Reviews</a>
@@ -151,15 +333,239 @@
                 <a href="privacy.html">Privacy Policy</a>
             </div>
         </div>
-
         <div class="footer-bottom">
             <p>&copy; 2026 SmartBudget.in — All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Back to Top -->
     <button class="back-to-top" id="back-to-top" aria-label="Back to top">↑</button>
 
     <script src="script.js"></script>
+
+    <script>
+        // ============================================================
+        //  SUPABASE CONFIG — Central constants
+        // ============================================================
+        const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // State
+        let allProducts = [];
+        let currentFilter = 'all';
+
+        // ============================================================
+        //  FETCH PRODUCTS FROM SUPABASE
+        // ============================================================
+        async function loadStoreProducts() {
+            const grid = document.getElementById('dynamic-products-grid');
+
+            try {
+                const { data, error } = await db
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                // Clear skeleton loaders
+                grid.innerHTML = '';
+
+                if (error) {
+                    grid.innerHTML = `
+                        <div class="status-message">
+                            ❌ Database error: ${error.message}<br>
+                            <small style="color:#94a3b8;">Please refresh or contact support.</small>
+                        </div>`;
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    grid.innerHTML = `
+                        <div class="no-results-state">
+                            <div class="emoji">🛒</div>
+                            <h3>Store is stocking up!</h3>
+                            <p>New products are coming soon. Check back shortly.</p>
+                            <a href="index.html" class="btn btn-primary">← Back to Homepage</a>
+                        </div>`;
+                    return;
+                }
+
+                allProducts = data;
+
+                // Show controls
+                document.getElementById('store-controls').style.display = 'flex';
+                document.getElementById('products-count').style.display = 'block';
+
+                renderProducts(allProducts);
+
+            } catch (err) {
+                grid.innerHTML = `<div class="status-message" style="color:red;">❌ System Error: ${err.message}</div>`;
+            }
+        }
+
+        // ============================================================
+        //  RENDER PRODUCT CARDS
+        // ============================================================
+        function renderProducts(products) {
+            const grid = document.getElementById('dynamic-products-grid');
+            const countEl = document.getElementById('products-count');
+            grid.innerHTML = '';
+
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-results-state">
+                        <div class="emoji">🔍</div>
+                        <h3>No products found</h3>
+                        <p>Try a different search term or filter.</p>
+                        <button class="btn btn-primary" onclick="resetFilters()">Clear Filters</button>
+                    </div>`;
+                countEl.textContent = '';
+                return;
+            }
+
+            const n = products.length;
+            countEl.textContent = `Showing ${n} product${n !== 1 ? 's' : ''}`;
+
+            products.forEach(product => {
+                // Normalise stock status for case-insensitive checks
+                const cleanStatus = (product.stock_status || 'in stock').trim().toLowerCase();
+                const isOutOfStock = ['out of stock', 'sold out', 'not in stock'].includes(cleanStatus);
+                const isFewLeft   = ['only a few left', 'few left', 'limited stock'].includes(cleanStatus);
+
+                // URL: pass only the ID; product.html fetches everything from DB
+                const productUrl = `product.html?id=${encodeURIComponent(product.product_id)}`;
+
+                // Calculate MRP if missing
+                const discount = product.discount || 60;
+                const mrp = product.mrp || Math.round(product.price / (1 - discount / 100));
+
+                // Discount badge
+                let badgeText  = `-${discount}%`;
+                let badgeStyle = '';
+                if (isOutOfStock) { badgeText = 'SOLD OUT'; badgeStyle = 'background:#ef4444;'; }
+                else if (isFewLeft) { badgeText = '⏳ FEW LEFT'; badgeStyle = 'background:#f59e0b;'; }
+
+                const tile = document.createElement('div');
+                tile.className = `viral-tile${isOutOfStock ? ' out-of-stock' : ''}`;
+
+                tile.innerHTML = `
+                    ${isOutOfStock ? '<div class="oos-overlay">OUT OF STOCK</div>' : ''}
+                    <div class="viral-discount" style="${badgeStyle}">${badgeText}</div>
+                    <img
+                        src="${product.image_url}"
+                        loading="lazy"
+                        alt="${product.name}"
+                        onerror="this.src='https://placehold.co/300x300?text=No+Image'"
+                    >
+                    <h3 class="viral-name">${product.name}</h3>
+                    <div class="tile-price-block">
+                        <span class="tile-price">₹${product.price.toLocaleString('en-IN')}</span>
+                        <span class="tile-mrp">₹${mrp.toLocaleString('en-IN')}</span>
+                    </div>
+                    ${isFewLeft ? '<p class="tile-badge-few">⚡ Only a few units left!</p>' : ''}
+                    <div class="viral-action">
+                        ${isOutOfStock
+                            ? `<button class="btn-sold-out" disabled>Sold Out</button>`
+                            : `<a href="${productUrl}" class="btn btn-primary"
+                                style="width:100%;border-radius:6px;padding:10px 0;text-decoration:none;display:block;text-align:center;">
+                                View Details →
+                               </a>`
+                        }
+                    </div>
+                `;
+                grid.appendChild(tile);
+            });
+        }
+
+        // ============================================================
+        //  FILTER + SORT LOGIC
+        // ============================================================
+        function setFilter(filter, el) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query  = (document.getElementById('store-search').value || '').toLowerCase().trim();
+            const sortBy = document.getElementById('sort-select').value;
+
+            let filtered = allProducts.filter(p => {
+                const cleanStatus = (p.stock_status || '').trim().toLowerCase();
+                const isOutOfStock = ['out of stock', 'sold out', 'not in stock'].includes(cleanStatus);
+                const isFewLeft   = ['only a few left', 'few left', 'limited stock'].includes(cleanStatus);
+                const isInStock   = !isOutOfStock && !isFewLeft;
+
+                const matchesSearch = !query
+                    || p.name.toLowerCase().includes(query)
+                    || (p.description || '').toLowerCase().includes(query)
+                    || (p.product_id || '').toLowerCase().includes(query);
+
+                const matchesFilter =
+                    currentFilter === 'all'
+                    || (currentFilter === 'in-stock'    && isInStock)
+                    || (currentFilter === 'few-left'    && isFewLeft)
+                    || (currentFilter === 'out-of-stock' && isOutOfStock);
+
+                return matchesSearch && matchesFilter;
+            });
+
+            // Sort
+            if (sortBy === 'price-asc')      filtered.sort((a, b) => a.price - b.price);
+            else if (sortBy === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+            else if (sortBy === 'discount-desc') filtered.sort((a, b) => (b.discount || 0) - (a.discount || 0));
+
+            renderProducts(filtered);
+        }
+
+        function resetFilters() {
+            currentFilter = 'all';
+            document.getElementById('store-search').value = '';
+            document.getElementById('sort-select').value = 'default';
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector('[data-filter="all"]').classList.add('active');
+            renderProducts(allProducts);
+        }
+
+        // ============================================================
+        //  WIRE HEADER SEARCH → STORE SEARCH (Desktop + Mobile)
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerInput = document.getElementById('search-input');
+            const headerBtn   = document.getElementById('search-btn');
+            const storeInput  = document.getElementById('store-search');
+
+            function syncAndApply(val) {
+                storeInput.value = val;
+                applyFilters();
+                document.getElementById('store-products').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            if (headerInput) {
+                headerInput.addEventListener('keyup', e => {
+                    if (e.key === 'Enter') syncAndApply(headerInput.value);
+                });
+            }
+            if (headerBtn) {
+                headerBtn.addEventListener('click', () => syncAndApply(headerInput.value));
+            }
+
+            storeInput.addEventListener('keyup', e => {
+                if (e.key === 'Enter') applyFilters();
+            });
+        });
+
+        window.triggerMobileSearch = function() {
+            const val = document.getElementById('mobile-search-inp').value;
+            document.getElementById('store-search').value = val;
+            applyFilters();
+            document.getElementById('store-products').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        loadStoreProducts();
+    </script>
 </body>
 </html>

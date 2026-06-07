@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details | SmartBudget Store</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .product-detail-section {
             max-width: 1100px;
@@ -15,8 +17,6 @@
             gap: 50px;
             align-items: start;
         }
-
-        /* Image Gallery Styling */
         .product-image-container {
             background: #fff;
             border-radius: 16px;
@@ -32,15 +32,21 @@
             border-radius: 12px;
             max-height: 450px;
             object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-        .product-image-container img:hover {
-            transform: scale(1.05);
         }
 
-        /* Product Info Styling */
+        /* Breadcrumb */
+        .breadcrumb {
+            max-width: 1100px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .breadcrumb a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
         .product-info h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: var(--primary);
             margin-bottom: 15px;
             line-height: 1.3;
@@ -52,7 +58,7 @@
             align-items: center;
             background: #10b981;
             color: white;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 6px;
             font-weight: 700;
             font-size: 0.9rem;
@@ -60,13 +66,11 @@
             gap: 5px;
         }
 
-        /* Urgency Banner */
+        /* Dynamic Stock Banner */
         .urgency-banner {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 700;
             margin-bottom: 20px;
             display: flex;
@@ -75,7 +79,6 @@
             border-left: 4px solid #dc2626;
         }
 
-        /* Pricing Block */
         .price-block {
             display: flex;
             align-items: baseline;
@@ -85,18 +88,10 @@
             padding: 15px 20px;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
+            flex-wrap: wrap;
         }
-        .price-main {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        .price-mrp {
-            font-size: 1.2rem;
-            text-decoration: line-through;
-            color: #94a3b8;
-            font-weight: 600;
-        }
+        .price-main { font-size: 2.8rem; font-weight: 800; color: var(--primary); }
+        .price-mrp  { font-size: 1.2rem; text-decoration: line-through; color: #94a3b8; font-weight: 600; }
         .price-discount {
             background: #ef4444;
             color: white;
@@ -104,13 +99,12 @@
             border-radius: 8px;
             font-weight: 800;
             font-size: 1rem;
-            letter-spacing: 1px;
         }
 
-        /* Trust Badges */
+        /* Trust Badges Grid */
         .trust-badges {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 10px;
             margin-bottom: 30px;
         }
@@ -129,6 +123,7 @@
         .trust-badge span.icon { font-size: 1.8rem; }
         .trust-badge span.text { font-size: 0.75rem; font-weight: 700; color: #475569; }
 
+        /* CTA Button */
         .checkout-btn {
             font-size: 1.2rem;
             padding: 18px;
@@ -141,23 +136,30 @@
             color: white;
             font-weight: 800;
             text-transform: uppercase;
+            text-decoration: none;
             letter-spacing: 1px;
             box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .checkout-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5);
+        .checkout-btn:hover:not(.disabled-btn) {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(59, 130, 246, 0.5);
+        }
+        .disabled-btn {
+            background: #cbd5e1 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            pointer-events: none;
         }
 
-        /* Description & Specs */
+        /* Details Box */
         .details-box {
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         .details-box h3 {
             font-size: 1.3rem;
@@ -165,49 +167,38 @@
             color: var(--primary);
             border-bottom: 2px solid #f1f5f9;
             padding-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
-        .details-box p {
-            color: #475569;
-            line-height: 1.8;
-            font-size: 1.05rem;
-            margin-bottom: 20px;
-        }
-        .specs-list { list-style: none; padding: 0; margin-bottom: 0; }
+        .details-box p { color: #475569; line-height: 1.8; font-size: 1.05rem; }
+
+        /* Specs List */
+        .specs-list { list-style: none; padding: 0; }
         .specs-list li {
             padding: 12px 0;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             gap: 15px;
         }
+        .specs-list li:last-child { border-bottom: none; }
         .specs-list li strong { min-width: 130px; color: var(--primary); font-weight: 700; }
-        .specs-list li span { color: #475569; }
 
-        /* Reviews */
-        .review-item { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #f1f5f9; }
-        .review-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .review-stars { color: #f59e0b; margin-bottom: 8px; font-size: 1.1rem; }
-        .review-name { font-weight: 800; font-size: 1rem; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; color: var(--primary); }
-        .verified-buyer { color: #10b981; font-size: 0.75rem; background: #d1fae5; padding: 2px 6px; border-radius: 4px; }
-        .review-text { color: #475569; font-size: 0.95rem; line-height: 1.6; }
-
-        /* Mobile Sticky Footer */
+        /* Mobile Sticky Buy Bar */
         .mobile-sticky-buy { display: none; }
 
         @media (max-width: 768px) {
-            .product-detail-section { grid-template-columns: 1fr; gap: 30px; margin: 20px auto; padding-bottom: 80px; }
-            .product-info h1 { font-size: 1.8rem; }
-            .product-image-container { position: static; padding: 15px; }
-            .price-main { font-size: 2.2rem; }
-            
-            /* Sticky Bottom Bar for Mobile */
-            .checkout-btn { display: none; } /* Hide main button on mobile */
+            .product-detail-section {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                margin: 20px auto;
+                padding-bottom: 90px;
+            }
+            .product-image-container { position: static; }
+            .checkout-btn  { display: none; }
             .mobile-sticky-buy {
                 display: flex;
                 position: fixed;
-                bottom: 0; left: 0; right: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 background: white;
                 padding: 12px 20px;
                 box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
@@ -216,25 +207,22 @@
                 justify-content: space-between;
                 border-top: 1px solid #e2e8f0;
             }
-            .mobile-sticky-buy .price-info { display: flex; flex-direction: column; }
-            .mobile-sticky-buy .price { font-size: 1.6rem; font-weight: 800; color: var(--primary); line-height: 1; }
-            .mobile-sticky-buy .mrp { font-size: 0.8rem; text-decoration: line-through; color: #94a3b8; }
-            .mobile-sticky-buy .btn { 
-                margin: 0; 
-                padding: 14px 35px; 
-                font-size: 1.1rem; 
+            .mobile-sticky-buy .price { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+            .mobile-sticky-buy .btn {
+                padding: 14px 35px;
+                font-size: 1.1rem;
                 background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
                 border-radius: 50px;
                 color: white;
                 font-weight: 800;
                 text-decoration: none;
-                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
             }
         }
     </style>
 </head>
 <body>
 
+    <!-- Header -->
     <header class="site-header">
         <div class="nav-container">
             <a href="index.html" class="logo-link">
@@ -247,351 +235,233 @@
         </div>
     </header>
 
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &rsaquo;
+        <a href="store.html">Store</a> &rsaquo;
+        <span id="breadcrumb-name" style="color:#1e293b;">Loading...</span>
+    </div>
+
     <main>
-        <div class="product-detail-section">
-            
-            <!-- Left Column: Image -->
+        <!-- Loading Screen -->
+        <div id="loading-screen" style="text-align:center; padding:100px 20px; font-size:1.5rem; font-weight:bold; color:var(--accent);">
+            ⏳ Fetching product details...
+        </div>
+
+        <!-- Main Product Layout (hidden until loaded) -->
+        <div class="product-detail-section" id="main-product-layout" style="display:none;">
+
+            <!-- Left: Product Image -->
             <div class="product-image-container">
                 <img id="prod-img" src="" alt="Product Image">
             </div>
-            
-            <!-- Right Column: Details -->
+
+            <!-- Right: Product Info -->
             <div class="product-info">
-                <div class="rating-badge">⭐ 4.8 | 2,104 Ratings</div>
-                <h1 id="prod-name">Loading...</h1>
-                
-                <div class="urgency-banner">
-                    ⏳ <span><strong>Hurry!</strong> Only a few items left in stock.</span>
-                </div>
+                <div class="rating-badge">⭐ 4.8 &nbsp;|&nbsp; 2,104 Ratings</div>
+                <h1 id="prod-name">...</h1>
 
+                <!-- Dynamic Stock / Urgency Banner -->
+                <div class="urgency-banner" id="prod-stock-banner"></div>
+
+                <!-- Price Block -->
                 <div class="price-block">
-                    <span class="price-main">₹<span id="prod-price">...</span></span>
-                    <span class="price-mrp">₹<span id="prod-mrp">...</span></span>
-                    <span class="price-discount" id="prod-discount">... OFF</span>
+                    <span class="price-main">₹<span id="prod-price">0</span></span>
+                    <span class="price-mrp">₹<span id="prod-mrp">0</span></span>
+                    <span class="price-discount" id="prod-discount">0% OFF</span>
                 </div>
 
-                <div class="trust-badges">
-                    <div class="trust-badge">
-                        <span class="icon">🚚</span>
-                        <span class="text">Free Delivery</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span class="icon">🛡️</span>
-                        <span class="text">Secure Pay</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span class="icon">🔄</span>
-                        <span class="text">7 Days Return</span>
-                    </div>
+                <!-- Dynamic Trust Badges -->
+                <div class="trust-badges" id="dynamic-badges-grid">
+                    <!-- Always-present defaults -->
+                    <div class="trust-badge"><span class="icon">🛡️</span><span class="text">Secure Pay</span></div>
+                    <div class="trust-badge"><span class="icon">🔄</span><span class="text">7 Days Return</span></div>
                 </div>
-                
+
+                <!-- Desktop CTA -->
                 <a href="#" id="buy-btn-desktop" class="checkout-btn">Proceed to Buy ⚡</a>
 
-                <!-- Dynamic Description Box -->
+                <!-- Description & Specs -->
                 <div class="details-box">
                     <h3>📝 Product Description</h3>
-                    <p id="prod-desc">Loading description...</p>
+                    <p id="prod-desc">Loading...</p>
 
-                    <h3 style="margin-top: 30px;">⚙️ Specifications</h3>
-                    <ul class="specs-list" id="prod-specs">
-                        <!-- Specs JS se aayenge -->
-                    </ul>
+                    <h3 style="margin-top:30px;">⚙️ Specifications</h3>
+                    <ul class="specs-list" id="prod-specs"></ul>
                 </div>
-
-                <!-- Dynamic Reviews Box -->
-                <div class="details-box">
-                    <h3>⭐ Top Customer Reviews</h3>
-                    <div id="prod-reviews">
-                        <!-- Reviews JS se aayenge -->
-                    </div>
-                </div>
-
             </div>
         </div>
     </main>
 
-    <!-- Mobile Sticky Footer -->
-    <div class="mobile-sticky-buy">
-        <div class="price-info">
-            <span class="mrp">MRP: ₹<span id="sticky-mrp">...</span></span>
-            <span class="price">₹<span id="sticky-price">...</span></span>
+    <!-- Mobile Sticky Buy Bar (hidden until loaded) -->
+    <div class="mobile-sticky-buy" id="mobile-footer-bar" style="display:none;">
+        <div style="display:flex; flex-direction:column;">
+            <span style="font-size:0.78rem; text-decoration:line-through; color:#94a3b8;">
+                MRP: ₹<span id="sticky-mrp">0</span>
+            </span>
+            <span class="price">₹<span id="sticky-price">0</span></span>
         </div>
         <a href="#" id="buy-btn-mobile" class="btn">Buy Now ⚡</a>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            
-            const productData = {
-                "M10-TWS": {
-                    description: "The M10 TWS Wireless Earbuds provide incredible HD sound quality with deep bass. It comes with a massive 2000mAh charging case that can also act as an emergency power bank for your smartphone. Features an LED digital display to show battery levels.",
-                    specs: {
-                        "Bluetooth": "Version 5.1",
-                        "Battery Life": "4-5 Hours (Continuous)",
-                        "Charging Case": "2000mAh",
-                        "Waterproof": "IPX7 Rated",
-                        "Mic": "Built-in HD Microphone"
-                    },
-                    reviews: [
-                        { name: "Rahul Sharma", rating: "⭐⭐⭐⭐⭐", text: "Bhai sound quality ekdum mast hai. Aur powerbank wala feature sach me kaam aata hai emergency me." },
-                        { name: "Amit Kumar", rating: "⭐⭐⭐⭐", text: "Good bass and clear vocals. Value for money under 400 rupees." }
-                    ]
-                },
-                "T800-SW": {
-                    description: "The T800 Ultra is the ultimate budget smartwatch featuring a massive 1.99-inch edge-to-edge HD display. It supports Bluetooth calling, so you can make and receive calls directly from your wrist. Comes with the iconic ocean loop strap.",
-                    specs: {
-                        "Display": "1.99 inch HD IPS",
-                        "Calling": "Bluetooth Calling Supported",
-                        "Health": "Heart Rate & SpO2 Monitor",
-                        "Strap": "Ocean Loop (Orange)",
-                        "Battery": "2-3 Days normal usage"
-                    },
-                    reviews: [
-                        { name: "Vikash Singh", rating: "⭐⭐⭐⭐⭐", text: "Looks exactly like the Apple Watch Ultra. Display is very bright even in sunlight." },
-                        { name: "Neha", rating: "⭐⭐⭐⭐", text: "Nice watch for daily use. Calling feature works perfectly." }
-                    ]
-                },
-                "SLING-BAG": {
-                    description: "Premium Men's Crossbody Sling Bag made with high-quality splash-proof material. Perfect for carrying your phone, power bank, wallet, and sunglasses securely while traveling or riding a bike.",
-                    specs: {
-                        "Material": "High-density Oxford Cloth",
-                        "Type": "Crossbody / Sling",
-                        "Compartments": "3 Zip Pockets",
-                        "Waterproof": "Splash-resistant",
-                        "Strap": "Adjustable & Comfortable"
-                    },
-                    reviews: [
-                        { name: "Suresh P.", rating: "⭐⭐⭐⭐⭐", text: "Quality is premium. Zips are very smooth. Perfect for bike riders." }
-                    ]
-                },
-                "DEFAULT": {
-                    description: "High-quality premium product sourced directly from trusted manufacturers. We ensure 100% quality check before shipping.",
-                    specs: {
-                        "Quality": "Premium Grade",
-                        "Warranty": "7 Days Replacement",
-                        "Delivery": "Free Shipping Available"
-                    },
-                    reviews: [
-                        { name: "Verified Buyer", rating: "⭐⭐⭐⭐⭐", text: "Great product, highly recommended!" }
-                    ]
-                }
-            };
+        document.addEventListener("DOMContentLoaded", async () => {
 
+            // ============================================================
+            //  SUPABASE CONFIG
+            // ============================================================
+            const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+            const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            // ============================================================
+            //  GET PRODUCT ID FROM URL
+            // ============================================================
             const urlParams = new URLSearchParams(window.location.search);
-            const prodId = urlParams.get('id');
-            const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
-            const prodPrice = parseInt(urlParams.get('price') || "0");
-            const prodImg = urlParams.get('img') || "logo.jpg";
+            const prodId    = urlParams.get('id');
 
-            if(!prodId) window.location.href = 'store.html';
-
-            // Auto calculate Fake MRP (2.5x of original price) to show massive discount
-            const fakeMrp = Math.floor(prodPrice * 2.5);
-            const discountPercent = Math.floor(((fakeMrp - prodPrice) / fakeMrp) * 100);
-
-            // Populate UI Elements
-            document.getElementById('prod-name').innerText = prodName;
-            document.getElementById('prod-price').innerText = prodPrice;
-            document.getElementById('prod-mrp').innerText = fakeMrp;
-            document.getElementById('prod-discount').innerText = `${discountPercent}% OFF`;
-            document.getElementById('prod-img').src = prodImg;
-            
-            // Sticky Footer Elements
-            document.getElementById('sticky-price').innerText = prodPrice;
-            document.getElementById('sticky-mrp').innerText = fakeMrp;
-
-            const checkoutUrl = `checkout.html?id=${prodId}&name=${encodeURIComponent(prodName)}&price=${prodPrice}`;
-            document.getElementById('buy-btn-desktop').href = checkoutUrl;
-            document.getElementById('buy-btn-mobile').href = checkoutUrl;
-
-            // Fetch Details
-            const data = productData[prodId] || productData["DEFAULT"];
-            document.getElementById('prod-desc').innerText = data.description;
-
-            // Render Specs
-            const specsContainer = document.getElementById('prod-specs');
-            specsContainer.innerHTML = "";
-            for (const [key, value] of Object.entries(data.specs)) {
-                specsContainer.innerHTML += `<li><strong>${key}:</strong> <span>${value}</span></li>`;
+            if (!prodId) {
+                window.location.href = 'store.html';
+                return;
             }
 
-            // Render Reviews
-            const reviewsContainer = document.getElementById('prod-reviews');
-            reviewsContainer.innerHTML = "";
-            data.reviews.forEach(review => {
-                reviewsContainer.innerHTML += `
-                    <div class="review-item">
-                        <div class="review-stars">${review.rating}</div>
-                        <span class="review-name">${review.name} <span class="verified-buyer">✔ Verified</span></span>
-                        <p class="review-text">${review.text}</p>
-                    </div>
-                `;
-            });
-        });
-    </script>
-</body>
-</html>
-        <div class="nav-container">
-            <a href="index.html" class="logo-link">
-                <img src="logo.jpg" alt="Logo" class="nav-logo">
-                <span class="brand-text">SmartBudget<span class="brand-dot">.in</span></span>
-            </a>
-            <nav class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="store.html" style="color: var(--accent); font-weight: 800;">Store</a>
-                <a href="track.html">Track Order</a>
-            </nav>
-        </div>
-    </header>
+            const loadingScreen = document.getElementById('loading-screen');
 
-    <main>
-        <div class="product-detail-section">
-            
-            <!-- Left Column: Image -->
-            <div class="product-image-container">
-                <img id="prod-img" src="" alt="Product Image">
-            </div>
-            
-            <!-- Right Column: Details -->
-            <div class="product-info">
-                <span class="category-tag" style="background: #e0e7ff; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem;">Verified Deal</span>
-                <h1 id="prod-name">Loading...</h1>
-                <div class="product-price">₹<span id="prod-price">...</span></div>
-                
-                <a href="#" id="buy-btn" class="btn btn-primary checkout-btn">Proceed to Buy →</a>
+            try {
+                // ============================================================
+                //  FETCH PRODUCT FROM SUPABASE
+                // ============================================================
+                const { data: products, error } = await db
+                    .from('products')
+                    .select('*')
+                    .eq('product_id', prodId);
 
-                <!-- Dynamic Description Box -->
-                <div class="details-box">
-                    <h3>📝 Description</h3>
-                    <p id="prod-desc">Loading description...</p>
-
-                    <h3>⚙️ Specifications</h3>
-                    <ul class="specs-list" id="prod-specs">
-                        <!-- Specs JS se aayenge -->
-                    </ul>
-                </div>
-
-                <!-- Dynamic Reviews Box -->
-                <div class="details-box">
-                    <h3>⭐ Customer Reviews</h3>
-                    <div id="prod-reviews">
-                        <!-- Reviews JS se aayenge -->
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            
-            /* =========================================
-               1. PRODUCT DATABASE (JSON/Dictionary)
-               Yahan tum aage chal kar aur products add kar sakte ho unke ID ke hisaab se
-               ========================================= */
-            const productData = {
-                "M10-TWS": {
-                    description: "The M10 TWS Wireless Earbuds provide incredible HD sound quality with deep bass. It comes with a massive 2000mAh charging case that can also act as an emergency power bank for your smartphone. Features an LED digital display to show battery levels.",
-                    specs: {
-                        "Bluetooth": "Version 5.1",
-                        "Battery Life": "4-5 Hours (Continuous)",
-                        "Charging Case": "2000mAh",
-                        "Waterproof": "IPX7 Rated",
-                        "Mic": "Built-in HD Microphone"
-                    },
-                    reviews: [
-                        { name: "Rahul Sharma", rating: "⭐⭐⭐⭐⭐", text: "Bhai sound quality ekdum mast hai. Aur powerbank wala feature sach me kaam aata hai emergency me." },
-                        { name: "Amit Kumar", rating: "⭐⭐⭐⭐", text: "Good bass and clear vocals. Value for money under 400 rupees." }
-                    ]
-                },
-                "T800-SW": {
-                    description: "The T800 Ultra is the ultimate budget smartwatch featuring a massive 1.99-inch edge-to-edge HD display. It supports Bluetooth calling, so you can make and receive calls directly from your wrist. Comes with the iconic ocean loop strap.",
-                    specs: {
-                        "Display": "1.99 inch HD IPS",
-                        "Calling": "Bluetooth Calling Supported",
-                        "Health": "Heart Rate & SpO2 Monitor",
-                        "Strap": "Ocean Loop (Orange)",
-                        "Battery": "2-3 Days normal usage"
-                    },
-                    reviews: [
-                        { name: "Vikash Singh", rating: "⭐⭐⭐⭐⭐", text: "Looks exactly like the Apple Watch Ultra. Display is very bright even in sunlight." },
-                        { name: "Neha", rating: "⭐⭐⭐⭐", text: "Nice watch for daily use. Calling feature works perfectly." }
-                    ]
-                },
-                "SLING-BAG": {
-                    description: "Premium Men's Crossbody Sling Bag made with high-quality splash-proof material. Perfect for carrying your phone, power bank, wallet, and sunglasses securely while traveling or riding a bike.",
-                    specs: {
-                        "Material": "High-density Oxford Cloth",
-                        "Type": "Crossbody / Sling",
-                        "Compartments": "3 Zip Pockets",
-                        "Waterproof": "Splash-resistant",
-                        "Strap": "Adjustable & Comfortable"
-                    },
-                    reviews: [
-                        { name: "Suresh P.", rating: "⭐⭐⭐⭐⭐", text: "Quality is premium. Zips are very smooth. Perfect for bike riders." }
-                    ]
-                },
-                // Default data agar koi naya product ho jiska data upar na ho
-                "DEFAULT": {
-                    description: "High-quality premium product sourced directly from trusted manufacturers. We ensure 100% quality check before shipping.",
-                    specs: {
-                        "Quality": "Premium Grade",
-                        "Warranty": "7 Days Replacement",
-                        "Delivery": "Free Shipping Available"
-                    },
-                    reviews: [
-                        { name: "Verified Buyer", rating: "⭐⭐⭐⭐⭐", text: "Great product, highly recommended!" }
-                    ]
+                if (error || !products || products.length === 0) {
+                    loadingScreen.innerHTML = `
+                        <div style="color:#ef4444;">
+                            ❌ Product not found in store registry!<br>
+                            <a href="store.html" style="color:var(--accent);font-size:1rem;margin-top:20px;display:inline-block;">
+                                ← Back to Store
+                            </a>
+                        </div>`;
+                    return;
                 }
-            };
 
-            /* =========================================
-               2. URL SE DATA NIKALNA AUR RENDER KARNA
-               ========================================= */
-            const urlParams = new URLSearchParams(window.location.search);
-            const prodId = urlParams.get('id');
-            const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
-            const prodPrice = urlParams.get('price') || "0";
-            const prodImg = urlParams.get('img') || "logo.jpg";
+                const product = products[0];
 
-            // Redirect if no ID
-            if(!prodId) window.location.href = 'store.html';
+                // ============================================================
+                //  STOCK STATUS CHECK — Normalised (lowercase, trimmed)
+                //  BUG FIX: All checks now use cleanStatus consistently
+                // ============================================================
+                const cleanStatus = (product.stock_status || 'in stock').trim().toLowerCase();
+                const isOutOfStock = ['out of stock', 'sold out', 'not in stock'].includes(cleanStatus);
+                const isFewLeft    = ['only a few left', 'few left', 'limited stock'].includes(cleanStatus);
 
-            // Set Basic Info
-            document.getElementById('prod-name').innerText = prodName;
-            document.getElementById('prod-price').innerText = prodPrice;
-            document.getElementById('prod-img').src = prodImg;
+                // ============================================================
+                //  RENDER BASIC PRODUCT INFO
+                // ============================================================
+                document.title = `${product.name} | SmartBudget Store`;
+                document.getElementById('breadcrumb-name').textContent = product.name;
 
-            // Set Checkout Link
-            const checkoutUrl = `checkout.html?id=${prodId}&name=${encodeURIComponent(prodName)}&price=${prodPrice}`;
-            document.getElementById('buy-btn').href = checkoutUrl;
+                document.getElementById('prod-name').textContent    = product.name;
+                document.getElementById('prod-price').textContent   = product.price.toLocaleString('en-IN');
+                document.getElementById('prod-mrp').textContent     = (product.mrp || 0).toLocaleString('en-IN');
+                document.getElementById('prod-discount').textContent = `${product.discount}% OFF`;
+                document.getElementById('prod-img').src             = product.image_url;
+                document.getElementById('prod-img').alt             = product.name;
+                document.getElementById('prod-desc').textContent    = product.description || 'Standard quality product. Verify details on delivery.';
 
-            // Fetch Detailed Data from Dictionary
-            const data = productData[prodId] || productData["DEFAULT"];
+                // ============================================================
+                //  STOCK STATUS BANNER RENDERING
+                // ============================================================
+                const stockBanner = document.getElementById('prod-stock-banner');
 
-            // Render Description
-            document.getElementById('prod-desc').innerText = data.description;
+                if (isOutOfStock) {
+                    stockBanner.style.cssText = 'background:#fee2e2;color:#dc2626;border-left-color:#dc2626;';
+                    stockBanner.innerHTML     = `❌ <strong>Out of Stock!</strong> This item is currently unavailable.`;
+                } else if (isFewLeft) {
+                    stockBanner.style.cssText = 'background:#fffbeb;color:#b45309;border-left-color:#f59e0b;';
+                    stockBanner.innerHTML     = `⏳ <strong>Hurry!</strong> Only a few units left. Order before it sells out!`;
+                } else {
+                    stockBanner.style.cssText = 'background:#ecfdf5;color:#065f46;border-left-color:#10b981;';
+                    stockBanner.innerHTML     = `✅ <strong>In Stock</strong> — Ready to ship with instant confirmation.`;
+                }
 
-            // Render Specs
-            const specsContainer = document.getElementById('prod-specs');
-            specsContainer.innerHTML = "";
-            for (const [key, value] of Object.entries(data.specs)) {
-                specsContainer.innerHTML += `<li><strong>${key}:</strong> <span>${value}</span></li>`;
+                // ============================================================
+                //  CHECKOUT URL & BUTTON STATES
+                // ============================================================
+                const checkoutUrl = `checkout.html?id=${product.product_id}&name=${encodeURIComponent(product.name.replace(/\s+/g, '-'))}&price=${product.price}&udiscount=${product.upi_discount || 0}`;
+
+                const desktopBtn = document.getElementById('buy-btn-desktop');
+                const mobileBtn  = document.getElementById('buy-btn-mobile');
+
+                if (isOutOfStock) {
+                    desktopBtn.classList.add('disabled-btn');
+                    desktopBtn.textContent = '❌ Sold Out';
+                    mobileBtn.classList.add('disabled-btn');
+                    mobileBtn.textContent  = 'SOLD OUT';
+                } else {
+                    desktopBtn.href = checkoutUrl;
+                    mobileBtn.href  = checkoutUrl;
+                }
+
+                // ============================================================
+                //  DYNAMIC TRUST BADGES
+                // ============================================================
+                const badgesGrid = document.getElementById('dynamic-badges-grid');
+                if (product.is_free_delivery) {
+                    badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">🚚</span><span class="text">Free Delivery</span></div>`;
+                }
+                if (product.is_cod_available) {
+                    badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">💵</span><span class="text">Cash on Delivery</span></div>`;
+                }
+                if (isFewLeft) {
+                    badgesGrid.innerHTML += `<div class="trust-badge"><span class="icon">⏳</span><span class="text">Limited Stock</span></div>`;
+                }
+
+                // ============================================================
+                //  SPECIFICATIONS PARSER (Key: Value format, one per line)
+                // ============================================================
+                const specsContainer = document.getElementById('prod-specs');
+                if (product.specs && product.specs.trim()) {
+                    const lines = product.specs.split('\n');
+                    let specsHtml = '';
+                    lines.forEach(line => {
+                        const colonIdx = line.indexOf(':');
+                        if (colonIdx > -1) {
+                            const key = line.substring(0, colonIdx).trim();
+                            const val = line.substring(colonIdx + 1).trim();
+                            if (key && val) {
+                                specsHtml += `<li><strong>${key}:</strong> <span>${val}</span></li>`;
+                            }
+                        }
+                    });
+                    specsContainer.innerHTML = specsHtml || '<li>Specifications available on product delivery.</li>';
+                } else {
+                    specsContainer.innerHTML = '<li>Specifications available on product delivery.</li>';
+                }
+
+                // ============================================================
+                //  SHOW LAYOUT, HIDE LOADER
+                // ============================================================
+                loadingScreen.style.display        = 'none';
+                document.getElementById('main-product-layout').style.display = 'grid';
+
+                // ============================================================
+                //  MOBILE STICKY BAR
+                //  BUG FIX: Was using raw product.stock_status (case-sensitive).
+                //  Now uses normalised cleanStatus consistently.
+                // ============================================================
+                if (window.innerWidth <= 768 && !isOutOfStock) {
+                    document.getElementById('sticky-price').textContent = product.price.toLocaleString('en-IN');
+                    document.getElementById('sticky-mrp').textContent   = (product.mrp || 0).toLocaleString('en-IN');
+                    document.getElementById('mobile-footer-bar').style.display = 'flex';
+                }
+
+            } catch (err) {
+                document.getElementById('loading-screen').innerHTML =
+                    `<div style="color:#ef4444;">❌ System Error: ${err.message}</div>`;
             }
-
-            // Render Reviews
-            const reviewsContainer = document.getElementById('prod-reviews');
-            reviewsContainer.innerHTML = "";
-            data.reviews.forEach(review => {
-                reviewsContainer.innerHTML += `
-                    <div class="review-item">
-                        <div class="review-stars">${review.rating}</div>
-                        <span class="review-name">${review.name}</span>
-                        <p class="review-text">${review.text}</p>
-                    </div>
-                `;
-            });
         });
     </script>
 </body>

@@ -3,232 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details | SmartBudget Store</title>
+    <title>Track Order | SmartBudget Store</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .product-detail-section {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            align-items: start;
-        }
-
-        /* Image Gallery Styling */
-        .product-image-container {
+        .track-section {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 40px 20px;
             background: #fff;
             border-radius: 16px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            text-align: center;
-            position: sticky;
-            top: 100px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        .product-image-container img {
-            width: 100%;
-            border-radius: 12px;
-            max-height: 450px;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-        .product-image-container img:hover {
-            transform: scale(1.05);
-        }
-
-        /* Product Info Styling */
-        .product-info h1 {
-            font-size: 2.2rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-            line-height: 1.3;
-            font-weight: 800;
-        }
-
-        .rating-badge {
-            display: inline-flex;
-            align-items: center;
-            background: #10b981;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            gap: 5px;
-        }
-
-        /* Urgency Banner */
-        .urgency-banner {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-left: 4px solid #dc2626;
-        }
-
-        /* Pricing Block */
-        .price-block {
-            display: flex;
-            align-items: baseline;
-            gap: 15px;
-            margin-bottom: 25px;
-            background: #f8fafc;
-            padding: 15px 20px;
-            border-radius: 12px;
             border: 1px solid #e2e8f0;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
         }
-        .price-main {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: var(--primary);
+
+        .track-section h1 { 
+            color: var(--primary); 
+            margin-bottom: 10px;
+            font-size: 1.8rem;
         }
-        .price-mrp {
-            font-size: 1.2rem;
-            text-decoration: line-through;
-            color: #94a3b8;
-            font-weight: 600;
+
+        .track-section p {
+            color: #64748b;
+            margin-bottom: 30px;
         }
-        .price-discount {
-            background: #ef4444;
-            color: white;
-            padding: 6px 12px;
+
+        .track-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .track-input-group input {
+            flex: 1;
+            min-width: 200px;
+            padding: 14px;
+            border: 2px solid #cbd5e1;
             border-radius: 8px;
+            font-size: 1.05rem;
+            outline: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .track-input-group input:focus { 
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn-track {
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        /* Status & Results */
+        #result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fafc 0%, #ecf0f5 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: left;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status Badge with Color Coding */
+        .status-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 50px;
             font-weight: 800;
             font-size: 1rem;
-            letter-spacing: 1px;
-        }
-
-        /* Trust Badges */
-        .trust-badges {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        .trust-badge {
-            background: #fff;
-            border: 1px solid var(--border);
-            padding: 15px 10px;
-            border-radius: 12px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-        .trust-badge span.icon { font-size: 1.8rem; }
-        .trust-badge span.text { font-size: 0.75rem; font-weight: 700; color: #475569; }
-
-        .checkout-btn {
-            font-size: 1.2rem;
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-            display: block;
-            width: 100%;
-            margin-bottom: 40px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            font-weight: 800;
+            margin-bottom: 25px;
+            border: 2px solid transparent;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s ease;
-        }
-        .checkout-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5);
+            letter-spacing: 0.5px;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        /* Description & Specs */
-        .details-box {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
-        .details-box h3 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: var(--primary);
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 12px;
+
+        .status-badge.received {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #3b82f6;
+        }
+
+        .status-badge.processed {
+            background: #e0e7ff;
+            color: #3730a3;
+            border-color: #6366f1;
+        }
+
+        .status-badge.shipped {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .status-badge.delivery {
+            background: #fed7aa;
+            color: #9a3412;
+            border-color: #f97316;
+        }
+
+        .status-badge.delivered {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .status-badge.awaiting {
+            background: #fef08a;
+            color: #854d0e;
+            border-color: #eab308;
+        }
+
+        .status-badge.review {
+            background: #fed7aa;
+            color: #7c2d12;
+            border-color: #ea580c;
+        }
+
+        .status-badge.approved {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #22c55e;
+        }
+
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        /* Timeline Progress */
+        .timeline-progress {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .timeline-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 15px;
         }
-        .details-box p {
-            color: #475569;
-            line-height: 1.8;
-            font-size: 1.05rem;
+
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #cbd5e1;
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background: #10b981;
+            box-shadow: 0 0 0 2px #d1fae5;
+        }
+
+        .timeline-item.current .timeline-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px #fef3c7;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .timeline-text {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .timeline-item.completed .timeline-text {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .timeline-item.current .timeline-text {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+
+        /* Detail Rows */
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+
+        .detail-row span:first-child {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .detail-row strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Payment & UTR Section */
+        .payment-section {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #93c5fd;
+            margin-top: 20px;
             margin-bottom: 20px;
         }
-        .specs-list { list-style: none; padding: 0; margin-bottom: 0; }
-        .specs-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
+
+        .payment-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .payment-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .payment-badge.cod {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .payment-badge.upi {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .utr-display {
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+            color: #1e40af;
+            border: 2px solid #93c5fd;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        .utr-display.empty {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: normal;
+            letter-spacing: normal;
+        }
+
+        .payment-note {
+            font-size: 0.85rem;
+            color: #1e40af;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Loading & Error States */
+        #loading {
+            display: none; 
+            color: var(--accent); 
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #cbd5e1;
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #error-msg {
+            display: none; 
+            color: #ef4444; 
+            margin-top: 20px; 
+            font-weight: 700;
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
             display: flex;
             gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
         }
-        .specs-list li strong { min-width: 130px; color: var(--primary); font-weight: 700; }
-        .specs-list li span { color: #475569; }
 
-        /* Reviews */
-        .review-item { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #f1f5f9; }
-        .review-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .review-stars { color: #f59e0b; margin-bottom: 8px; font-size: 1.1rem; }
-        .review-name { font-weight: 800; font-size: 1rem; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; color: var(--primary); }
-        .verified-buyer { color: #10b981; font-size: 0.75rem; background: #d1fae5; padding: 2px 6px; border-radius: 4px; }
-        .review-text { color: #475569; font-size: 0.95rem; line-height: 1.6; }
+        .btn-action {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
 
-        /* Mobile Sticky Footer */
-        .mobile-sticky-buy { display: none; }
+        .btn-action.primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
 
+        .btn-action.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-action.secondary {
+            background: #f1f5f9;
+            color: var(--primary);
+            border: 2px solid #cbd5e1;
+        }
+
+        .btn-action.secondary:hover {
+            border-color: var(--accent);
+            background: #eff6ff;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .product-detail-section { grid-template-columns: 1fr; gap: 30px; margin: 20px auto; padding-bottom: 80px; }
-            .product-info h1 { font-size: 1.8rem; }
-            .product-image-container { position: static; padding: 15px; }
-            .price-main { font-size: 2.2rem; }
-            
-            /* Sticky Bottom Bar for Mobile */
-            .checkout-btn { display: none; } /* Hide main button on mobile */
-            .mobile-sticky-buy {
-                display: flex;
-                position: fixed;
-                bottom: 0; left: 0; right: 0;
-                background: white;
-                padding: 12px 20px;
-                box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-                z-index: 1000;
-                align-items: center;
-                justify-content: space-between;
-                border-top: 1px solid #e2e8f0;
+            .track-section {
+                padding: 25px 15px;
+                margin: 40px auto;
             }
-            .mobile-sticky-buy .price-info { display: flex; flex-direction: column; }
-            .mobile-sticky-buy .price { font-size: 1.6rem; font-weight: 800; color: var(--primary); line-height: 1; }
-            .mobile-sticky-buy .mrp { font-size: 0.8rem; text-decoration: line-through; color: #94a3b8; }
-            .mobile-sticky-buy .btn { 
-                margin: 0; 
-                padding: 14px 35px; 
-                font-size: 1.1rem; 
-                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                border-radius: 50px;
-                color: white;
-                font-weight: 800;
-                text-decoration: none;
-                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            .track-section h1 {
+                font-size: 1.5rem;
+            }
+            .track-input-group {
+                flex-direction: column;
+            }
+            .track-input-group input {
+                min-width: unset;
+            }
+            .btn-track {
+                width: 100%;
+            }
+            .detail-row {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn-action {
+                width: 100%;
             }
         }
     </style>
@@ -248,185 +427,277 @@
     </header>
 
     <main>
-        <div class="product-detail-section">
+        <div class="track-section">
+            <h1>📦 Track Your Order</h1>
+            <p>Enter your Order ID (e.g., <strong>SB-123456</strong>) to check the current delivery status.</p>
             
-            <!-- Left Column: Image -->
-            <div class="product-image-container">
-                <img id="prod-img" src="" alt="Product Image">
+            <form id="trackForm" class="track-input-group">
+                <input type="text" id="orderIdInput" required placeholder="Enter Order ID" autocomplete="off" spellcheck="false">
+                <button type="submit" class="btn btn-primary btn-track" id="trackBtn">🔍 Track</button>
+            </form>
+
+            <div id="loading" style="display: none;">
+                <span class="loading-spinner"></span>
+                <span>Fetching order details...</span>
             </div>
             
-            <!-- Right Column: Details -->
-            <div class="product-info">
-                <div class="rating-badge">⭐ 4.8 | 2,104 Ratings</div>
-                <h1 id="prod-name">Loading...</h1>
-                
-                <div class="urgency-banner">
-                    ⏳ <span><strong>Hurry!</strong> Only a few items left in stock.</span>
+            <div id="error-msg"></div>
+
+            <!-- Result Box -->
+            <div id="result-box">
+                <!-- Status Badge -->
+                <div style="text-align: center;">
+                    <div class="status-badge" id="res-status">...</div>
                 </div>
 
-                <div class="price-block">
-                    <span class="price-main">₹<span id="prod-price">...</span></span>
-                    <span class="price-mrp">₹<span id="prod-mrp">...</span></span>
-                    <span class="price-discount" id="prod-discount">... OFF</span>
+                <!-- Main Order Details -->
+                <div class="detail-row">
+                    <span>📦 Product:</span>
+                    <strong id="res-product">...</strong>
                 </div>
-
-                <div class="trust-badges">
-                    <div class="trust-badge">
-                        <span class="icon">🚚</span>
-                        <span class="text">Free Delivery</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span class="icon">🛡️</span>
-                        <span class="text">Secure Pay</span>
-                    </div>
-                    <div class="trust-badge">
-                        <span class="icon">🔄</span>
-                        <span class="text">7 Days Return</span>
-                    </div>
+                <div class="detail-row">
+                    <span>👤 Customer:</span>
+                    <strong id="res-name">...</strong>
                 </div>
-                
-                <a href="#" id="buy-btn-desktop" class="checkout-btn">Proceed to Buy ⚡</a>
-
-                <!-- Dynamic Description Box -->
-                <div class="details-box">
-                    <h3>📝 Product Description</h3>
-                    <p id="prod-desc">Loading description...</p>
-
-                    <h3 style="margin-top: 30px;">⚙️ Specifications</h3>
-                    <ul class="specs-list" id="prod-specs">
-                        <!-- Specs JS se aayenge -->
-                    </ul>
+                <div class="detail-row">
+                    <span>💰 Amount:</span>
+                    <strong id="res-price">...</strong>
                 </div>
-
-                <!-- Dynamic Reviews Box -->
-                <div class="details-box">
-                    <h3>⭐ Top Customer Reviews</h3>
-                    <div id="prod-reviews">
-                        <!-- Reviews JS se aayenge -->
+                <div class="detail-row">
+                    <span>📅 Order Date:</span>
+                    <strong id="res-date">...</strong>
+                </div>
+                <div class="detail-row">
+                    <span>📍 Location:</span>
+                    <div>
+                        <strong id="res-address">...</strong>
+                        <br>
+                        <span style="font-size: 0.9rem; color: #94a3b8;" id="res-pincode">PIN: ...</span>
                     </div>
                 </div>
 
+                <!-- Payment Section -->
+                <div class="payment-section" id="payment-section">
+                    <h3>💳 Payment Information</h3>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span class="payment-badge" id="res-payment-method">...</span>
+                        <span id="res-payment-status" style="font-size: 0.9rem; color: #1e40af; font-weight: 600;"></span>
+                    </div>
+                    
+                    <!-- UTR Display (Only for Prepaid) -->
+                    <div id="utr-section" style="display: none; margin-top: 15px;">
+                        <p style="color: #1e40af; font-size: 0.9rem; margin-bottom: 8px;">📝 <strong>UTR Number:</strong></p>
+                        <div class="utr-display" id="res-utr-number">—</div>
+                        <div class="payment-note" id="payment-note">⏳ Your payment is under review. We'll verify it within 1-2 hours.</div>
+                    </div>
+                </div>
+
+                <!-- Expected Delivery Date Banner (set by admin) -->
+                <div id="expected-delivery-banner" style="display:none; margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 12px; border-left: 4px solid #3b82f6; text-align: center;">
+                    <p style="font-size: 0.82rem; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">📦 Expected Delivery</p>
+                    <p id="expected-delivery-date-text" style="font-size: 1.45rem; font-weight: 800; color: #1e293b; margin: 0;"></p>
+                    <p style="font-size: 0.78rem; color: #64748b; margin-top: 5px;">Actual delivery may vary slightly based on your location.</p>
+                </div>
+
+                <!-- Timeline Progress -->
+                <div class="timeline-progress" id="timeline-section" style="display: none;">
+                    <h3 style="text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 1rem;">📍 Delivery Timeline</h3>
+                    <div id="timeline-container"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-action secondary" onclick="location.reload()">🔄 Refresh Status</button>
+                    <a href="store.html" class="btn-action secondary">🏪 Continue Shopping</a>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Mobile Sticky Footer -->
-    <div class="mobile-sticky-buy">
-        <div class="price-info">
-            <span class="mrp">MRP: ₹<span id="sticky-mrp">...</span></span>
-            <span class="price">₹<span id="sticky-price">...</span></span>
-        </div>
-        <a href="#" id="buy-btn-mobile" class="btn">Buy Now ⚡</a>
-    </div>
-
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            
-            const productData = {
-                "M10-TWS": {
-                    description: "The M10 TWS Wireless Earbuds provide incredible HD sound quality with deep bass. It comes with a massive 2000mAh charging case that can also act as an emergency power bank for your smartphone. Features an LED digital display to show battery levels.",
-                    specs: {
-                        "Bluetooth": "Version 5.1",
-                        "Battery Life": "4-5 Hours (Continuous)",
-                        "Charging Case": "2000mAh",
-                        "Waterproof": "IPX7 Rated",
-                        "Mic": "Built-in HD Microphone"
-                    },
-                    reviews: [
-                        { name: "Rahul Sharma", rating: "⭐⭐⭐⭐⭐", text: "Bhai sound quality ekdum mast hai. Aur powerbank wala feature sach me kaam aata hai emergency me." },
-                        { name: "Amit Kumar", rating: "⭐⭐⭐⭐", text: "Good bass and clear vocals. Value for money under 400 rupees." }
-                    ]
-                },
-                "T800-SW": {
-                    description: "The T800 Ultra is the ultimate budget smartwatch featuring a massive 1.99-inch edge-to-edge HD display. It supports Bluetooth calling, so you can make and receive calls directly from your wrist. Comes with the iconic ocean loop strap.",
-                    specs: {
-                        "Display": "1.99 inch HD IPS",
-                        "Calling": "Bluetooth Calling Supported",
-                        "Health": "Heart Rate & SpO2 Monitor",
-                        "Strap": "Ocean Loop (Orange)",
-                        "Battery": "2-3 Days normal usage"
-                    },
-                    reviews: [
-                        { name: "Vikash Singh", rating: "⭐⭐⭐⭐⭐", text: "Looks exactly like the Apple Watch Ultra. Display is very bright even in sunlight." },
-                        { name: "Neha", rating: "⭐⭐⭐⭐", text: "Nice watch for daily use. Calling feature works perfectly." }
-                    ]
-                },
-                "SLING-BAG": {
-                    description: "Premium Men's Crossbody Sling Bag made with high-quality splash-proof material. Perfect for carrying your phone, power bank, wallet, and sunglasses securely while traveling or riding a bike.",
-                    specs: {
-                        "Material": "High-density Oxford Cloth",
-                        "Type": "Crossbody / Sling",
-                        "Compartments": "3 Zip Pockets",
-                        "Waterproof": "Splash-resistant",
-                        "Strap": "Adjustable & Comfortable"
-                    },
-                    reviews: [
-                        { name: "Suresh P.", rating: "⭐⭐⭐⭐⭐", text: "Quality is premium. Zips are very smooth. Perfect for bike riders." }
-                    ]
-                },
-                "DEFAULT": {
-                    description: "High-quality premium product sourced directly from trusted manufacturers. We ensure 100% quality check before shipping.",
-                    specs: {
-                        "Quality": "Premium Grade",
-                        "Warranty": "7 Days Replacement",
-                        "Delivery": "Free Shipping Available"
-                    },
-                    reviews: [
-                        { name: "Verified Buyer", rating: "⭐⭐⭐⭐⭐", text: "Great product, highly recommended!" }
-                    ]
-                }
+        const supabaseUrl = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+        const supabaseKey = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const statusFlows = {
+            'Cash on Delivery': [
+                { status: 'Order Received', label: 'Order Confirmed' },
+                { status: 'Order Processed', label: 'Processing' },
+                { status: 'Shipped', label: 'Shipped' },
+                { status: 'Out for Delivery', label: 'Out for Delivery' },
+                { status: 'Delivered', label: 'Delivered' }
+            ],
+            'Prepaid UPI': [
+                { status: 'Awaiting Payment', label: 'Awaiting Payment' },
+                { status: 'Payment Under Review', label: 'Payment Review' },
+                { status: 'Payment Approved', label: 'Payment Confirmed' },
+                { status: 'Order Received', label: 'Order Confirmed' },
+                { status: 'Order Processed', label: 'Processing' },
+                { status: 'Shipped', label: 'Shipped' },
+                { status: 'Out for Delivery', label: 'Out for Delivery' },
+                { status: 'Delivered', label: 'Delivered' }
+            ]
+        };
+
+        function getStatusClass(statusValue) {
+            const classes = {
+                'Order Received': 'received',
+                'Order Processed': 'processed',
+                'Shipped': 'shipped',
+                'Out for Delivery': 'delivery',
+                'Delivered': 'delivered',
+                'Awaiting Payment': 'awaiting',
+                'Payment Under Review': 'review',
+                'Payment Approved': 'approved',
+                'Payment Rejected': 'rejected'
             };
+            return classes[statusValue] || 'received';
+        }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const prodId = urlParams.get('id');
-            const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
-            const prodPrice = parseInt(urlParams.get('price') || "0");
-            const prodImg = urlParams.get('img') || "logo.jpg";
-
-            if(!prodId) window.location.href = 'store.html';
-
-            // Auto calculate Fake MRP (2.5x of original price) to show massive discount
-            const fakeMrp = Math.floor(prodPrice * 2.5);
-            const discountPercent = Math.floor(((fakeMrp - prodPrice) / fakeMrp) * 100);
-
-            // Populate UI Elements
-            document.getElementById('prod-name').innerText = prodName;
-            document.getElementById('prod-price').innerText = prodPrice;
-            document.getElementById('prod-mrp').innerText = fakeMrp;
-            document.getElementById('prod-discount').innerText = `${discountPercent}% OFF`;
-            document.getElementById('prod-img').src = prodImg;
+        function renderTimeline(paymentMethod, currentStatus) {
+            const flow = statusFlows[paymentMethod] || statusFlows['Cash on Delivery'];
+            const container = document.getElementById('timeline-container');
             
-            // Sticky Footer Elements
-            document.getElementById('sticky-price').innerText = prodPrice;
-            document.getElementById('sticky-mrp').innerText = fakeMrp;
-
-            const checkoutUrl = `checkout.html?id=${prodId}&name=${encodeURIComponent(prodName)}&price=${prodPrice}`;
-            document.getElementById('buy-btn-desktop').href = checkoutUrl;
-            document.getElementById('buy-btn-mobile').href = checkoutUrl;
-
-            // Fetch Details
-            const data = productData[prodId] || productData["DEFAULT"];
-            document.getElementById('prod-desc').innerText = data.description;
-
-            // Render Specs
-            const specsContainer = document.getElementById('prod-specs');
-            specsContainer.innerHTML = "";
-            for (const [key, value] of Object.entries(data.specs)) {
-                specsContainer.innerHTML += `<li><strong>${key}:</strong> <span>${value}</span></li>`;
-            }
-
-            // Render Reviews
-            const reviewsContainer = document.getElementById('prod-reviews');
-            reviewsContainer.innerHTML = "";
-            data.reviews.forEach(review => {
-                reviewsContainer.innerHTML += `
-                    <div class="review-item">
-                        <div class="review-stars">${review.rating}</div>
-                        <span class="review-name">${review.name} <span class="verified-buyer">✔ Verified</span></span>
-                        <p class="review-text">${review.text}</p>
+            container.innerHTML = flow.map((item, index) => {
+                const isCompleted = flow.slice(0, index + 1).some(s => s.status === currentStatus);
+                const isCurrent = item.status === currentStatus;
+                const className = isCurrent ? 'current' : isCompleted ? 'completed' : '';
+                
+                return `
+                    <div class="timeline-item ${className}">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-text">${item.label}</div>
                     </div>
                 `;
-            });
+            }).join('');
+
+            document.getElementById('timeline-section').style.display = 'block';
+        }
+
+        document.getElementById('trackForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const trackBtn = document.getElementById('trackBtn');
+            const orderId = document.getElementById('orderIdInput').value.trim().toUpperCase();
+            
+            document.getElementById('result-box').style.display = 'none';
+            document.getElementById('error-msg').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            trackBtn.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .eq('order_id', orderId);
+
+                document.getElementById('loading').style.display = 'none';
+                trackBtn.disabled = false;
+
+                if (error) {
+                    document.getElementById('error-msg').innerText = "❌ Database Error: " + error.message;
+                    document.getElementById('error-msg').style.display = 'block';
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    document.getElementById('error-msg').innerText = "❌ Order not found! Please check your Order ID and try again.";
+                    document.getElementById('error-msg').style.display = 'block';
+                    return;
+                }
+
+                const orderData = data[0];
+                const statusClass = getStatusClass(orderData.status);
+
+                // Populate basic details
+                document.getElementById('res-status').className = `status-badge ${statusClass}`;
+                document.getElementById('res-status').innerText = orderData.status;
+                document.getElementById('res-product').innerText = orderData.product_name;
+                document.getElementById('res-name').innerText = orderData.customer_name;
+                document.getElementById('res-price').innerText = `₹${orderData.price}`;
+                document.getElementById('res-date').innerText = new Date(orderData.created_at).toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('res-address').innerText = orderData.address;
+                document.getElementById('res-pincode').innerText = `PIN: ${orderData.pincode}`;
+
+                // Payment Info
+                const paymentMethod = orderData.payment_method || 'Cash on Delivery';
+                const isUPI = paymentMethod === 'Prepaid UPI';
+                
+                document.getElementById('res-payment-method').className = `payment-badge ${isUPI ? 'upi' : 'cod'}`;
+                document.getElementById('res-payment-method').innerText = isUPI ? '💳 Prepaid UPI' : '🚚 Cash on Delivery';
+
+                // Payment Status for UPI
+                if (isUPI) {
+                    document.getElementById('utr-section').style.display = 'block';
+                    
+                    if (orderData.utr_number) {
+                        document.getElementById('res-utr-number').className = 'utr-display';
+                        document.getElementById('res-utr-number').innerText = orderData.utr_number;
+                    } else {
+                        document.getElementById('res-utr-number').className = 'utr-display empty';
+                        document.getElementById('res-utr-number').innerText = 'Awaiting UTR submission';
+                    }
+
+                    // Update payment note based on status
+                    const noteEl = document.getElementById('payment-note');
+                    if (orderData.status === 'Payment Approved') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#10b981';
+                        noteEl.style.color = '#047857';
+                        noteEl.innerHTML = '✅ Payment verified! Your order is confirmed.';
+                    } else if (orderData.status === 'Payment Rejected') {
+    noteEl.className = 'payment-note';
+    noteEl.style.borderLeftColor = '#ef4444';
+    noteEl.style.color = '#991b1b';
+    // Yahan admin_note ko rendering mein add kar diya hai
+    noteEl.innerHTML = `❌ <strong>Payment Rejected Reason:</strong> ${orderData.admin_note || 'Invalid UTR Number'} <br><br> <a href="checkout.html?resumeOrder=${orderId}" style="color: inherit; font-weight: 700;">Click here to resubmit payment</a>`;
+                    } else if (orderData.status === 'Payment Under Review') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#f59e0b';
+                        noteEl.style.color = '#92400e';
+                        noteEl.innerHTML = '⏳ Payment under review. We\'ll verify within 1-2 hours. <br><small><a href="checkout.html?resumeOrder=' + orderId + '" style="color: inherit; font-weight: 700;">Resume if you need to resubmit UTR</a></small>';
+                    } else if (orderData.status === 'Awaiting Payment') {
+                        noteEl.className = 'payment-note';
+                        noteEl.style.borderLeftColor = '#f59e0b';
+                        noteEl.style.color = '#92400e';
+                        noteEl.innerHTML = '⏳ Waiting for your payment. <a href="checkout.html?resumeOrder=' + orderId + '" style="color: inherit; font-weight: 700;">Click here to complete payment</a>';
+                    }
+                } else {
+                    document.getElementById('utr-section').style.display = 'none';
+                }
+
+                // Expected Delivery Date (set by admin)
+                const delivBanner = document.getElementById('expected-delivery-banner');
+                const delivText   = document.getElementById('expected-delivery-date-text');
+                if (orderData.expected_delivery_date) {
+                    const delivDate = new Date(orderData.expected_delivery_date);
+                    delivText.textContent = delivDate.toLocaleDateString('en-IN', {
+                        weekday: 'long',
+                        year:    'numeric',
+                        month:   'long',
+                        day:     'numeric'
+                    });
+                    delivBanner.style.display = 'block';
+                } else {
+                    delivBanner.style.display = 'none';
+                }
+
+                // Render Timeline
+                renderTimeline(paymentMethod, orderData.status);
+
+                document.getElementById('result-box').style.display = 'block';
+
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                trackBtn.disabled = false;
+                document.getElementById('error-msg').innerText = "❌ System Error: " + err.message;
+                document.getElementById('error-msg').style.display = 'block';
+            }
         });
     </script>
 </body>

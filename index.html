@@ -79,11 +79,12 @@
 
             <!-- Nav Links -->
             <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="store.html" style="color: var(--accent); font-weight: 800;">🛍️ Store</a>
+                <a href="track.html">Track Order</a>
                 <a href="#categories">Categories</a>
                 <a href="#featured">Top Picks</a>
-                <a href="#deals">Deals</a>
-                <a href="#guides">Guides</a>
-                <a href="#about">About</a>
+                <a href="allposts.html">Guides</a>
                 <!-- Mobile search inside nav -->
                 <div class="mobile-search">
                     <input type="text" placeholder="Search products..." aria-label="Search">
@@ -128,75 +129,198 @@
 <!-- ==========================================
      LATEST VIRAL FINDS (Affiliate Tiles)
      ========================================== -->
+<!-- ==========================================
+     LATEST VIRAL FINDS (Modified for Dropship)
+     ========================================== -->
 <section class="viral-finds-section" id="viralfinds">
     <div class="section-header" style="margin-bottom: 15px;">
         <h2>🔥 Trending Loot Deals</h2>
+        <p>Grab these viral products before they go out of stock!</p>
     </div>
     
     <div class="viral-grid">
-        
-        
+        <!-- ITEM 1: Blender -->
          <div class="viral-tile">
             <div class="viral-discount">-65%</div>
-            <img src="blender.jpg" loading="lazy">
-            <h3 class="viral-name">Portable Blender</h3>
+            <img src="blender.jpg" loading="lazy" alt="Portable Blender">
+            <h3 class="viral-name">Portable USB Blender</h3>
             <div class="viral-action">
-                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Buy Now</button>
+                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Check Price</button>
                 <div class="viral-platforms">
+                    <a href="product.html?id=PORTABLE-BLENDER&name=Portable-USB-Juicer-Blender&price=399&img=blender.jpg" class="plat-btn" style="background: var(--accent);">🛍️ SmartBudget Store</a>
                     <a href="https://amzn.to/4o0SiVX" target="_blank" class="plat-btn amazon">Amazon</a>
-                    <a href="https://www.flipkart.com/austrich-portable-usb-juicer-blender-fresh-juice-anywhere-anytime-25-w/p/itmd72f085b946cf?pid=MIXHN93WPV8WGRYK&lid=LSTMIXHN93WPV8WGRYKR8PZBV&marketplace=FLIPKART&hl_lid=&q=portable+blender&store=j9e%2Fm38%2F7ek&ctx=eyJkZWxpdmVyZWRCeSI6IiIsImRpc3BsYXlQcmljZSI6IjQ0OCJ9&fm=eyJ3dHAiOiJwcm9kdWN0Q2FyZExpc3QiLCJwcnB0Ijoic3AiLCJtaWQiOiJQUk9EVUNUIn0&pageUID=1780353009009" target="_blank" class="plat-btn flipkart">Flipkart</a>
-                    <a href="https://www.meesho.com/portable-mini-juicer-blender-usb-rechargeable-electric-fruit-mixer-grinder-smoothie-maker-for-kitchen-travel-gym-portable-juicer-bottle-for-fruits-vegetables/p/f8ol39" target="_blank" class="plat-btn meesho">Meesho</a>
+                    <a href="#" target="_blank" class="plat-btn flipkart">Flipkart</a>
                 </div>
             </div>
         </div>
         
-        <!-- ITEM 1: Mini Cooler -->
+        <!-- ITEM 2: Mini Cooler -->
         <div class="viral-tile">
             <div class="viral-discount">-65%</div>
-            <img src="mini_cooler.jpg" loading="lazy">
+            <img src="mini_cooler.jpg" loading="lazy" alt="Mini Cooler">
             <h3 class="viral-name">Portable Mini Cooler</h3>
             <div class="viral-action">
-                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Buy Now</button>
+                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Check Price</button>
                 <div class="viral-platforms">
+                    <a href="product.html?id=MINI-COOLER&name=Portable-Mini-AC-Cooler&price=499&img=mini_cooler.jpg" class="plat-btn" style="background: var(--accent);">🛍️ SmartBudget Store</a>
                     <a href="#" target="_blank" class="plat-btn amazon">Amazon</a>
                     <a href="#" target="_blank" class="plat-btn flipkart">Flipkart</a>
-                    <a href="#" target="_blank" class="plat-btn meesho">Meesho</a>
                 </div>
             </div>
         </div>
 
-        <!-- ITEM 2: Watermelon Slicer -->
+        <!-- ITEM 3: Watermelon Slicer -->
         <div class="viral-tile">
             <div class="viral-discount">-50%</div>
-            <img src="wm_slicer.jpg" loading="lazy">
+            <img src="wm_slicer.jpg" loading="lazy" alt="Watermelon Slicer">
             <h3 class="viral-name">Watermelon Slicer</h3>
             <div class="viral-action">
-                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Buy Now</button>
+                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Check Price</button>
                 <div class="viral-platforms">
+                    <a href="product.html?id=WM-SLICER&name=Stainless-Steel-Watermelon-Slicer&price=199&img=wm_slicer.jpg" class="plat-btn" style="background: var(--accent);">🛍️ SmartBudget Store</a>
                     <a href="#" target="_blank" class="plat-btn amazon">Amazon</a>
                     <a href="#" target="_blank" class="plat-btn flipkart">Flipkart</a>
-                    <a href="#" target="_blank" class="plat-btn meesho">Meesho</a>
                 </div>
             </div>
         </div>
-
-        <!-- ITEM 3: Mini Fan -->
+                <!-- ITEM 4: Mini Fan -->
         <div class="viral-tile">
             <div class="viral-discount">-70%</div>
-            <img src="mini_fan.png" alt="Mini USB Fan" loading="lazy">
+            <img src="mini_fan.png" loading="lazy" alt="Mini USB Fan">
             <h3 class="viral-name">Mini USB Desk Fan</h3>
             <div class="viral-action">
-                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Buy Now</button>
+                <button class="btn-viral-buy" onclick="revealPlatforms(this)">Check Price</button>
                 <div class="viral-platforms">
+                    <a href="product.html?id=MINI-FAN&name=Mini-USB-Desk-Fan&price=149&img=mini_fan.png" class="plat-btn" style="background: var(--accent);">🛍️ SmartBudget Store</a>
                     <a href="#" target="_blank" class="plat-btn amazon">Amazon</a>
                     <a href="#" target="_blank" class="plat-btn flipkart">Flipkart</a>
-                    <a href="#" target="_blank" class="plat-btn meesho">Meesho</a>
                 </div>
             </div>
         </div>
 
     </div>
 </section>
+
+<!-- ==========================================
+     SMARTBUDGET OFFICIAL STORE PREVIEW
+     Dynamic — Loads latest 3 products from Supabase
+     ========================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<section class="viral-finds-section" id="official-store" style="margin-top: 40px; padding-top: 40px; border-top: 2px dashed #e2e8f0;">
+    <div class="section-header" style="margin-bottom: 25px;">
+        <h2>🛍️ SmartBudget Official Store</h2>
+        <p style="color: #10b981; font-weight: 700;">Direct factory prices • Free Delivery • Pay on Delivery</p>
+    </div>
+
+    <!-- Dynamic grid: populated by JS below -->
+    <div class="viral-grid" id="homepage-store-grid">
+        <!-- Skeleton loaders shown while fetching -->
+        <div class="viral-tile" style="opacity:0.4;pointer-events:none;">
+            <div style="height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:12px;animation:shimmer 1.5s infinite;"></div>
+            <div style="height:14px;background:#f1f5f9;border-radius:6px;margin-bottom:8px;animation:shimmer 1.5s infinite;"></div>
+            <div style="height:14px;background:#f1f5f9;border-radius:6px;width:60%;animation:shimmer 1.5s infinite;"></div>
+        </div>
+        <div class="viral-tile" style="opacity:0.4;pointer-events:none;">
+            <div style="height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:12px;animation:shimmer 1.5s infinite;"></div>
+            <div style="height:14px;background:#f1f5f9;border-radius:6px;margin-bottom:8px;animation:shimmer 1.5s infinite;"></div>
+            <div style="height:14px;background:#f1f5f9;border-radius:6px;width:60%;animation:shimmer 1.5s infinite;"></div>
+        </div>
+        <div class="viral-tile" style="opacity:0.4;pointer-events:none;">
+            <div style="height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:12px;animation:shimmer 1.5s infinite;"></div>
+            <div style="height:14px;background:#f1f5f9;border-radius:6px;margin-bottom:8px;animation:shimmer 1.5s infinite;"></div>
+            <div style="height:14px;background:#f1f5f9;border-radius:6px;width:60%;animation:shimmer 1.5s infinite;"></div>
+        </div>
+    </div>
+
+    <!-- VIEW ALL STORE PRODUCTS BUTTON -->
+    <div style="text-align: center; margin-top: 35px;">
+        <a href="store.html" class="btn btn-primary" style="padding: 16px 35px; font-size: 1.15rem; border-radius: 50px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);">
+            Show More Store Products →
+        </a>
+    </div>
+</section>
+
+<style>
+    @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+
+<script>
+(async function loadHomepageStorePreview() {
+    const grid = document.getElementById('homepage-store-grid');
+
+    try {
+        const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Fetch latest 3 in-stock products
+        const { data, error } = await db
+            .from('products')
+            .select('*')
+            .not('stock_status', 'ilike', 'out of stock')
+            .not('stock_status', 'ilike', 'sold out')
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+        grid.innerHTML = ''; // Clear skeletons
+
+        if (error || !data || data.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;font-weight:600;">
+                    🛒 Store is stocking up! <a href="store.html" style="color:var(--accent);">Check back soon →</a>
+                </div>`;
+            return;
+        }
+
+        data.forEach((product, i) => {
+            const discount  = product.discount || 60;
+            const mrp       = product.mrp || Math.round(product.price / (1 - discount / 100));
+            const cleanStat = (product.stock_status || '').trim().toLowerCase();
+            const isFew     = cleanStat === 'only a few left' || cleanStat === 'few left';
+
+            // Cycle badge styles for visual variety
+            const badges    = [
+                { text: `-${discount}% OFF`, style: '' },
+                { text: 'Hot Seller 🔥', style: 'background:#f59e0b;color:#000;' },
+                { text: 'Free Ship 🚚',  style: 'background:#10b981;' }
+            ];
+            const badge = badges[i % 3];
+
+            const tile = document.createElement('div');
+            tile.className = 'viral-tile';
+            tile.innerHTML = `
+                <div class="viral-discount" style="${badge.style}">${badge.text}</div>
+                <img src="${product.image_url}" loading="lazy" alt="${product.name}"
+                     onerror="this.src='https://placehold.co/300x300?text=No+Image'"
+                     style="width:100%;border-radius:12px;object-fit:cover;max-height:200px;">
+                <h3 class="viral-name">${product.name}</h3>
+                <p style="font-weight:800;font-size:1.25rem;color:var(--primary);margin-bottom:12px;">
+                    ₹${product.price.toLocaleString('en-IN')}
+                    <del style="font-size:0.8rem;color:var(--muted);font-weight:500;">₹${mrp.toLocaleString('en-IN')}</del>
+                </p>
+                ${isFew ? '<p style="font-size:0.8rem;font-weight:700;color:#b45309;margin-bottom:8px;">⏳ Only a few left!</p>' : ''}
+                <div class="viral-action">
+                    <a href="product.html?id=${encodeURIComponent(product.product_id)}"
+                       class="btn btn-primary"
+                       style="width:100%;border-radius:6px;padding:10px 0;display:block;text-align:center;text-decoration:none;">
+                        View Details →
+                    </a>
+                </div>
+            `;
+            grid.appendChild(tile);
+        });
+
+    } catch (err) {
+        console.error('Store preview error:', err);
+        grid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">
+                Could not load store preview. <a href="store.html" style="color:var(--accent);">Visit the store →</a>
+            </div>`;
+    }
+})();
+</script>
+
 
 
         <!-- ===== CATEGORIES ===== -->
