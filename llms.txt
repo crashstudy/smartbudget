@@ -1,0 +1,14 @@
+# SmartBudget
+
+> SmartBudget.in provides honest reviews, tech guides, and direct factory deals on the best budget-friendly gadgets.
+
+## Core Pages
+- [/store.html](https://www.smartbudget.in/store.html): Direct factory deals and featured smart budget store.
+- [/allposts.html](https://www.smartbudget.in/allposts.html): All tech guides, reviews, and blog posts.
+- [/budget-mic-review.html](https://www.smartbudget.in/budget-mic-review.html): Comprehensive review of the best budget microphone for YouTube in India.
+- [/about.html](https://www.smartbudget.in/about.html): About SmartBudget, our team, and our mission.
+
+## Information
+- [/privacy.html](https://www.smartbudget.in/privacy.html): Privacy policy and data handling rules.
+- [/disclosure.html](https://www.smartbudget.in/disclosure.html): Affiliate disclosure.
+
