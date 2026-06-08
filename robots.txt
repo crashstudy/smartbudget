@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /adminproduct.html
+Disallow: /inventory.html
 Sitemap: https://www.smartbudget.in/sitemap.xml
-
