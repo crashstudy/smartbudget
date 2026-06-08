@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Gadget Not Found | SmartBudget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b1120; /* Deep tech dark blue */
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 50%);
+        }
+
+        /* Smooth slide-up fade-in animation for the whole card */
+        .error-container {
+            max-width: 600px;
+            padding: 50px 40px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* Floating animation for the plug icon */
+        .glitch-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Neon glowing pulse for the 404 */
+        h1 {
+            font-size: 110px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 5px;
+            letter-spacing: 8px;
+            animation: textGlow 2s infinite alternate;
+        }
+
+        h2 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #e2e8f0;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 35px;
+            line-height: 1.7;
+            padding: 0 10px;
+        }
+
+        /* Animated gradient button */
+        .home-btn {
+            display: inline-block;
+            padding: 16px 36px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #3b82f6);
+            background-size: 200% auto;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .home-btn:hover {
+            background-position: right center;
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(139, 92, 246, 0.5);
+        }
+
+        /* --- Keyframe Animations --- */
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6; }
+            100% { text-shadow: 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="error-container">
+        <span class="glitch-icon">🔌</span>
+        <h1>404</h1>
+        <h2>Gadget Not Found</h2>
+        <p>It looks like the link you're looking for has a dead battery, or the deal just flew off the shelves. Don't worry—our top-tier budget tech is still waiting for you!</p>
+        <a href="/" class="home-btn">Explore Budget Deals</a>
+    </div>
+
+</body>
+</html>
