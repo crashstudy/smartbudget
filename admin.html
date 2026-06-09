@@ -237,18 +237,15 @@
 </head>
 <body>
 
-    <!-- Password Gate -->
+    <!-- Supabase Auth Gate -->
     <script>
-        const pass = prompt("🔒 Enter Admin Password:");
-        if (pass !== "Satyam@123") {
-            document.body.innerHTML = `
-                <div style="text-align:center;margin-top:100px;font-family:sans-serif;">
-                    <h2 style="color:#ef4444;font-size:2rem;">⛔ Access Denied</h2>
-                    <p style="color:#64748b;margin-top:10px;">Incorrect password.</p>
-                    <a href="index.html" style="color:#3b82f6;">← Go Back</a>
-                </div>`;
-            throw new Error("Unauthorized");
-        }
+        (async () => {
+            const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+            const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data: { session } } = await _sb.auth.getSession();
+            if (!session) window.location.href = 'login.html';
+        })();
     </script>
 
     <!-- Admin Navigation (NEW) -->
@@ -258,6 +255,7 @@
         <a href="inventory.html">📦 Inventory</a>
         <a href="adminproduct.html">➕ Add Product</a>
         <a href="index.html">🏠 View Site</a>
+        <a href="#" onclick="logoutAdmin()" style="margin-left:auto;border-color:#ef4444;color:#ef4444;">🚪 Logout</a>
     </div>
 
     <div class="dashboard">
@@ -532,6 +530,13 @@
             if (error) { alert("❌ " + error.message); btn.disabled = false; btn.innerHTML = '❌ Reject Payment'; }
             else { alert("✅ Payment Rejected!"); document.getElementById('paymentModal').style.display = 'none'; btn.innerHTML = '❌ Reject Payment'; fetchOrders(); }
         });
+
+        // Logout
+        async function logoutAdmin() {
+            if (!confirm('Logout from admin panel?')) return;
+            await supabaseClient.auth.signOut();
+            window.location.href = 'login.html';
+        }
 
         // Filter Buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
