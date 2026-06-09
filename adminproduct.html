@@ -32,11 +32,13 @@
 <body>
 
     <script>
-        const pass = prompt("Enter Admin Password:");
-        if (pass !== "Satyam@123") {
-            document.body.innerHTML = "<h2 style='text-align:center; color:red; margin-top:50px;'>Access Denied!</h2>";
-            throw new Error("Unauthorized"); 
-        }
+        (async () => {
+            const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+            const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data: { session } } = await _sb.auth.getSession();
+            if (!session) window.location.href = 'login.html';
+        })();
     </script>
 
     <div class="form-container">
