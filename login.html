@@ -4,56 +4,242 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | SmartBudget</title>
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #0056b3; }
-        #error-msg { color: red; margin-top: 10px; font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px 35px;
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            margin-bottom: 6px;
+        }
+
+        .login-card h2 {
+            color: #1e293b;
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        .login-card p.subtitle {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 28px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            color: #1e293b;
+        }
+
+        .input-group input:focus {
+            border-color: #3b82f6;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 6px;
+            font-family: inherit;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59,130,246,0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Message box — shows below button */
+        #msg-box {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            text-align: left;
+        }
+        #msg-box.error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; display: block; }
+        #msg-box.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; display: block; }
+        #msg-box.info    { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; display: block; }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #3b82f6; }
     </style>
 </head>
 <body>
 
-    <div class="login-box">
-        <h2>Admin Login</h2>
-        <input type="email" id="email" placeholder="Admin Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="loginAdmin()">Login</button>
-        <p id="error-msg"></p>
+    <div class="login-card">
+        <div class="login-logo">⚙️</div>
+        <h2>SmartBudget Admin</h2>
+        <p class="subtitle">Enter your credentials to access the panel</p>
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="admin@smartbudget.in"
+                autocomplete="email"
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+            >
+        </div>
+
+        <button class="login-btn" id="login-btn" onclick="loginAdmin()">
+            🔐 Login to Admin Panel
+        </button>
+
+        <div id="msg-box"></div>
+
+        <a href="index.html" class="back-link">← Back to website</a>
     </div>
 
     <script>
-        // YAHAN APNI SUPABASE URL AUR ANON KEY DAALO
-        const supabaseUrl = 'YOUR_SUPABASE_URL_HERE';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY_HERE';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // ── Supabase Init ──────────────────────────────────────────
+        const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ── If already logged in, skip login page ──────────────────
+        (async () => {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session) {
+                window.location.href = 'admin.html';
+            }
+        })();
+
+        // ── Login function ─────────────────────────────────────────
         async function loginAdmin() {
-            const email = document.getElementById('email').val(); // user ki jagah value aayega line neeche thik likhi hai
-            const emailValue = document.getElementById('email').value;
-            const passwordValue = document.getElementById('password').value;
-            const errorMsg = document.getElementById('error-msg');
+            const email    = document.getElementById('email').value.trim();       // FIX: .value not .val()
+            const password = document.getElementById('password').value;
+            const btn      = document.getElementById('login-btn');
+            const msgBox   = document.getElementById('msg-box');
 
-            errorMsg.innerText = "Checking...";
+            // Basic client-side validation
+            if (!email || !password) {
+                showMsg('❌ Please enter both email and password.', 'error');
+                return;
+            }
+            if (!email.includes('@')) {
+                showMsg('❌ Please enter a valid email address.', 'error');
+                return;
+            }
 
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: emailValue,
-                password: passwordValue,
-            });
+            // Loading state
+            btn.disabled   = true;
+            btn.textContent = '⏳ Logging in...';
+            showMsg('Verifying credentials...', 'info');
 
-            if (error) {
-                errorMsg.innerText = error.message;
-            } else {
-                errorMsg.style.color = "green";
-                errorMsg.innerText = "Login Success! Redirecting...";
-                // Login hone ke baad direct admin page par bhej dega
-                window.location.href = "/admin"; 
+            try {
+                const { data, error } = await sb.auth.signInWithPassword({
+                    email:    email,
+                    password: password,
+                });
+
+                if (error) {
+                    // Show Supabase error clearly
+                    let friendlyMsg = error.message;
+                    if (friendlyMsg.includes('Invalid login'))    friendlyMsg = '❌ Wrong email or password. Please try again.';
+                    if (friendlyMsg.includes('Email not confirm')) friendlyMsg = '❌ Email not confirmed. Check your inbox.';
+                    if (friendlyMsg.includes('Too many requests')) friendlyMsg = '⏳ Too many attempts. Please wait a moment.';
+                    showMsg(friendlyMsg, 'error');
+
+                    btn.disabled    = false;
+                    btn.textContent = '🔐 Login to Admin Panel';
+                    return;
+                }
+
+                // ✅ Login successful
+                showMsg('✅ Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'admin.html'; // FIX: was "/admin" (broken server route)
+                }, 800);
+
+            } catch (err) {
+                showMsg('❌ Network error: ' + err.message, 'error');
+                btn.disabled    = false;
+                btn.textContent = '🔐 Login to Admin Panel';
             }
         }
+
+        function showMsg(text, type) {
+            const box   = document.getElementById('msg-box');
+            box.textContent = text;
+            box.className   = type;
+        }
+
+        // ── Enter key support ──────────────────────────────────────
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter') loginAdmin();
+        });
     </script>
 </body>
 </html>
-
