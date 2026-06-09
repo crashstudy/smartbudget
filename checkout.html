@@ -427,14 +427,13 @@
                     <span>Price:</span>
                     <span style="font-weight: 600;" id="summ-price">₹0</span>
                 </div>
-                                <div class="summary-item">
+                <div class="summary-item">
                     <span>Delivery</span>
-                    <span id="delivery-fee-display" style="font-weight: 700;">Loading...</span>
+                    <span style="color: #10b981; font-weight: 700;">FREE 🚚</span>
                 </div>
-
                 <div class="summary-item" id="discount-row" style="display: none;">
                     <span>Prepaid Discount</span>
-                    <span style="color: #10b981; font-weight: 700;" id="discount-amount-display">- ₹0</span>
+                    <span style="color: #10b981; font-weight: 700;">- ₹25</span>
                 </div>
                 <div class="summary-total">
                     <span>Total</span>
@@ -482,7 +481,7 @@
                                 <div class="payment-option active" data-method="upi" onclick="selectPaymentMethod('upi')">
                                     <div class="payment-option-icon">💰</div>
                                     <div class="payment-option-title">Prepaid UPI</div>
-                                    <div class="payment-option-desc" id="upi-save-label">Online Pay</div>
+                                    <div class="payment-option-desc">Save ₹25!</div>
                                 </div>
                                 <div class="payment-option" data-method="cod" onclick="selectPaymentMethod('cod')">
                                     <div class="payment-option-icon">🚚</div>
@@ -498,7 +497,7 @@
                                     <p>1️⃣ Click "Pay Now" button below</p>
                                     <p>2️⃣ Complete payment in your UPI app</p>
                                     <p>3️⃣ Copy the UPI Transaction Id (UTR) and paste it back here</p>
-                                    <p>💡 <strong id="upi-discount-tip">Pay via UPI and complete your order instantly!</strong></p>
+                                    <p>💡 <strong>Your ₹25 discount will be automatically applied!</strong></p>
                                 </div>
                             </div>
                         </div>
@@ -507,7 +506,7 @@
                     <!-- Action Buttons -->
                     <div id="action-buttons-section" class="button-group">
                         <button class="btn-place-order" id="upiPayBtn" style="grid-column: 1 / -1;">
-                            💳 Pay Now (Prepaid UPI)
+                            💳 Pay Now & Save ₹25
                         </button>
                         <button class="btn-cod" id="codBtn">
                             🚚 Cash on Delivery
@@ -589,51 +588,91 @@
             const paymentConfirmationBox = document.getElementById('payment-confirmation-box');
             const resumeSection = document.getElementById('resume-payment-section');
             
-            // URL Parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const prodId = urlParams.get('id');
-            const prodName = urlParams.get('name') ? urlParams.get('name').replace(/-/g, ' ') : "Unknown Product";
-            const prodPrice = parseInt(urlParams.get('price') || "0");
-            // Dynamic UPI discount — comes from per-product setting in Supabase via product.html
-            const upiDiscount = parseInt(urlParams.get('udiscount') || "0");
-            const deliveryCharge = parseInt(urlParams.get('delivery') || "0"); // ✅ SINGLE DECLARATION
+            // ─── URL Parameters ────────────────────────────────────────────
+            const urlParams  = new URLSearchParams(window.location.search);
+            const prodId     = urlParams.get('id');
 
             // Resume section ALWAYS visible - don't hide it
             if (!prodId && !urlParams.get('resumeOrder')) { window.location.href = 'store.html'; return; }
 
-            // ✅ Total Math calculate karna - CORRECT CALCULATION
-            const totalWithDelivery = prodPrice + deliveryCharge;
-
-            // ✅ UI update karna
-            document.getElementById('summ-name').innerText = prodName;
-            document.getElementById('summ-price').innerText = `₹${prodPrice}`;
-            document.getElementById('summ-total').innerText = `₹${totalWithDelivery}`;
-
-            if (deliveryCharge === 0) {
-                document.getElementById('delivery-fee-display').innerHTML = '<span style="color: #10b981;">FREE 🚚</span>';
-            } else {
-                document.getElementById('delivery-fee-display').innerHTML = `<span style="color: #ef4444;">+ ₹${deliveryCharge}</span>`;
-            }
-
-            // Apply dynamic discount labels to UI
-            if (upiDiscount > 0) {
-                document.getElementById('upi-save-label').textContent   = `Save ₹${upiDiscount}!`;
-                document.getElementById('upi-discount-tip').textContent  = `Your ₹${upiDiscount} discount will be automatically applied!`;
-                document.getElementById('upiPayBtn').textContent         = `💳 Pay Now & Save ₹${upiDiscount}`;
-                document.getElementById('discount-amount-display').textContent = `- ₹${upiDiscount}`;
-            } else {
-                document.getElementById('upi-save-label').textContent   = 'Online Pay';
-                document.getElementById('upi-discount-tip').textContent  = 'Pay via UPI and complete your order instantly!';
-                document.getElementById('upiPayBtn').textContent         = '💳 Pay Now (Prepaid UPI)';
-            }
-
-
+            // ─── Supabase Client ───────────────────────────────────────────
             let dbClient = null;
             try {
                 dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             } catch (err) {
                 console.error("Supabase Error: ", err);
                 alert("Critical error: Database connection failed. Please refresh.");
+                return;
+            }
+
+            // ─── SECURE PRICE FETCH ────────────────────────────────────────
+            // price, name, upiDiscount all come from DB — never from URL params
+            // URL me price=1 karne se kuch nahi hoga — real price hamesha DB se aayega
+            let prodPrice   = 0;
+            let prodName    = 'Loading...';
+            let upiDiscount = 0;
+
+            if (prodId) {
+                // Show loading state in summary while fetching
+                document.getElementById('summ-name').innerText  = 'Loading product...';
+                document.getElementById('summ-price').innerText = '⏳';
+                document.getElementById('summ-total').innerText = '⏳';
+
+                try {
+                    const { data: productData, error: productError } = await dbClient
+                        .from('products')
+                        .select('name, price, upi_discount, stock_status')
+                        .eq('product_id', prodId)
+                        .single();
+
+                    if (productError || !productData) {
+                        // Product ID not found in DB — block checkout
+                        document.getElementById('summ-name').innerText  = '❌ Product not found';
+                        document.getElementById('summ-price').innerText = '—';
+                        document.getElementById('summ-total').innerText = '—';
+                        document.getElementById('codBtn').disabled = true;
+                        document.getElementById('upiPayBtn').disabled = true;
+                        alert('❌ Product not found. Please go back to the store.');
+                        return;
+                    }
+
+                    // ✅ Use ONLY DB values — URL price param is completely ignored
+                    prodPrice   = productData.price;
+                    prodName    = productData.name;
+                    upiDiscount = productData.upi_discount || 0;
+
+                    // Check stock — block if out of stock
+                    const cleanStatus = (productData.stock_status || '').trim().toLowerCase();
+                    if (['out of stock', 'sold out'].includes(cleanStatus)) {
+                        document.getElementById('summ-name').innerText  = prodName;
+                        document.getElementById('summ-price').innerText = `₹${prodPrice}`;
+                        document.getElementById('summ-total').innerText = '—';
+                        document.getElementById('codBtn').disabled = true;
+                        document.getElementById('upiPayBtn').disabled = true;
+                        alert('❌ This product is currently out of stock.');
+                        return;
+                    }
+
+                } catch (fetchErr) {
+                    alert('Network error fetching product. Please refresh.');
+                    return;
+                }
+            }
+
+            // ─── Update Summary UI with real DB values ─────────────────────
+            document.getElementById('summ-name').innerText  = prodName;
+            document.getElementById('summ-price').innerText = `₹${prodPrice}`;
+            document.getElementById('summ-total').innerText = `₹${prodPrice}`;
+
+            // Dynamic UPI discount labels
+            if (upiDiscount > 0) {
+                const saveLabel = document.getElementById('upi-save-label');
+                const discTip   = document.getElementById('upi-discount-tip');
+                const discDisp  = document.getElementById('discount-amount-display');
+                if (saveLabel) saveLabel.textContent = `Save ₹${upiDiscount}!`;
+                if (discTip)   discTip.textContent   = `Your ₹${upiDiscount} discount will be automatically applied!`;
+                if (discDisp)  discDisp.textContent  = `- ₹${upiDiscount}`;
+                document.getElementById('upiPayBtn').textContent = `💳 Pay Now & Save ₹${upiDiscount}`;
             }
 
             // Helper Functions
@@ -648,12 +687,12 @@
                 
                 if (method === 'upi') {
                     document.getElementById('upi-payment-section').classList.add('active');
-                    document.getElementById('upiPayBtn').textContent = upiDiscount > 0 ? `💳 Pay Now & Save ₹${upiDiscount}` : '💳 Pay Now (Prepaid UPI)';
+                    document.getElementById('upiPayBtn').textContent = '💳 Pay Now & Save ₹25';
                     document.getElementById('upiPayBtn').style.gridColumn = '1 / -1';
                     document.getElementById('codBtn').style.display = 'block';
                 } else {
                     document.getElementById('upi-payment-section').classList.remove('active');
-                    document.getElementById('upiPayBtn').textContent = upiDiscount > 0 ? `💳 Prepaid UPI (Save ₹${upiDiscount})` : '💳 Prepaid UPI';
+                    document.getElementById('upiPayBtn').textContent = '💳 Prepaid UPI (Save ₹25)';
                     document.getElementById('upiPayBtn').style.gridColumn = 'auto';
                     document.getElementById('codBtn').style.display = 'block';
                 }
@@ -674,7 +713,7 @@
                 const orderDetails = {
                     order_id: orderId,
                     product_name: prodName,
-                    price: prodPrice + deliveryCharge,
+                    price: prodPrice,
                     customer_name: document.getElementById('custName').value,
                     phone: document.getElementById('custPhone').value,
                     address: document.getElementById('custAddress').value,
@@ -708,8 +747,7 @@
                 this.disabled = true;
                 document.getElementById('codBtn').disabled = true;
 
-                const discountedPrice = upiDiscount > 0 ? (prodPrice + deliveryCharge) - upiDiscount : (prodPrice + deliveryCharge);
-
+                const discountedPrice = upiDiscount > 0 ? prodPrice - upiDiscount : prodPrice;
                 generatedOrderId = "SB-" + Math.floor(100000 + Math.random() * 900000);
                 const orderDetails = {
                     order_id: generatedOrderId,
@@ -727,7 +765,7 @@
 
                 if (error) {
                     alert("❌ Could not create order! " + error.message);
-                    this.innerHTML = upiDiscount > 0 ? `💳 Pay Now & Save ₹${upiDiscount}` : '💳 Pay Now (Prepaid UPI)';
+                    this.innerHTML = '💳 Pay Now & Save ₹25';
                     this.disabled = false;
                     document.getElementById('codBtn').disabled = false;
                 } else {
@@ -774,7 +812,7 @@
             document.getElementById('cancelUpiBtn').addEventListener('click', function() {
                 shippingDetailsBox.style.display = 'block';
                 paymentConfirmationBox.style.display = 'none';
-                document.getElementById('upiPayBtn').innerHTML = upiDiscount > 0 ? `💳 Pay Now & Save ₹${upiDiscount}` : '💳 Pay Now (Prepaid UPI)';
+                document.getElementById('upiPayBtn').innerHTML = '💳 Pay Now & Save ₹25';
                 document.getElementById('upiPayBtn').disabled = false;
                 document.getElementById('codBtn').disabled = false;
             });
