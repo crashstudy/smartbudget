@@ -294,7 +294,7 @@
                         <th>🆔 Order ID</th>
                         <th>📦 Product</th>
                         <th>💰 Price</th>
-                        <th>👤 Customer</th>
+                      <th>👤 Customer</th><th>  📧 Email & Contact</th>
                         <th>📍 Address</th>
                         <th>💳 Payment</th>
                         <th>📝 UTR Number</th>
@@ -399,7 +399,15 @@
         const waButtonHtml = (order.status === 'Awaiting Payment' || order.status === 'Payment Under Review' || order.status === 'Payment Rejected') 
             ? `<a href="${waLink}" target="_blank" style="display:inline-block; margin-top:8px; padding:5px 10px; background:#25D366; color:white; border-radius:5px; text-decoration:none; font-size:0.75rem; font-weight:bold; box-shadow: 0 2px 5px rgba(37,211,102,0.3); transition: transform 0.2s;">💬 Chat on WhatsApp</a>` 
             : '';
-        // === WHATSAPP LOGIC END ===
+        
+        
+                // === WHATSAPP LOGIC END ===
+
+        // === EMAIL LOGIC START ===
+        let emailSubject = encodeURIComponent(`Update on your SmartBudget Order #${order.order_id}`);
+        let emailBody = encodeURIComponent(`Hi ${order.customer_name},\n\nWe wanted to give you a quick update regarding your order #${order.order_id}.\n\nCurrent Status: ${order.status}\n\nPlease reply to this email if you have any questions.\n\nThanks,\nTeam SmartBudget`);
+        let mailtoLink = `mailto:${order.email}?subject=${emailSubject}&body=${emailBody}`;
+        // === EMAIL LOGIC END ===
 
         return `
             <tr>
@@ -412,8 +420,20 @@
                     <span style="font-size:0.8rem;color:#64748b;">📞 ${order.phone}</span><br>
                     ${waButtonHtml}
                 </td>
-                <td><div class="address-box">${order.address}<br><strong>PIN: ${order.pincode}</strong></div></td>
+                
+                <!-- NAYA EMAIL COLUMN YAHAN HAI -->
                 <td>
+                    <div style="font-size:0.85rem;color:#475569;margin-bottom:8px;word-break:break-all;">
+                        ${order.email || 'No Email provided'}
+                    </div>
+                    <a href="${mailtoLink}" style="background-color: #3b82f6; color: white; padding: 6px 10px; text-decoration: none; border-radius: 5px; font-size: 0.75rem; font-weight: bold; display: inline-block; box-shadow: 0 2px 5px rgba(59,130,246,0.3); transition: transform 0.2s;">
+                        📧 Email
+                    </a>
+                </td>
+
+                <td><div class="address-box">${order.address}<br><strong>PIN: ${order.pincode}</strong></div></td>
+
+        
                     <span class="payment-badge ${isUPI ? 'upi' : 'cod'}">
                         ${isUPI ? '💳 Prepaid UPI' : '🚚 Cash on Delivery'}
                     </span>
