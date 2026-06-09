@@ -281,6 +281,7 @@
         <div class="filter-section">
             <button class="filter-btn active" data-filter="all">All Orders</button>
             <button class="filter-btn" data-filter="review">⏳ Pending Review</button>
+            <button class="filter-btn" data-filter="ghost" style="border-color:#f59e0b; color:#d97706;">👻 Ghost Orders</button>
             <button class="filter-btn" data-filter="delivered">✅ Delivered</button>
         </div>
 
@@ -365,80 +366,101 @@
             document.getElementById('deliveredOrders').innerText = allOrders.filter(o => o.status === 'Delivered').length;
         }
 
-        function renderOrders() {
-            const tbody = document.getElementById('orders-table-body');
-            const filtered = currentFilter === 'all'
-                ? allOrders
-                : currentFilter === 'review'
-                ? allOrders.filter(o => o.status === 'Payment Under Review')
-                : allOrders.filter(o => o.status === 'Delivered');
+    function renderOrders() {
+    const tbody = document.getElementById('orders-table-body');
+    
+    // Naya Filter Logic
+    const filtered = currentFilter === 'all'
+        ? allOrders
+        : currentFilter === 'review'
+        ? allOrders.filter(o => o.status === 'Payment Under Review')
+        : currentFilter === 'ghost'
+        ? allOrders.filter(o => o.status === 'Awaiting Payment' || o.status === 'Payment Rejected')
+        : allOrders.filter(o => o.status === 'Delivered');
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan='9' style='text-align:center;color:#999;padding:30px;'>No orders match this filter.</td></tr>`;
-                return;
-            }
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan='9' style='text-align:center;color:#999;padding:30px;'>No orders match this filter.</td></tr>`;
+        return;
+    }
 
-            tbody.innerHTML = filtered.map(order => {
-                const date = new Date(order.created_at).toLocaleDateString('en-IN');
-                const isUPI = (order.payment_method || '') === 'Prepaid UPI';
-                return `
-                    <tr>
-                        <td>${date}</td>
-                        <td><strong style="color:#3b82f6;">${order.order_id}</strong></td>
-                        <td style="color:#3b82f6;font-weight:700;">${order.product_name}</td>
-                        <td><strong>₹${order.price}</strong></td>
-                        <td>
-                            <strong>${order.customer_name}</strong><br>
-                            <span style="font-size:0.8rem;color:#64748b;">📞 ${order.phone}</span>
-                        </td>
-                        <td><div class="address-box">${order.address}<br><strong>PIN: ${order.pincode}</strong></div></td>
-                        <td>
-                            <span class="payment-badge ${isUPI ? 'upi' : 'cod'}">
-                                ${isUPI ? '💳 Prepaid UPI' : '🚚 Cash on Delivery'}
-                            </span>
-                        </td>
-                        <td>
-                            ${order.utr_number
-                                ? `<div class="utr-box">${order.utr_number}</div>`
-                                : `<div class="utr-box empty">—</div>`}
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                ${order.status === 'Payment Under Review'
-                                    ? `
-                                        <button class="btn-approve" onclick="openPaymentReview('${order.id}')">Review Payment</button>
-                                        <button class="btn-reject"  onclick="deleteOrder('${order.id}','${order.order_id}')">🗑️ Delete</button>
-                                    `
-                                    : `
-                                        <select id="status-${order.id}" class="status-select">
-                                            <option value="Awaiting Payment"      ${order.status==='Awaiting Payment'      ?'selected':''}>⏳ Awaiting Payment</option>
-                                            <option value="Payment Under Review"  ${order.status==='Payment Under Review'  ?'selected':''}>🔍 Payment Under Review</option>
-                                            <option value="Payment Approved"      ${order.status==='Payment Approved'      ?'selected':''}>✅ Payment Approved</option>
-                                            <option value="Payment Rejected"      ${order.status==='Payment Rejected'      ?'selected':''}>❌ Payment Rejected</option>
-                                            <option value="Order Received"        ${order.status==='Order Received'        ?'selected':''}>📦 Order Received</option>
-                                            <option value="Order Processed"       ${order.status==='Order Processed'       ?'selected':''}>⚙️ Order Processed</option>
-                                            <option value="Shipped"               ${order.status==='Shipped'               ?'selected':''}>🚚 Shipped</option>
-                                            <option value="Out for Delivery"      ${order.status==='Out for Delivery'      ?'selected':''}>🏃 Out for Delivery</option>
-                                            <option value="Delivered"             ${order.status==='Delivered'             ?'selected':''}>✔️ Delivered</option>
-                                        </select>
-                                        <input
-                                            type="date"
-                                            id="delivery-date-${order.id}"
-                                            value="${order.expected_delivery_date ? order.expected_delivery_date.split('T')[0] : ''}"
-                                            title="Expected Delivery Date (visible to customer)"
-                                            style="margin-top:6px;padding:7px 10px;border:2px solid #e2e8f0;border-radius:6px;font-family:inherit;font-size:0.85rem;width:100%;outline:none;"
-                                        >
-                                        <small style="color:#94a3b8;font-size:0.75rem;margin-top:2px;display:block;">📅 Expected delivery date</small>
-                                        <button class="btn-update" onclick="updateStatus('${order.id}')">Save</button>
-                                        <button class="btn-reject" onclick="deleteOrder('${order.id}','${order.order_id}')" style="margin-top:5px;">🗑️ Delete</button>
-                                    `
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
+    tbody.innerHTML = filtered.map(order => {
+        const date = new Date(order.created_at).toLocaleDateString('en-IN');
+        const isUPI = (order.payment_method || '') === 'Prepaid UPI';
+        
+        // === WHATSAPP LOGIC START ===
+        // Phone number se extra spaces hatana aur 91 add karna
+        const cleanPhone = (order.phone || '').replace(/\D/g, '');
+        const waPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+        // Custom pre-filled message
+        const waMsg = `Hi ${order.customer_name}, I noticed your order for *${order.product_name}* at SmartBudget is pending. Do you need any help completing the payment for Order ID: ${order.order_id}?`;
+        const waLink = `https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`;
+        
+        // Agar order incomplete hai tabhi WhatsApp button dikhega
+        const waButtonHtml = (order.status === 'Awaiting Payment' || order.status === 'Payment Under Review' || order.status === 'Payment Rejected') 
+            ? `<a href="${waLink}" target="_blank" style="display:inline-block; margin-top:8px; padding:5px 10px; background:#25D366; color:white; border-radius:5px; text-decoration:none; font-size:0.75rem; font-weight:bold; box-shadow: 0 2px 5px rgba(37,211,102,0.3); transition: transform 0.2s;">💬 Chat on WhatsApp</a>` 
+            : '';
+        // === WHATSAPP LOGIC END ===
+
+        return `
+            <tr>
+                <td>${date}</td>
+                <td><strong style="color:#3b82f6;">${order.order_id}</strong></td>
+                <td style="color:#3b82f6;font-weight:700;">${order.product_name}</td>
+                <td><strong>₹${order.price}</strong></td>
+                <td>
+                    <strong>${order.customer_name}</strong><br>
+                    <span style="font-size:0.8rem;color:#64748b;">📞 ${order.phone}</span><br>
+                    ${waButtonHtml}
+                </td>
+                <td><div class="address-box">${order.address}<br><strong>PIN: ${order.pincode}</strong></div></td>
+                <td>
+                    <span class="payment-badge ${isUPI ? 'upi' : 'cod'}">
+                        ${isUPI ? '💳 Prepaid UPI' : '🚚 Cash on Delivery'}
+                    </span>
+                </td>
+                <td>
+                    ${order.utr_number
+                        ? `<div class="utr-box">${order.utr_number}</div>`
+                        : `<div class="utr-box empty">—</div>`}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        ${order.status === 'Payment Under Review'
+                            ? `
+                                <button class="btn-approve" onclick="openPaymentReview('${order.id}')">Review Payment</button>
+                                <button class="btn-reject"  onclick="deleteOrder('${order.id}','${order.order_id}')">🗑️ Delete</button>
+                            `
+                            : `
+                                <select id="status-${order.id}" class="status-select">
+                                    <option value="Awaiting Payment"      ${order.status==='Awaiting Payment'      ?'selected':''}>⏳ Awaiting Payment</option>
+                                    <option value="Payment Under Review"  ${order.status==='Payment Under Review'  ?'selected':''}>🔍 Payment Under Review</option>
+                                    <option value="Payment Approved"      ${order.status==='Payment Approved'      ?'selected':''}>✅ Payment Approved</option>
+                                    <option value="Payment Rejected"      ${order.status==='Payment Rejected'      ?'selected':''}>❌ Payment Rejected</option>
+                                    <option value="Order Received"        ${order.status==='Order Received'        ?'selected':''}>📦 Order Received</option>
+                                    <option value="Order Processed"       ${order.status==='Order Processed'       ?'selected':''}>⚙️ Order Processed</option>
+                                    <option value="Shipped"               ${order.status==='Shipped'               ?'selected':''}>🚚 Shipped</option>
+                                    <option value="Out for Delivery"      ${order.status==='Out for Delivery'      ?'selected':''}>🏃 Out for Delivery</option>
+                                    <option value="Delivered"             ${order.status==='Delivered'             ?'selected':''}>✔️ Delivered</option>
+                                </select>
+                                <input
+                                    type="date"
+                                    id="delivery-date-${order.id}"
+                                    value="${order.expected_delivery_date ? order.expected_delivery_date.split('T')[0] : ''}"
+                                    title="Expected Delivery Date (visible to customer)"
+                                    style="margin-top:6px;padding:7px 10px;border:2px solid #e2e8f0;border-radius:6px;font-family:inherit;font-size:0.85rem;width:100%;outline:none;"
+                                >
+                                <small style="color:#94a3b8;font-size:0.75rem;margin-top:2px;display:block;">📅 Expected delivery date</small>
+                                <button class="btn-update" onclick="updateStatus('${order.id}')">Save</button>
+                                <button class="btn-reject" onclick="deleteOrder('${order.id}','${order.order_id}')" style="margin-top:5px;">🗑️ Delete</button>
+                            `
+                        }
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
 
         async function updateStatus(id) {
             const newStatus   = document.getElementById(`status-${id}`).value;
