@@ -457,6 +457,13 @@
                                 <input type="text" id="custName" required placeholder="Enter your full name">
                             </div>
 
+<div class="form-group">
+    <label>Email Address (For Invoice & Tracking) *</label>
+    <input type="email" id="custEmail" required placeholder="name@example.com">
+</div>
+
+
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Phone Number (10 Digits) *</label>
@@ -712,6 +719,7 @@
                     product_name: prodName,
                     price: realPrice,           // ✅ DB price — not URL price
                     customer_name: document.getElementById('custName').value,
+                    email: document.getElementById('custEmail').value.trim(),
                     phone: document.getElementById('custPhone').value,
                     address: document.getElementById('custAddress').value,
                     pincode: document.getElementById('custPin').value,
@@ -763,6 +771,7 @@
                     product_name: prodName,
                     price: discountedPrice,     // ✅ DB price — not URL price
                     customer_name: document.getElementById('custName').value,
+                    email: document.getElementById('custEmail').value.trim(),
                     phone: document.getElementById('custPhone').value,
                     address: document.getElementById('custAddress').value,
                     pincode: document.getElementById('custPin').value,
