@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shivam's NEET Chart — Daily Prep Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --paper:#EFF5F0;
+    --card:#FFFFFF;
+    --ink:#16241F;
+    --ink-soft:#4C5F57;
+    --green:#2F6F4E;
+    --green-dark:#1F4E37;
+    --green-pale:#E3EFE7;
+    --red:#C1442D;
+    --red-pale:#F7E7E2;
+    --gold:#B08D57;
+    --line:#D9E3DC;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    padding-bottom:60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px; margin:0 auto; padding:18px 16px;}
+
+  /* ---------- Header ---------- */
+  .header-card{
+    background:var(--green-dark);
+    color:#F3F7F4;
+    border-radius:var(--radius);
+    padding:22px 20px 18px;
+    position:relative;
+    overflow:hidden;
+  }
+  .greet-row{display:flex; justify-content:space-between; align-items:flex-start;}
+  .greet-label{font-size:12px; letter-spacing:.08em; text-transform:uppercase; opacity:.7; font-family:'IBM Plex Mono',monospace;}
+  .greet-name{font-family:'Spectral',serif; font-size:26px; font-weight:600; margin-top:2px;}
+  .edit-name{background:none; border:1px solid rgba(255,255,255,.35); color:#F3F7F4; font-size:11px; padding:4px 9px; border-radius:20px; font-family:'IBM Plex Mono',monospace; cursor:pointer;}
+  .admin-btn{background:none; border:none; color:rgba(255,255,255,.55); font-size:11px; font-family:'IBM Plex Mono',monospace; text-decoration:underline; cursor:pointer; padding:4px 0;}
+
+  .vitals{margin-top:18px;}
+  .vitals-label{font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.65; font-family:'IBM Plex Mono',monospace;}
+  .vitals-number{font-family:'IBM Plex Mono',monospace; font-size:44px; font-weight:600; line-height:1.05; margin-top:2px; display:flex; align-items:baseline; gap:8px;}
+  .vitals-number span.unit{font-size:14px; font-weight:500; opacity:.7;}
+  .ecg{width:100%; height:26px; margin-top:6px;}
+  .ecg path{
+    fill:none; stroke:#7FD8A6; stroke-width:2;
+    stroke-dasharray:340; stroke-dashoffset:340;
+    animation:draw 2.6s ease-in-out infinite;
+  }
+  @keyframes draw{
+    0%{stroke-dashoffset:340;}
+    45%{stroke-dashoffset:0;}
+    100%{stroke-dashoffset:-340;}
+  }
+  @media (prefers-reduced-motion: reduce){ .ecg path{animation:none; stroke-dashoffset:0;} }
+  .vitals-sub{font-size:11px; opacity:.6; margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- Stats strip ---------- */
+  .stats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 10px; text-align:center;}
+  .stat-num{font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:600; color:var(--green-dark);}
+  .stat-label{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-top:2px;}
+
+  /* ---------- Section ---------- */
+  .section{margin-top:26px;}
+  .section-head{display:flex; align-items:baseline; gap:8px; margin-bottom:10px;}
+  .section-title{font-family:'Spectral',serif; font-size:19px; font-weight:600;}
+  .section-note{font-size:11px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px;}
+
+  /* ---------- Form elements ---------- */
+  label.field-label{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); display:block; margin-bottom:5px; margin-top:12px;}
+  label.field-label:first-child{margin-top:0;}
+  input[type=text], input[type=date], select, textarea{
+    width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 11px;
+    font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:var(--ink); background:#FCFDFC;
+  }
+  textarea{resize:vertical; min-height:50px;}
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--green); outline-offset:1px;}
+
+  .priority-toggle{display:flex; gap:8px; margin-top:6px;}
+  .priority-btn{flex:1; border:1px solid var(--line); background:#FCFDFC; border-radius:9px; padding:9px; font-size:13px; font-weight:500; cursor:pointer; text-align:center;}
+  .priority-btn.active-important{background:var(--red-pale); border-color:var(--red); color:var(--red);}
+  .priority-btn.active-normal{background:var(--green-pale); border-color:var(--green); color:var(--green-dark);}
+
+  .btn-primary{
+    margin-top:16px; width:100%; background:var(--green-dark); color:#fff; border:none;
+    border-radius:9px; padding:12px; font-size:14px; font-weight:600; cursor:pointer;
+    font-family:'IBM Plex Sans',sans-serif;
+  }
+  .btn-primary:active{background:var(--green);}
+  .btn-ghost{background:none; border:1px solid var(--line); color:var(--ink-soft); border-radius:9px; padding:8px 12px; font-size:12px; cursor:pointer;}
+
+  /* ---------- Target list ---------- */
+  .date-picker-row{display:flex; align-items:center; gap:8px; margin-bottom:12px;}
+  .date-picker-row input{flex:1;}
+
+  .target-item{
+    border:1px solid var(--line); border-radius:11px; padding:11px 12px; margin-top:10px; background:#FCFDFC;
+  }
+  .target-item.done{opacity:.55;}
+  .target-top{display:flex; align-items:flex-start; gap:10px;}
+  .check{
+    width:22px; height:22px; border-radius:6px; border:2px solid var(--green); flex-shrink:0; margin-top:2px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; background:#fff;
+  }
+  .check.checked{background:var(--green); color:#fff; font-size:14px;}
+  .target-body{flex:1;}
+  .target-subject{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .target-topic{font-size:14.5px; font-weight:500; margin-top:1px;}
+  .target-topic.strike{text-decoration:line-through;}
+  .badge{display:inline-block; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:600; margin-top:5px;}
+  .badge-important{background:var(--red-pale); color:var(--red);}
+  .badge-normal{background:var(--green-pale); color:var(--green-dark);}
+
+  .admin-comment-box{margin-top:9px; border-top:1px dashed var(--line); padding-top:9px;}
+  .admin-comment-box textarea{font-size:13px;}
+  .admin-comment-box .btn-ghost{margin-top:6px;}
+  .existing-comment{font-size:12.5px; color:var(--ink-soft); margin-top:6px; background:var(--paper); padding:7px 9px; border-radius:8px; font-style:italic;}
+
+  .empty{font-size:13px; color:var(--ink-soft); text-align:center; padding:14px 0;}
+
+  /* ---------- Chapters ---------- */
+  .chapter-item{border:1px solid var(--line); border-radius:11px; padding:11px 12px; margin-top:10px; background:#FCFDFC;}
+  .chapter-top{display:flex; justify-content:space-between; align-items:center;}
+  .chapter-name{font-weight:600; font-size:14.5px;}
+  .chapter-subject{font-size:10px; text-transform:uppercase; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .status-select{width:auto; font-size:12px; padding:5px 8px;}
+  .conf-row{display:flex; align-items:center; gap:8px; margin-top:8px;}
+  .conf-row input[type=range]{flex:1; accent-color:var(--green);}
+  .conf-val{font-family:'IBM Plex Mono',monospace; font-size:12px; width:34px; text-align:right;}
+  .next-rev{font-size:11px; color:var(--gold); margin-top:6px; font-family:'IBM Plex Mono',monospace;}
+
+  .toast{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+    background:var(--green-dark); color:#fff; padding:9px 18px; border-radius:20px; font-size:13px;
+    opacity:0; transition:opacity .25s; pointer-events:none; z-index:50;
+  }
+  .toast.show{opacity:1;}
+
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(22,36,31,.55); display:none; align-items:center; justify-content:center; z-index:60; padding:20px;
+  }
+  .modal-backdrop.show{display:flex;}
+  .modal{background:#fff; border-radius:14px; padding:20px; width:100%; max-width:340px;}
+  .modal h3{font-family:'Spectral',serif; font-size:18px; margin-bottom:12px;}
+
+  footer{text-align:center; margin-top:30px; font-size:11px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header-card">
+    <div class="greet-row">
+      <div>
+        <div class="greet-label">Welcome back</div>
+        <div class="greet-name" id="greetName">Aspirant</div>
+      </div>
+      <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+        <button class="edit-name" id="editNameBtn">edit name</button>
+        <button class="admin-btn" id="adminBtn">Admin login</button>
+      </div>
+    </div>
+
+    <div class="vitals">
+      <div class="vitals-label">NEET 2027 — Countdown</div>
+      <div class="vitals-number"><span id="daysLeft">--</span><span class="unit">days left</span></div>
+      <svg class="ecg" viewBox="0 0 340 26" preserveAspectRatio="none">
+        <path d="M0,13 L60,13 L75,4 L90,22 L105,13 L340,13" />
+      </svg>
+      <div class="vitals-sub">Tentative — May 2, 2027 (NTA confirmation pending)</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="statStreak">0</div><div class="stat-label">Day streak</div></div>
+    <div class="stat"><div class="stat-num" id="statToday">0%</div><div class="stat-label">Today done</div></div>
+    <div class="stat"><div class="stat-num" id="statRevisions">0</div><div class="stat-label">Revisions due</div></div>
+  </div>
+
+  <!-- DAILY TARGETS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Daily Target Chart</div>
+    </div>
+
+    <div class="card">
+      <div class="date-picker-row">
+        <input type="date" id="targetDate">
+      </div>
+
+      <label class="field-label">Subject</label>
+      <select id="subjectSelect">
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology" selected>Biology</option>
+        <option value="Others">Others</option>
+      </select>
+
+      <label class="field-label">Topic</label>
+      <input type="text" id="topicInput" placeholder="e.g. Human Reproduction — Spermatogenesis">
+
+      <label class="field-label">Priority</label>
+      <div class="priority-toggle">
+        <button type="button" class="priority-btn active-normal" id="prioNormalBtn" data-p="normal">Normal</button>
+        <button type="button" class="priority-btn" id="prioImportantBtn" data-p="important">Important</button>
+      </div>
+
+      <button class="btn-primary" id="addTargetBtn">+ Add Target</button>
+    </div>
+
+    <div id="targetList"></div>
+  </div>
+
+  <!-- CHAPTER TRACKER -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Chapter Tracker</div>
+    </div>
+
+    <div class="card">
+      <label class="field-label">Subject</label>
+      <select id="chSubject">
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology" selected>Biology</option>
+        <option value="Others">Others</option>
+      </select>
+      <label class="field-label">Chapter name</label>
+      <input type="text" id="chName" placeholder="e.g. Human Reproduction">
+      <button class="btn-primary" id="addChapterBtn">+ Add Chapter</button>
+    </div>
+
+    <div id="chapterList"></div>
+  </div>
+
+  <footer>SmartBudget.in/shivam · built for consistency, not perfection</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-backdrop" id="nameModal">
+  <div class="modal">
+    <h3>What's your name?</h3>
+    <input type="text" id="nameInput" placeholder="Enter name">
+    <button class="btn-primary" id="saveNameBtn">Save</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="adminModal">
+  <div class="modal">
+    <h3>Admin login</h3>
+    <input type="text" id="pinInput" placeholder="Enter PIN">
+    <button class="btn-primary" id="savePinBtn">Unlock</button>
+  </div>
+</div>
+
+<script>
+/* ================== CONFIG — FILL THESE IN ================== */
+const SUPABASE_URL = "YOUR_SUPABASE_URL_HERE";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
+const ADMIN_PIN = "SHIVAM2027"; // change this to whatever PIN Satyam wants
+/* =============================================================== */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let isAdmin = false;
+let currentPriority = "normal";
+let allTargets = [];
+let allChapters = [];
+
+const $ = (id) => document.getElementById(id);
+
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+function todayISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+/* ---------- Countdown ---------- */
+function renderCountdown(){
+  const examDate = new Date("2027-05-02T00:00:00");
+  const now = new Date();
+  const diff = Math.ceil((examDate - now) / (1000*60*60*24));
+  $("daysLeft").textContent = diff > 0 ? diff : 0;
+}
+
+/* ---------- Name ---------- */
+async function loadName(){
+  const cached = localStorage.getItem("shivam_name");
+  if(cached){ $("greetName").textContent = cached; }
+  const { data, error } = await sb.from("profile").select("*").eq("id",1).maybeSingle();
+  if(data && data.name){
+    $("greetName").textContent = data.name;
+    localStorage.setItem("shivam_name", data.name);
+  } else if(!cached){
+    $("nameModal").classList.add("show");
+  }
+}
+
+$("editNameBtn").addEventListener("click", ()=> $("nameModal").classList.add("show"));
+
+$("saveNameBtn").addEventListener("click", async ()=>{
+  const val = $("nameInput").value.trim();
+  if(!val) return;
+  $("greetName").textContent = val;
+  localStorage.setItem("shivam_name", val);
+  $("nameModal").classList.remove("show");
+  await sb.from("profile").upsert({ id:1, name: val, updated_at: new Date().toISOString() });
+  toast("Name saved");
+});
+
+/* ---------- Admin ---------- */
+$("adminBtn").addEventListener("click", ()=>{
+  if(isAdmin){
+    isAdmin = false;
+    $("adminBtn").textContent = "Admin login";
+    toast("Admin mode off");
+    renderTargets();
+  } else {
+    $("adminModal").classList.add("show");
+  }
+});
+
+$("savePinBtn").addEventListener("click", ()=>{
+  const val = $("pinInput").value.trim();
+  if(val === ADMIN_PIN){
+    isAdmin = true;
+    $("adminBtn").textContent = "Admin mode: ON";
+    $("adminModal").classList.remove("show");
+    $("pinInput").value = "";
+    toast("Admin mode on");
+    renderTargets();
+  } else {
+    toast("Wrong PIN");
+  }
+});
+
+/* ---------- Priority toggle ---------- */
+$("prioNormalBtn").addEventListener("click", ()=>{
+  currentPriority = "normal";
+  $("prioNormalBtn").classList.add("active-normal");
+  $("prioImportantBtn").classList.remove("active-important");
+});
+$("prioImportantBtn").addEventListener("click", ()=>{
+  currentPriority = "important";
+  $("prioImportantBtn").classList.add("active-important");
+  $("prioNormalBtn").classList.remove("active-normal");
+});
+
+/* ---------- Daily Targets ---------- */
+$("targetDate").value = todayISO();
+$("targetDate").addEventListener("change", loadTargets);
+
+$("addTargetBtn").addEventListener("click", async ()=>{
+  const topic = $("topicInput").value.trim();
+  if(!topic){ toast("Enter a topic first"); return; }
+  const row = {
+    target_date: $("targetDate").value,
+    subject: $("subjectSelect").value,
+    topic: topic,
+    priority: currentPriority,
+    status: "pending"
+  };
+  const { error } = await sb.from("daily_targets").insert(row);
+  if(error){ toast("Error saving — check Supabase setup"); console.error(error); return; }
+  $("topicInput").value = "";
+  $("topicInput").focus();
+  toast("Target added");
+  loadTargets();
+});
+
+async function loadTargets(){
+  const date = $("targetDate").value;
+  const { data, error } = await sb.from("daily_targets").select("*").eq("target_date", date).order("created_at", {ascending:true});
+  if(error){ console.error(error); return; }
+  allTargets = data || [];
+  renderTargets();
+  updateStats();
+}
+
+function renderTargets(){
+  const list = $("targetList");
+  if(allTargets.length === 0){
+    list.innerHTML = `<div class="empty">No targets yet for this date. Add one above.</div>`;
+    return;
+  }
+  list.innerHTML = allTargets.map(t => `
+    <div class="target-item ${t.status==='done' ? 'done' : ''}" data-id="${t.id}">
+      <div class="target-top">
+        <div class="check ${t.status==='done' ? 'checked' : ''}" data-check="${t.id}">${t.status==='done' ? '✓' : ''}</div>
+        <div class="target-body">
+          <div class="target-subject">${t.subject}</div>
+          <div class="target-topic ${t.status==='done' ? 'strike' : ''}">${escapeHtml(t.topic)}</div>
+          <span class="badge ${t.priority==='important' ? 'badge-important' : 'badge-normal'}">${t.priority==='important' ? 'Important' : 'Normal'}</span>
+          ${t.admin_comment ? `<div class="existing-comment">Satyam: ${escapeHtml(t.admin_comment)}</div>` : ''}
+          ${isAdmin ? `
+            <div class="admin-comment-box">
+              <textarea placeholder="Comment as admin — is this sufficient?" data-comment-input="${t.id}">${t.admin_comment || ''}</textarea>
+              <button class="btn-ghost" data-save-comment="${t.id}">Save comment</button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll("[data-check]").forEach(el=>{
+    el.addEventListener("click", ()=> toggleTarget(el.getAttribute("data-check")));
+  });
+  list.querySelectorAll("[data-save-comment]").forEach(el=>{
+    el.addEventListener("click", ()=> saveComment(el.getAttribute("data-save-comment")));
+  });
+}
+
+async function toggleTarget(id){
+  const t = allTargets.find(x=>x.id===id);
+  const newStatus = t.status === "done" ? "pending" : "done";
+  const { error } = await sb.from("daily_targets").update({status:newStatus}).eq("id", id);
+  if(error){ console.error(error); return; }
+  t.status = newStatus;
+  renderTargets();
+  updateStats();
+}
+
+async function saveComment(id){
+  const val = document.querySelector(`[data-comment-input="${id}"]`).value.trim();
+  const { error } = await sb.from("daily_targets").update({admin_comment: val}).eq("id", id);
+  if(error){ toast("Could not save comment"); console.error(error); return; }
+  const t = allTargets.find(x=>x.id===id);
+  t.admin_comment = val;
+  renderTargets();
+  toast("Comment saved");
+}
+
+function updateStats(){
+  if(allTargets.length === 0){ $("statToday").textContent = "0%"; return; }
+  const done = allTargets.filter(t=>t.status==="done").length;
+  $("statToday").textContent = Math.round((done/allTargets.length)*100) + "%";
+}
+
+/* ---------- Chapters ---------- */
+$("addChapterBtn").addEventListener("click", async ()=>{
+  const name = $("chName").value.trim();
+  if(!name){ toast("Enter chapter name"); return; }
+  const row = {
+    subject: $("chSubject").value,
+    chapter_name: name,
+    status: "not_started",
+    confidence: 0,
+    revision_count: 0
+  };
+  const { error } = await sb.from("chapters").insert(row);
+  if(error){ toast("Error — check Supabase setup"); console.error(error); return; }
+  $("chName").value = "";
+  toast("Chapter added");
+  loadChapters();
+});
+
+async function loadChapters(){
+  const { data, error } = await sb.from("chapters").select("*").order("created_at", {ascending:true});
+  if(error){ console.error(error); return; }
+  allChapters = data || [];
+  renderChapters();
+  updateRevisionStat();
+}
+
+function renderChapters(){
+  const list = $("chapterList");
+  if(allChapters.length === 0){
+    list.innerHTML = `<div class="empty">No chapters added yet.</div>`;
+    return;
+  }
+  list.innerHTML = allChapters.map(c => `
+    <div class="chapter-item" data-id="${c.id}">
+      <div class="chapter-top">
+        <div>
+          <div class="chapter-subject">${c.subject}</div>
+          <div class="chapter-name">${escapeHtml(c.chapter_name)}</div>
+        </div>
+        <select class="status-select" data-status="${c.id}">
+          <option value="not_started" ${c.status==='not_started'?'selected':''}>Not started</option>
+          <option value="in_progress" ${c.status==='in_progress'?'selected':''}>In progress</option>
+          <option value="done" ${c.status==='done'?'selected':''}>Done</option>
+        </select>
+      </div>
+      <div class="conf-row">
+        <input type="range" min="0" max="100" step="5" value="${c.confidence}" data-conf="${c.id}">
+        <div class="conf-val">${c.confidence}%</div>
+      </div>
+      ${c.next_revision ? `<div class="next-rev">Next revision: ${c.next_revision}</div>` : `<div class="next-rev">Mark "Done" to start revision cycle</div>`}
+    </div>
+  `).join("");
+
+  list.querySelectorAll("[data-status]").forEach(el=>{
+    el.addEventListener("change", (e)=> updateChapterStatus(el.getAttribute("data-status"), e.target.value));
+  });
+  list.querySelectorAll("[data-conf]").forEach(el=>{
+    el.addEventListener("change", (e)=> updateChapterConfidence(el.getAttribute("data-conf"), e.target.value));
+  });
+}
+
+const REVISION_GAPS = [1,3,7,15,30,60];
+
+async function updateChapterStatus(id, status){
+  const c = allChapters.find(x=>x.id===id);
+  const update = { status };
+  if(status === "done" && !c.next_revision){
+    const next = new Date();
+    next.setDate(next.getDate() + REVISION_GAPS[0]);
+    update.last_revision = todayISO();
+    update.next_revision = next.toISOString().slice(0,10);
+    update.revision_count = 0;
+  }
+  const { error } = await sb.from("chapters").update(update).eq("id", id);
+  if(error){ console.error(error); return; }
+  Object.assign(c, update);
+  renderChapters();
+  updateRevisionStat();
+}
+
+async function updateChapterConfidence(id, val){
+  const { error } = await sb.from("chapters").update({confidence: parseInt(val)}).eq("id", id);
+  if(error){ console.error(error); return; }
+  const c = allChapters.find(x=>x.id===id);
+  c.confidence = parseInt(val);
+  renderChapters();
+}
+
+function updateRevisionStat(){
+  const today = todayISO();
+  const due = allChapters.filter(c => c.next_revision && c.next_revision <= today).length;
+  $("statRevisions").textContent = due;
+}
+
+/* ---------- Streak (simple local tracker based on any target added today) ---------- */
+function updateStreak(){
+  const last = localStorage.getItem("shivam_last_active");
+  const streakVal = parseInt(localStorage.getItem("shivam_streak") || "0");
+  const today = todayISO();
+  if(last === today){
+    $("statStreak").textContent = streakVal;
+    return;
+  }
+  const yest = new Date(); yest.setDate(yest.getDate()-1);
+  const yestISO = yest.toISOString().slice(0,10);
+  let newStreak = (last === yestISO) ? streakVal + 1 : 1;
+  localStorage.setItem("shivam_last_active", today);
+  localStorage.setItem("shivam_streak", newStreak);
+  $("statStreak").textContent = newStreak;
+}
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------- Init ---------- */
+renderCountdown();
+loadName();
+loadTargets();
+loadChapters();
+updateStreak();
+</script>
+</body>
+</html>
