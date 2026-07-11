@@ -605,7 +605,8 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
 ══════════════════════════════════════ */
 const SUPABASE_URL     = "https://ytuvjhjemkzcjldiwafv.supabase.co";
 const SUPABASE_ANON_KEY= "sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5";
-// AI powered by Claude (Anthropic) — no API key needed
+const GROQ_API_KEY     = "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";
+const GROQ_MODEL       = "llama-3.3-70b-versatile";  // latest free Groq model
 const ADMIN_PIN        = "123";
 /* ══════════════════════════════════════ */
 
@@ -620,22 +621,31 @@ let selectedPreloadChapters = new Set();
 let aiLogItems = [];
 let briefingDone = false; // only once per page load
 
-/* ══════════════════ CLAUDE AI ENGINE ══════════════════ */
+/* ══════════════════ GROQ AI ENGINE ══════════════════ */
 async function groqChat(systemPrompt, userPrompt, maxTokens=400){
+  if(!GROQ_API_KEY) return null;
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages",{
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+GROQ_API_KEY},
       body:JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: Math.min(maxTokens, 1000),
-        system: systemPrompt,
-        messages:[{role:"user", content: userPrompt}]
+        model: GROQ_MODEL,
+        max_tokens: maxTokens,
+        temperature: 0.85,
+        messages:[
+          {role:"system", content: systemPrompt},
+          {role:"user",   content: userPrompt}
+        ]
       })
     });
+    if(!res.ok){
+      const err = await res.json().catch(()=>null);
+      console.error("Groq API error:", res.status, err);
+      return null;
+    }
     const data = await res.json();
-    return data.content?.[0]?.text?.trim() || null;
-  } catch(e){ console.error("Claude API error",e); return null; }
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } catch(e){ console.error("Groq fetch error",e); return null; }
 }
 
 function buildContext(){
