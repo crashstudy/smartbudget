@@ -10,87 +10,93 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --paper:#EFF5F0;
-  --card:#FFFFFF;
-  --ink:#16241F;
-  --ink-soft:#4C5F57;
-  --green:#2F6F4E;
-  --green-dark:#1F4E37;
-  --green-pale:#E3EFE7;
-  --green-glow:rgba(47,111,78,.18);
-  --red:#C1442D;
-  --red-pale:#F7E7E2;
-  --gold:#B08D57;
-  --gold-pale:#F7F0E3;
-  --blue:#2563EB;
-  --blue-pale:#EFF6FF;
-  --purple:#7C3AED;
-  --purple-pale:#F5F3FF;
-  --line:#D9E3DC;
-  --radius:14px;
-
-  /* Subject colors */
-  --phy:#2563EB;   --phy-pale:#EFF6FF;
-  --chem:#9333EA;  --chem-pale:#FAF5FF;
-  --bio:#16A34A;   --bio-pale:#DCFCE7;
-  --other:#B08D57; --other-pale:#FEF9EE;
+  --paper:#EFF5F0;--card:#FFFFFF;--ink:#16241F;--ink-soft:#4C5F57;
+  --green:#2F6F4E;--green-dark:#1F4E37;--green-pale:#E3EFE7;--green-glow:rgba(47,111,78,.18);
+  --red:#C1442D;--red-pale:#F7E7E2;--gold:#B08D57;--gold-pale:#F7F0E3;
+  --blue:#2563EB;--blue-pale:#EFF6FF;--purple:#7C3AED;--purple-pale:#F5F3FF;
+  --line:#D9E3DC;--radius:14px;
+  --phy:#2563EB;--phy-pale:#EFF6FF;--chem:#9333EA;--chem-pale:#FAF5FF;
+  --bio:#16A34A;--bio-pale:#DCFCE7;--other:#B08D57;--other-pale:#FEF9EE;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:'IBM Plex Sans',sans-serif;
-  padding-bottom:100px;
-  -webkit-font-smoothing:antialiased;
-}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;padding-bottom:110px;-webkit-font-smoothing:antialiased;}
 .wrap{max-width:680px;margin:0 auto;padding:18px 16px;}
 
-/* ─── Skeleton Loader ─── */
-.skeleton{
-  background:linear-gradient(90deg,#dce8df 25%,#c8dccb 50%,#dce8df 75%);
-  background-size:200% 100%;
-  animation:shimmer 1.4s infinite;
-  border-radius:8px;
-}
+/* ── Skeleton ── */
+.skeleton{background:linear-gradient(90deg,#dce8df 25%,#c8dccb 50%,#dce8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skel-line{height:14px;margin:6px 0;border-radius:6px;}
-.skel-line.w60{width:60%;}
-.skel-line.w80{width:80%;}
-.skel-line.w40{width:40%;}
+.skel-line.w60{width:60%;}.skel-line.w80{width:80%;}.skel-line.w40{width:40%;}
 
-/* ─── Flash Message Banner ─── */
+/* ── Flash Banner ── */
 @keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
-#flashBanner{ animation:slideDown .4s cubic-bezier(.16,1,.3,1); }
+#flashBanner{animation:slideDown .4s cubic-bezier(.16,1,.3,1);}
 
-/* ─── Header ─── */
-.header-card{
-  background:linear-gradient(135deg,#1F4E37 0%,#2F6F4E 100%);
-  color:#F3F7F4;
-  border-radius:var(--radius);
-  padding:22px 20px 18px;
-  position:relative;
+/* ── AI Notification Banner ── */
+.ai-banner{
+  display:none;margin-bottom:12px;border-radius:var(--radius);padding:13px 15px;
+  color:#fff;position:relative;align-items:flex-start;gap:10px;
+  animation:slideDown .4s cubic-bezier(.16,1,.3,1);
 }
-.header-card::before{
-  content:'';position:absolute;top:-40px;right:-40px;
-  width:160px;height:160px;border-radius:50%;
-  background:rgba(255,255,255,.04);
-  pointer-events:none;
-  z-index:0;
+.ai-banner.show{display:flex;}
+.ai-banner.type-praise{background:linear-gradient(135deg,#1F4E37,#2F6F4E);box-shadow:0 4px 20px rgba(31,78,55,.3);}
+.ai-banner.type-warn{background:linear-gradient(135deg,#7C3AED,#9333EA);box-shadow:0 4px 20px rgba(124,58,237,.3);}
+.ai-banner.type-alert{background:linear-gradient(135deg,#B45309,#D97706);box-shadow:0 4px 20px rgba(180,83,9,.3);}
+.ai-banner.type-plan{background:linear-gradient(135deg,#1D4ED8,#2563EB);box-shadow:0 4px 20px rgba(29,78,216,.3);}
+.ai-banner-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.ai-banner-body{flex:1;}
+.ai-banner-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;opacity:.75;font-family:'IBM Plex Mono',monospace;margin-bottom:3px;}
+.ai-banner-text{font-size:13.5px;font-weight:500;line-height:1.5;}
+.ai-banner-close{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ai-banner-close:hover{background:rgba(255,255,255,.35);}
+
+/* AI typing cursor */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.ai-cursor{display:inline-block;width:2px;height:1em;background:#fff;margin-left:2px;vertical-align:middle;animation:blink .7s infinite;}
+
+/* ── AI toast (bigger, richer) ── */
+.ai-toast{
+  position:fixed;bottom:90px;left:16px;right:16px;max-width:500px;margin:0 auto;
+  background:var(--green-dark);color:#fff;padding:14px 16px;border-radius:14px;
+  font-size:13px;line-height:1.5;opacity:0;transform:translateY(8px);
+  transition:opacity .25s,transform .25s;pointer-events:none;z-index:101;
+  box-shadow:0 6px 24px rgba(31,78,55,.35);
 }
-.header-card .greet-row,
-.header-card .vitals,
-.header-card .quote-card{
-  position:relative;
-  z-index:1;
+.ai-toast.show{opacity:1;transform:translateY(0);}
+.ai-toast-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;opacity:.7;font-family:'IBM Plex Mono',monospace;margin-bottom:4px;}
+
+/* ── AI Panel in Admin ── */
+.ai-log-item{
+  padding:10px 12px;border-radius:10px;margin-bottom:8px;font-size:12.5px;line-height:1.5;
+  border-left:3px solid var(--green);background:var(--green-pale);color:var(--ink);
 }
+.ai-log-item.warn{border-left-color:var(--purple);background:var(--purple-pale);}
+.ai-log-item.alert{border-left-color:var(--gold);background:var(--gold-pale);}
+.ai-log-time{font-size:10px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;margin-top:4px;}
+
+/* ── AI Study Plan ── */
+.ai-plan-card{
+  background:var(--blue-pale);border:1px solid #BFDBFE;border-radius:var(--radius);
+  padding:14px;margin-top:10px;font-size:13px;line-height:1.7;color:var(--ink);
+  white-space:pre-wrap;
+}
+.ai-thinking{display:flex;align-items:center;gap:8px;color:var(--ink-soft);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+.ai-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin:0 2px;animation:bounce 1.2s infinite;}
+.ai-dots span:nth-child(2){animation-delay:.2s;}
+.ai-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* ── Header ── */
+.header-card{background:linear-gradient(135deg,#1F4E37 0%,#2F6F4E 100%);color:#F3F7F4;border-radius:var(--radius);padding:22px 20px 18px;position:relative;}
+.header-card::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;z-index:0;}
+.header-card .greet-row,.header-card .vitals,.header-card .quote-card{position:relative;z-index:1;}
 .greet-row{display:flex;justify-content:space-between;align-items:flex-start;}
 .greet-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;font-family:'IBM Plex Mono',monospace;}
 .greet-name{font-family:'Spectral',serif;font-size:26px;font-weight:600;margin-top:2px;}
 .header-actions{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 .edit-name{background:none;border:1px solid rgba(255,255,255,.35);color:#F3F7F4;font-size:11px;padding:4px 9px;border-radius:20px;font-family:'IBM Plex Mono',monospace;cursor:pointer;}
 .admin-btn{background:none;border:none;color:rgba(255,255,255,.55);font-size:11px;font-family:'IBM Plex Mono',monospace;text-decoration:underline;cursor:pointer;padding:4px 0;}
-
 .vitals{margin-top:18px;}
 .vitals-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.65;font-family:'IBM Plex Mono',monospace;}
 .vitals-number{font-family:'IBM Plex Mono',monospace;font-size:44px;font-weight:600;line-height:1.05;margin-top:2px;display:flex;align-items:baseline;gap:8px;}
@@ -100,25 +106,13 @@ body{
 @keyframes draw{0%{stroke-dashoffset:340}45%{stroke-dashoffset:0}100%{stroke-dashoffset:-340}}
 @media(prefers-reduced-motion:reduce){.ecg path{animation:none;stroke-dashoffset:0}}
 .vitals-sub{font-size:11px;opacity:.6;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
-
-/* ─── Motivational Quote ─── */
-.quote-card{
-  margin-top:12px;
-  background:rgba(255,255,255,.1);
-  border-radius:10px;
-  padding:10px 14px;
-  border-left:3px solid rgba(127,216,166,.6);
-}
+.quote-card{margin-top:12px;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;border-left:3px solid rgba(127,216,166,.6);}
 .quote-text{font-size:12.5px;font-style:italic;opacity:.9;line-height:1.5;}
 .quote-author{font-size:10px;opacity:.6;margin-top:3px;font-family:'IBM Plex Mono',monospace;}
 
-/* ─── Stats strip ─── */
+/* ── Stats ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
-.stat{
-  background:var(--card);border:1px solid var(--line);border-radius:12px;
-  padding:11px 8px;text-align:center;
-  transition:transform .15s,box-shadow .15s;cursor:default;
-}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center;transition:transform .15s,box-shadow .15s;cursor:default;}
 .stat:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(31,78,55,.1);}
 .stat-num{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--green-dark);}
 .stat-num.fire{color:#E85D04;}
@@ -126,30 +120,20 @@ body{
 .streak-flame{display:inline;animation:flamePulse 1s ease-in-out infinite;}
 @keyframes flamePulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
 
-/* ─── Subject Colour Legend ─── */
+/* ── Subject Legend ── */
 .subject-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-.subj-pill{
-  display:flex;align-items:center;gap:6px;
-  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
-  font-family:'IBM Plex Mono',monospace;
-}
+.subj-pill{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;}
 .subj-dot{width:8px;height:8px;border-radius:50%;}
 .pill-phy{background:var(--phy-pale);color:var(--phy);}
 .pill-chem{background:var(--chem-pale);color:var(--chem);}
 .pill-bio{background:var(--bio-pale);color:var(--bio);}
 .pill-other{background:var(--other-pale);color:var(--other);}
 
-/* ─── 7-Day Date Strip ─── */
+/* ── Date Strip ── */
 .date-strip-section{margin-top:20px;}
 .date-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
 .date-strip::-webkit-scrollbar{display:none;}
-.day-chip{
-  flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  padding:8px 10px;border-radius:11px;cursor:pointer;
-  border:1.5px solid var(--line);background:var(--card);
-  transition:all .15s cubic-bezier(.16,1,.3,1);
-  min-width:46px;
-}
+.day-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:11px;cursor:pointer;border:1.5px solid var(--line);background:var(--card);transition:all .15s cubic-bezier(.16,1,.3,1);min-width:46px;}
 .day-chip:hover{border-color:var(--green);transform:translateY(-1px);}
 .day-chip.active{background:var(--green-dark);border-color:var(--green-dark);color:#fff;}
 .day-chip .day-name{font-size:9px;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono',monospace;opacity:.7;}
@@ -159,123 +143,74 @@ body{
 .day-chip.has-tasks .day-dot{opacity:1;}
 .day-chip.active .day-dot{background:#7FD8A6;}
 
-/* ─── 7-Day Progress Graph ─── */
-.graph-card{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  padding:16px;margin-top:10px;
-}
+/* ── Graph ── */
+.graph-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:10px;}
 .graph-title{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--ink-soft);text-transform:uppercase;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;}
 #weekChart{max-height:140px;}
 
-/* ─── Section ─── */
+/* ── Section ── */
 .section{margin-top:24px;}
 .section-head{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;}
 .section-title{font-family:'Spectral',serif;font-size:19px;font-weight:600;}
 .section-note{font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
 
-/* ─── Form ─── */
+/* ── Form ── */
 label.field-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);display:block;margin-bottom:5px;margin-top:12px;}
 label.field-label:first-child{margin-top:0;}
-input[type=text],input[type=date],select,textarea{
-  width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;
-  font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);background:#FCFDFC;
-  transition:border-color .15s,box-shadow .15s;
-}
+input[type=text],input[type=date],select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);background:#FCFDFC;transition:border-color .15s,box-shadow .15s;}
 textarea{resize:vertical;min-height:50px;}
-input:focus,select:focus,textarea:focus{
-  outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-glow);
-}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-glow);}
 .priority-toggle{display:flex;gap:8px;margin-top:6px;}
-.priority-btn{
-  flex:1;border:1px solid var(--line);background:#FCFDFC;border-radius:9px;
-  padding:9px;font-size:13px;font-weight:500;cursor:pointer;text-align:center;
-  transition:all .15s;
-}
+.priority-btn{flex:1;border:1px solid var(--line);background:#FCFDFC;border-radius:9px;padding:9px;font-size:13px;font-weight:500;cursor:pointer;text-align:center;transition:all .15s;}
 .priority-btn.active-important{background:var(--red-pale);border-color:var(--red);color:var(--red);}
 .priority-btn.active-normal{background:var(--green-pale);border-color:var(--green);color:var(--green-dark);}
-.btn-primary{
-  margin-top:16px;width:100%;background:var(--green-dark);color:#fff;border:none;
-  border-radius:9px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;
-  font-family:'IBM Plex Sans',sans-serif;
-  transition:transform .12s,background .15s,box-shadow .15s;
-}
+.btn-primary{margin-top:16px;width:100%;background:var(--green-dark);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:transform .12s,background .15s,box-shadow .15s;}
 .btn-primary:hover{background:var(--green);box-shadow:0 4px 14px rgba(31,78,55,.25);}
 .btn-primary:active{transform:scale(.98);}
 .btn-ghost{background:none;border:1px solid var(--line);color:var(--ink-soft);border-radius:9px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all .12s;}
 .btn-ghost:hover{border-color:var(--green);color:var(--green-dark);}
 .btn-danger{background:none;border:1px solid var(--line);color:var(--red);border-radius:9px;padding:6px 10px;font-size:11px;cursor:pointer;transition:all .12s;font-family:'IBM Plex Mono',monospace;}
 .btn-danger:hover{background:var(--red-pale);border-color:var(--red);}
+.btn-ai{background:linear-gradient(135deg,#1D4ED8,#7C3AED);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:opacity .15s,transform .12s;display:flex;align-items:center;gap:7px;justify-content:center;}
+.btn-ai:hover{opacity:.9;}
+.btn-ai:active{transform:scale(.98);}
+.btn-ai:disabled{opacity:.5;cursor:not-allowed;}
 
-/* ─── Target Items ─── */
-.date-picker-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.date-picker-row input{flex:1;}
-
-.target-item{
-  border:1px solid var(--line);border-radius:11px;padding:11px 12px;
-  margin-top:10px;background:#FCFDFC;
-  transition:opacity .2s,transform .15s;
-  animation:popIn .25s cubic-bezier(.16,1,.3,1);
-}
+/* ── Targets ── */
+.target-item{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:10px;background:#FCFDFC;transition:opacity .2s,transform .15s;animation:popIn .25s cubic-bezier(.16,1,.3,1);}
 @keyframes popIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .target-item.done{opacity:.55;}
 .target-top{display:flex;align-items:flex-start;gap:10px;}
-.check{
-  width:22px;height:22px;border-radius:6px;border:2px solid var(--green);flex-shrink:0;
-  margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;
-  background:#fff;transition:all .18s cubic-bezier(.16,1,.3,1);
-}
+.check{width:22px;height:22px;border-radius:6px;border:2px solid var(--green);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;transition:all .18s cubic-bezier(.16,1,.3,1);}
 .check:hover{transform:scale(1.12);}
 .check.checked{background:var(--green);color:#fff;font-size:14px;animation:checkBounce .25s cubic-bezier(.16,1,.3,1);}
 @keyframes checkBounce{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
 .target-body{flex:1;min-width:0;}
 .target-subject{font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono',monospace;}
-.target-subject.phy{color:var(--phy);}
-.target-subject.chem{color:var(--chem);}
-.target-subject.bio{color:var(--bio);}
-.target-subject.other{color:var(--other);}
+.target-subject.phy{color:var(--phy);}.target-subject.chem{color:var(--chem);}.target-subject.bio{color:var(--bio);}.target-subject.other{color:var(--other);}
 .target-topic{font-size:14.5px;font-weight:500;margin-top:1px;word-break:break-word;}
 .target-topic.strike{text-decoration:line-through;color:var(--ink-soft);}
 .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;margin-top:5px;}
 .badge-important{background:var(--red-pale);color:var(--red);}
 .badge-normal{background:var(--green-pale);color:var(--green-dark);}
 .badge-revised{background:var(--gold-pale);color:var(--gold);margin-left:4px;}
-
 .target-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
-
 .admin-comment-box{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px;}
-.admin-comment-box textarea{font-size:13px;}
-.admin-comment-box .btn-ghost{margin-top:6px;}
-.existing-comment{
-  font-size:12.5px;color:var(--ink-soft);margin-top:6px;
-  background:var(--gold-pale);border-left:3px solid var(--gold);
-  padding:7px 9px;border-radius:0 8px 8px 0;font-style:italic;
-}
+.existing-comment{font-size:12.5px;color:var(--ink-soft);margin-top:6px;background:var(--gold-pale);border-left:3px solid var(--gold);padding:7px 9px;border-radius:0 8px 8px 0;font-style:italic;}
 .existing-comment strong{color:var(--gold);font-style:normal;}
-
 .empty{font-size:13px;color:var(--ink-soft);text-align:center;padding:20px 0;}
 .empty-icon{font-size:32px;display:block;margin-bottom:8px;}
 
-/* ─── Chapter List ─── */
+/* ── Chapters ── */
 .chapter-filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
 .chapter-filter-row::-webkit-scrollbar{display:none;}
-.filter-chip{
-  flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;
-  cursor:pointer;border:1.5px solid var(--line);background:#FCFDFC;
-  font-family:'IBM Plex Mono',monospace;transition:all .15s;
-}
+.filter-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:#FCFDFC;font-family:'IBM Plex Mono',monospace;transition:all .15s;}
 .filter-chip.active-all,.filter-chip:hover{border-color:var(--green);color:var(--green-dark);background:var(--green-pale);}
 .filter-chip.active-phy{border-color:var(--phy);color:var(--phy);background:var(--phy-pale);}
 .filter-chip.active-chem{border-color:var(--chem);color:var(--chem);background:var(--chem-pale);}
 .filter-chip.active-bio{border-color:var(--bio);color:var(--bio);background:var(--bio-pale);}
-
-.chapter-item{
-  border:1px solid var(--line);border-radius:11px;padding:11px 12px;
-  margin-top:10px;background:#FCFDFC;
-  animation:popIn .25s cubic-bezier(.16,1,.3,1);
-  border-left:3px solid var(--line);
-  transition:border-left-color .2s;
-}
+.chapter-item{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:10px;background:#FCFDFC;animation:popIn .25s cubic-bezier(.16,1,.3,1);border-left:3px solid var(--line);transition:border-left-color .2s;}
 .chapter-item.subj-phy{border-left-color:var(--phy);}
 .chapter-item.subj-chem{border-left-color:var(--chem);}
 .chapter-item.subj-bio{border-left-color:var(--bio);}
@@ -283,24 +218,21 @@ input:focus,select:focus,textarea:focus{
 .chapter-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
 .chapter-name{font-weight:600;font-size:14.5px;}
 .chapter-subject{font-size:10px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:2px;}
-.chapter-subject.phy{color:var(--phy);}
-.chapter-subject.chem{color:var(--chem);}
-.chapter-subject.bio{color:var(--bio);}
+.chapter-subject.phy{color:var(--phy);}.chapter-subject.chem{color:var(--chem);}.chapter-subject.bio{color:var(--bio);}
 .status-select{width:auto;font-size:12px;padding:5px 8px;border-radius:8px;}
 .conf-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
 .conf-row input[type=range]{flex:1;accent-color:var(--green);}
 .conf-val{font-family:'IBM Plex Mono',monospace;font-size:12px;width:34px;text-align:right;}
 .next-rev{font-size:11px;color:var(--gold);margin-top:6px;font-family:'IBM Plex Mono',monospace;}
 .chapter-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
-.mark-revised-btn{
-  background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);
-  border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;
-  font-family:'IBM Plex Mono',monospace;font-weight:600;transition:all .15s;
-}
+.mark-revised-btn{background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-weight:600;transition:all .15s;}
 .mark-revised-btn:hover{background:var(--gold);color:#fff;}
 .rev-count{font-size:10px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+/* AI insight on chapter */
+.ai-chapter-insight{margin-top:8px;padding:7px 10px;background:var(--purple-pale);border-left:3px solid var(--purple);border-radius:0 8px 8px 0;font-size:12px;color:var(--ink-soft);line-height:1.5;display:none;}
+.ai-chapter-insight.show{display:block;}
 
-/* ─── Progress Bars for Subjects ─── */
+/* ── Syllabus Progress ── */
 .subject-progress-section{margin-top:24px;}
 .subj-prog-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
 .subj-prog-row{margin-bottom:14px;}
@@ -310,152 +242,87 @@ input:focus,select:focus,textarea:focus{
 .subj-prog-pct{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);}
 .prog-bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;}
 .prog-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.16,1,.3,1);}
-.prog-fill.phy{background:var(--phy);}
-.prog-fill.chem{background:var(--chem);}
-.prog-fill.bio{background:var(--bio);}
+.prog-fill.phy{background:var(--phy);}.prog-fill.chem{background:var(--chem);}.prog-fill.bio{background:var(--bio);}
 
-/* ─── Floating Action Button ─── */
-.fab{
-  position:fixed;bottom:24px;right:20px;
-  width:56px;height:56px;border-radius:50%;
-  background:var(--green-dark);color:#fff;
-  border:none;font-size:26px;cursor:pointer;
-  box-shadow:0 6px 24px rgba(31,78,55,.4);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s;
-  z-index:40;
-}
+/* ── FAB ── */
+.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--green-dark);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 6px 24px rgba(31,78,55,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s;z-index:40;}
 .fab:hover{transform:scale(1.1);box-shadow:0 8px 30px rgba(31,78,55,.5);}
 .fab:active{transform:scale(.95);}
-
-.fab-menu{
-  position:fixed;bottom:90px;right:20px;
-  display:flex;flex-direction:column;gap:10px;align-items:flex-end;
-  z-index:40;
-  pointer-events:none;opacity:0;
-  transition:opacity .2s,transform .2s cubic-bezier(.16,1,.3,1);
-  transform:translateY(10px);
-}
+.fab-menu{position:fixed;bottom:90px;right:20px;display:flex;flex-direction:column;gap:10px;align-items:flex-end;z-index:40;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s cubic-bezier(.16,1,.3,1);transform:translateY(10px);}
 .fab-menu.open{pointer-events:all;opacity:1;transform:translateY(0);}
-.fab-item{
-  display:flex;align-items:center;gap:10px;cursor:pointer;
-}
-.fab-item-label{
-  background:var(--ink);color:#fff;font-size:12px;font-weight:500;
-  padding:6px 12px;border-radius:20px;white-space:nowrap;
-  font-family:'IBM Plex Mono',monospace;
-}
-.fab-item-btn{
-  width:42px;height:42px;border-radius:50%;border:none;
-  font-size:18px;cursor:pointer;
-  box-shadow:0 3px 12px rgba(0,0,0,.2);
-  display:flex;align-items:center;justify-content:center;
-  background:var(--card);transition:transform .12s;
-}
+.fab-item{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.fab-item-label{background:var(--ink);color:#fff;font-size:12px;font-weight:500;padding:6px 12px;border-radius:20px;white-space:nowrap;font-family:'IBM Plex Mono',monospace;}
+.fab-item-btn{width:42px;height:42px;border-radius:50%;border:none;font-size:18px;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;background:var(--card);transition:transform .12s;}
 .fab-item-btn:hover{transform:scale(1.08);}
 
-/* ─── Toast ─── */
-.toast{
-  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(8px);
-  background:var(--green-dark);color:#fff;padding:10px 20px;border-radius:24px;
-  font-size:13px;opacity:0;transition:opacity .2s,transform .2s;
-  pointer-events:none;z-index:100;white-space:nowrap;
-  box-shadow:0 4px 16px rgba(31,78,55,.3);
-}
+/* ── Toast ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--green-dark);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100;white-space:nowrap;box-shadow:0 4px 16px rgba(31,78,55,.3);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* ─── Modals ─── */
-.modal-backdrop{
-  position:fixed;inset:0;background:rgba(22,36,31,.55);
-  display:none;align-items:center;justify-content:center;z-index:60;padding:20px;
-  backdrop-filter:blur(3px);
-}
+/* ── Modals ── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(22,36,31,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:20px;backdrop-filter:blur(3px);}
 .modal-backdrop.show{display:flex;}
-.modal{
-  background:#fff;border-radius:18px;padding:22px;width:100%;max-width:380px;
-  animation:modalIn .25s cubic-bezier(.16,1,.3,1);
-  box-shadow:0 20px 60px rgba(22,36,31,.25);
-  max-height:90vh;overflow-y:auto;
-}
+.modal{background:#fff;border-radius:18px;padding:22px;width:100%;max-width:380px;animation:modalIn .25s cubic-bezier(.16,1,.3,1);box-shadow:0 20px 60px rgba(22,36,31,.25);max-height:90vh;overflow-y:auto;}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal h3{font-family:'Spectral',serif;font-size:20px;margin-bottom:14px;}
 .modal-footer{display:flex;gap:8px;margin-top:14px;}
 .modal-footer .btn-primary{margin-top:0;}
 
-/* ─── Admin Panel ─── */
+/* ── Admin Panel ── */
 .admin-panel{display:none;margin-top:24px;}
 .admin-panel.show{display:block;}
-.admin-panel-header{
-  background:var(--green-dark);color:#fff;border-radius:var(--radius) var(--radius) 0 0;
-  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
-}
+.admin-panel-header{background:var(--green-dark);color:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
 .admin-panel-body{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:16px;}
 .admin-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
-.admin-tab{
-  flex-shrink:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;
-  cursor:pointer;border:1.5px solid var(--line);background:#FCFDFC;
-  font-family:'IBM Plex Mono',monospace;transition:all .15s;
-}
+.admin-tab{flex-shrink:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:#FCFDFC;font-family:'IBM Plex Mono',monospace;transition:all .15s;}
 .admin-tab.active{background:var(--green-dark);border-color:var(--green-dark);color:#fff;}
 .admin-tab-content{display:none;}
 .admin-tab-content.active{display:block;}
-
-/* ─── Flash push form ─── */
-.flash-preview{
-  margin-top:10px;padding:12px;background:var(--green-pale);border-radius:10px;
-  border-left:3px solid var(--green);font-size:13px;font-style:italic;
-  display:none;
-}
+.flash-preview{margin-top:10px;padding:12px;background:var(--green-pale);border-radius:10px;border-left:3px solid var(--green);font-size:13px;font-style:italic;display:none;}
 .flash-preview.show{display:block;}
 
-/* ─── Preloaded chapters ─── */
+/* ── Preloaded Chapters Modal ── */
 .preload-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;max-height:260px;overflow-y:auto;padding:2px;}
-.preload-chip{
-  padding:7px 10px;border-radius:8px;font-size:11px;cursor:pointer;
-  border:1.5px solid var(--line);background:#FCFDFC;display:flex;align-items:center;gap:6px;
-  transition:all .12s;font-family:'IBM Plex Sans',sans-serif;
-}
+.preload-chip{padding:7px 10px;border-radius:8px;font-size:11px;cursor:pointer;border:1.5px solid var(--line);background:#FCFDFC;display:flex;align-items:center;gap:6px;transition:all .12s;font-family:'IBM Plex Sans',sans-serif;}
 .preload-chip:hover{border-color:var(--green);background:var(--green-pale);}
 .preload-chip.added{opacity:.45;pointer-events:none;}
 .preload-chip .chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-
-/* ─── Overall syllabus completion ─── */
-.syllabus-ring{text-align:center;padding:10px 0;}
-.ring-wrap{position:relative;display:inline-block;}
-#syllabusRing{transform:rotate(-90deg);}
-.ring-center{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-}
-.ring-pct{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:var(--green-dark);}
-.ring-sub{font-size:10px;color:var(--ink-soft);margin-top:1px;}
-
-/* ─── Revision schedule ─── */
-.rev-due-list{margin-top:8px;}
-.rev-due-item{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:8px 10px;border-radius:9px;background:var(--gold-pale);
-  border-left:3px solid var(--gold);margin-bottom:6px;font-size:13px;
-}
-.rev-due-today{background:var(--red-pale);border-left-color:var(--red);}
-
-/* ─── Subject tabs for chapters ─── */
 .chapter-preload-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.rev-due-list{margin-top:8px;}
+.rev-due-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:9px;background:var(--gold-pale);border-left:3px solid var(--gold);margin-bottom:6px;font-size:13px;}
+.rev-due-today{background:var(--red-pale);border-left-color:var(--red);}
 
 footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
-  <!-- FLASH BANNER -->
-  <div id="flashBanner" style="display:none;margin-bottom:14px;background:linear-gradient(135deg,#1F4E37,#2F6F4E);border-radius:var(--radius);padding:14px 16px;color:#fff;position:relative;box-shadow:0 4px 20px rgba(31,78,55,.3);align-items:flex-start;gap:10px;">
-    <span id="flashIcon" style="font-size:22px;flex-shrink:0;">📌</span>
-    <div style="flex:1;">
-      <div id="flashText" style="font-size:14px;font-weight:500;line-height:1.5;"></div>
+  <!-- FLASH BANNER (Admin push) -->
+  <div id="flashBanner" style="display:none;margin-bottom:12px;background:linear-gradient(135deg,#1F4E37,#2F6F4E);border-radius:var(--radius);padding:13px 15px;color:#fff;position:relative;box-shadow:0 4px 20px rgba(31,78,55,.3);align-items:flex-start;gap:10px;">
+    <span id="flashIcon" style="font-size:20px;flex-shrink:0;">📌</span>
+    <div style="flex:1;"><div id="flashText" style="font-size:13.5px;font-weight:500;line-height:1.5;"></div></div>
+    <button id="flashClose" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+  </div>
+
+  <!-- AI BRIEFING BANNER -->
+  <div class="ai-banner" id="aiBriefingBanner">
+    <div class="ai-banner-icon" id="aiBriefingIcon">🤖</div>
+    <div class="ai-banner-body">
+      <div class="ai-banner-label" id="aiBriefingLabel">AI Coach</div>
+      <div class="ai-banner-text" id="aiBriefingText"></div>
     </div>
-    <button id="flashClose" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+    <button class="ai-banner-close" id="aiBriefingClose">✕</button>
+  </div>
+
+  <!-- AI PRAISE / ALERT BANNER -->
+  <div class="ai-banner" id="aiAlertBanner">
+    <div class="ai-banner-icon" id="aiAlertIcon">🤖</div>
+    <div class="ai-banner-body">
+      <div class="ai-banner-label" id="aiAlertLabel">AI</div>
+      <div class="ai-banner-text" id="aiAlertText"></div>
+    </div>
+    <button class="ai-banner-close" id="aiAlertClose">✕</button>
   </div>
 
   <!-- HEADER -->
@@ -470,7 +337,6 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
         <button class="admin-btn" id="adminBtn">Admin login</button>
       </div>
     </div>
-
     <div class="vitals">
       <div class="vitals-label">NEET 2027 — Countdown</div>
       <div class="vitals-number"><span id="daysLeft">--</span><span class="unit">days left</span></div>
@@ -479,32 +345,18 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       </svg>
       <div class="vitals-sub">Tentative — May 2, 2027 (NTA confirmation pending)</div>
     </div>
-
-    <!-- Quote -->
     <div class="quote-card">
-      <div class="quote-text" id="quoteText">Loading inspiration...</div>
+      <div class="quote-text" id="quoteText">Loading AI quote...</div>
       <div class="quote-author" id="quoteAuthor"></div>
     </div>
   </div>
 
   <!-- STATS -->
   <div class="stats">
-    <div class="stat">
-      <div class="stat-num fire" id="statStreak">0</div>
-      <div class="stat-label"><span class="streak-flame">🔥</span> Streak</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="statToday">0%</div>
-      <div class="stat-label">Today done</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="statRevisions">0</div>
-      <div class="stat-label">Revisions due</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="statSyllabus">0%</div>
-      <div class="stat-label">Syllabus</div>
-    </div>
+    <div class="stat"><div class="stat-num fire" id="statStreak">0</div><div class="stat-label"><span class="streak-flame">🔥</span> Streak</div></div>
+    <div class="stat"><div class="stat-num" id="statToday">0%</div><div class="stat-label">Today done</div></div>
+    <div class="stat"><div class="stat-num" id="statRevisions">0</div><div class="stat-label">Revisions due</div></div>
+    <div class="stat"><div class="stat-num" id="statSyllabus">0%</div><div class="stat-label">Syllabus</div></div>
   </div>
 
   <!-- SUBJECT LEGEND -->
@@ -515,7 +367,7 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
     <div class="subj-pill pill-other"><span class="subj-dot" style="background:var(--other)"></span>Others</div>
   </div>
 
-  <!-- 7-DAY DATE STRIP + GRAPH -->
+  <!-- 7-DAY STRIP + GRAPH -->
   <div class="date-strip-section">
     <div class="section-head" style="margin-top:20px;margin-bottom:8px;">
       <div class="section-title" style="font-size:16px;">This Week</div>
@@ -527,32 +379,39 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
     </div>
   </div>
 
-  <!-- SUBJECT SYLLABUS PROGRESS -->
+  <!-- SYLLABUS PROGRESS -->
   <div class="subject-progress-section">
     <div class="section-head" style="margin-bottom:6px;">
       <div class="section-title" style="font-size:16px;">Syllabus Completion</div>
     </div>
     <div class="subj-prog-card">
       <div class="subj-prog-row">
-        <div class="subj-prog-header">
-          <span class="subj-prog-name" style="color:var(--phy)">⚡ Physics</span>
-          <span class="subj-prog-pct" id="phyPct">0%</span>
-        </div>
+        <div class="subj-prog-header"><span class="subj-prog-name" style="color:var(--phy)">⚡ Physics</span><span class="subj-prog-pct" id="phyPct">0%</span></div>
         <div class="prog-bar"><div class="prog-fill phy" id="phyBar" style="width:0%"></div></div>
       </div>
       <div class="subj-prog-row">
-        <div class="subj-prog-header">
-          <span class="subj-prog-name" style="color:var(--chem)">🧪 Chemistry</span>
-          <span class="subj-prog-pct" id="chemPct">0%</span>
-        </div>
+        <div class="subj-prog-header"><span class="subj-prog-name" style="color:var(--chem)">🧪 Chemistry</span><span class="subj-prog-pct" id="chemPct">0%</span></div>
         <div class="prog-bar"><div class="prog-fill chem" id="chemBar" style="width:0%"></div></div>
       </div>
       <div class="subj-prog-row">
-        <div class="subj-prog-header">
-          <span class="subj-prog-name" style="color:var(--bio)">🌿 Biology</span>
-          <span class="subj-prog-pct" id="bioPct">0%</span>
-        </div>
+        <div class="subj-prog-header"><span class="subj-prog-name" style="color:var(--bio)">🌿 Biology</span><span class="subj-prog-pct" id="bioPct">0%</span></div>
         <div class="prog-bar"><div class="prog-fill bio" id="bioBar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI STUDY PLAN SECTION -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">🤖 AI Study Plan</div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--ink-soft);margin-bottom:12px;line-height:1.5;">
+        AI analyses your chapters, revision dues, weak subjects and generates a personalised study plan for today.
+      </div>
+      <button class="btn-ai" id="generatePlanBtn">✨ Generate Today's Plan</button>
+      <div id="studyPlanOutput" style="display:none;">
+        <div class="ai-plan-card" id="studyPlanText"></div>
       </div>
     </div>
   </div>
@@ -563,7 +422,6 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       <div class="section-title">Daily Target Chart</div>
       <div class="section-note" id="targetDateLabel"></div>
     </div>
-
     <div class="card">
       <label class="field-label">Subject</label>
       <select id="subjectSelect">
@@ -572,37 +430,26 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
         <option value="Biology" selected>Biology</option>
         <option value="Others">Others</option>
       </select>
-
       <label class="field-label">Topic</label>
       <input type="text" id="topicInput" placeholder="e.g. Human Reproduction — Spermatogenesis">
-
       <label class="field-label">Priority</label>
       <div class="priority-toggle">
         <button type="button" class="priority-btn active-normal" id="prioNormalBtn">Normal</button>
         <button type="button" class="priority-btn" id="prioImportantBtn">⚠ Important</button>
       </div>
-
       <button class="btn-primary" id="addTargetBtn">+ Add Target</button>
     </div>
-
-    <!-- SKELETON -->
     <div id="targetSkeleton" style="margin-top:10px;">
       <div style="border:1px solid var(--line);border-radius:11px;padding:14px;">
-        <div class="skeleton skel-line w60"></div>
-        <div class="skeleton skel-line w80"></div>
-        <div class="skeleton skel-line w40"></div>
+        <div class="skeleton skel-line w60"></div><div class="skeleton skel-line w80"></div><div class="skeleton skel-line w40"></div>
       </div>
     </div>
-
     <div id="targetList" style="display:none;"></div>
   </div>
 
   <!-- CHAPTER TRACKER -->
   <div class="section">
-    <div class="section-head">
-      <div class="section-title">Chapter Tracker</div>
-    </div>
-
+    <div class="section-head"><div class="section-title">Chapter Tracker</div></div>
     <div class="card">
       <label class="field-label">Subject</label>
       <select id="chSubject">
@@ -613,11 +460,9 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       </select>
       <label class="field-label">Chapter name</label>
       <input type="text" id="chName" placeholder="e.g. Human Reproduction">
-
       <button class="btn-primary" id="addChapterBtn">+ Add Chapter</button>
       <button class="btn-ghost" id="preloadChaptersBtn" style="margin-top:8px;width:100%;">📚 Add from NEET Syllabus</button>
     </div>
-
     <div class="chapter-filter-row" id="chapterFilterRow">
       <div class="filter-chip active-all" data-filter="all">All</div>
       <div class="filter-chip" data-filter="Physics" style="color:var(--phy);">⚡ Physics</div>
@@ -626,16 +471,11 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       <div class="filter-chip" data-filter="done">✅ Done</div>
       <div class="filter-chip" data-filter="revision">📅 Revision due</div>
     </div>
-
-    <!-- SKELETON -->
     <div id="chapterSkeleton">
       <div style="border:1px solid var(--line);border-radius:11px;padding:14px;margin-top:10px;">
-        <div class="skeleton skel-line w40"></div>
-        <div class="skeleton skel-line w80"></div>
-        <div class="skeleton skel-line w60"></div>
+        <div class="skeleton skel-line w40"></div><div class="skeleton skel-line w80"></div><div class="skeleton skel-line w60"></div>
       </div>
     </div>
-
     <div id="chapterList" style="display:none;"></div>
   </div>
 
@@ -647,30 +487,41 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
     </div>
     <div class="admin-panel-body">
       <div class="admin-tabs">
-        <div class="admin-tab active" data-tab="flash">📣 Flash Message</div>
-        <div class="admin-tab" data-tab="targets">🎯 Manage Targets</div>
-        <div class="admin-tab" data-tab="chapters">📖 Manage Chapters</div>
+        <div class="admin-tab active" data-tab="flash">📣 Flash</div>
+        <div class="admin-tab" data-tab="ai">🤖 AI</div>
+        <div class="admin-tab" data-tab="targets">🎯 Targets</div>
+        <div class="admin-tab" data-tab="chapters">📖 Chapters</div>
         <div class="admin-tab" data-tab="stats">📊 Overview</div>
       </div>
 
-      <!-- Flash Message Tab -->
+      <!-- Flash Tab -->
       <div class="admin-tab-content active" id="tab-flash">
-        <label class="field-label">Push a flash message to Shivam</label>
-        <textarea id="flashMsgInput" rows="3" placeholder="e.g. Don't forget to revise Genetics tonight! Short notes karo 📝"></textarea>
+        <label class="field-label">Push flash message to Shivam</label>
+        <textarea id="flashMsgInput" rows="3" placeholder="e.g. Don't forget to revise Genetics tonight! 📝"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px;">
           <select id="flashEmoji" style="width:auto;flex-shrink:0;">
-            <option value="📌">📌</option>
-            <option value="🔔">🔔</option>
-            <option value="⚡">⚡</option>
-            <option value="📝">📝</option>
-            <option value="🎯">🎯</option>
-            <option value="💪">💪</option>
-            <option value="⏰">⏰</option>
+            <option value="📌">📌</option><option value="🔔">🔔</option><option value="⚡">⚡</option>
+            <option value="📝">📝</option><option value="🎯">🎯</option><option value="💪">💪</option><option value="⏰">⏰</option>
           </select>
           <button class="btn-primary" id="pushFlashBtn" style="margin-top:0;flex:1;">Push Message</button>
         </div>
         <div class="flash-preview" id="flashPreview"></div>
-        <button class="btn-danger" id="clearFlashBtn" style="margin-top:10px;width:100%;">Clear current message</button>
+        <button class="btn-danger" id="clearFlashBtn" style="margin-top:10px;width:100%;">Clear message</button>
+      </div>
+
+      <!-- AI Admin Tab -->
+      <div class="admin-tab-content" id="tab-ai">
+        <div style="font-size:12px;color:var(--ink-soft);margin-bottom:12px;font-family:'IBM Plex Mono',monospace;">Trigger AI actions manually or review AI history.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn-ai" id="adminAiBriefingBtn">🌅 Trigger Daily Briefing</button>
+          <button class="btn-ai" id="adminAiNeglectBtn" style="background:linear-gradient(135deg,#7C3AED,#9333EA);">⚠ Check Neglected Subjects</button>
+          <button class="btn-ai" id="adminAiRevisionBtn" style="background:linear-gradient(135deg,#B45309,#D97706);">📅 Check Overdue Revisions</button>
+          <button class="btn-ai" id="adminAiWeakBtn" style="background:linear-gradient(135deg,#0F766E,#0D9488);">📉 Analyse Weak Chapters</button>
+        </div>
+        <div style="margin-top:14px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;">AI Log (this session)</div>
+          <div id="aiLogList"><div class="empty"><span class="empty-icon">🤖</span>No AI activity yet.</div></div>
+        </div>
       </div>
 
       <!-- Targets Tab -->
@@ -701,73 +552,39 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
     </div>
   </div>
 
-  <footer>NEET 2027 · Shivam's Command Centre · built for consistency, not perfection</footer>
+  <footer>NEET 2027 · Shivam's Command Centre · powered by AI · built for consistency</footer>
 </div>
 
 <!-- FAB -->
 <div class="fab-menu" id="fabMenu">
-  <div class="fab-item" id="fabTarget">
-    <div class="fab-item-label">Add Target</div>
-    <div class="fab-item-btn" style="background:var(--green-pale);">🎯</div>
-  </div>
-  <div class="fab-item" id="fabChapter">
-    <div class="fab-item-label">Add Chapter</div>
-    <div class="fab-item-btn" style="background:var(--blue-pale);">📖</div>
-  </div>
-  <div class="fab-item" id="fabScrollTop">
-    <div class="fab-item-label">Back to top</div>
-    <div class="fab-item-btn" style="background:var(--paper);">⬆</div>
-  </div>
+  <div class="fab-item" id="fabAiPlan"><div class="fab-item-label">AI Study Plan</div><div class="fab-item-btn" style="background:var(--purple-pale);">✨</div></div>
+  <div class="fab-item" id="fabTarget"><div class="fab-item-label">Add Target</div><div class="fab-item-btn" style="background:var(--green-pale);">🎯</div></div>
+  <div class="fab-item" id="fabChapter"><div class="fab-item-label">Add Chapter</div><div class="fab-item-btn" style="background:var(--blue-pale);">📖</div></div>
+  <div class="fab-item" id="fabScrollTop"><div class="fab-item-label">Back to top</div><div class="fab-item-btn" style="background:var(--paper);">⬆</div></div>
 </div>
 <button class="fab" id="fabBtn">＋</button>
 
 <div class="toast" id="toast"></div>
+<div class="ai-toast" id="aiToast"><div class="ai-toast-label" id="aiToastLabel">AI Coach</div><div id="aiToastText"></div></div>
 
-<!-- Name Modal -->
+<!-- Modals -->
 <div class="modal-backdrop" id="nameModal">
-  <div class="modal">
-    <h3>What's your name?</h3>
-    <input type="text" id="nameInput" placeholder="Enter name">
-    <button class="btn-primary" id="saveNameBtn">Save</button>
-  </div>
+  <div class="modal"><h3>What's your name?</h3><input type="text" id="nameInput" placeholder="Enter name"><button class="btn-primary" id="saveNameBtn">Save</button></div>
 </div>
-
-<!-- Admin Modal -->
 <div class="modal-backdrop" id="adminModal">
-  <div class="modal">
-    <h3>Admin login</h3>
-    <input type="password" id="pinInput" placeholder="Enter PIN">
-    <button class="btn-primary" id="savePinBtn">Unlock</button>
-    <button class="btn-ghost" id="cancelAdminBtn" style="margin-top:8px;width:100%;">Cancel</button>
-  </div>
+  <div class="modal"><h3>Admin login</h3><input type="password" id="pinInput" placeholder="Enter PIN"><button class="btn-primary" id="savePinBtn">Unlock</button><button class="btn-ghost" id="cancelAdminBtn" style="margin-top:8px;width:100%;">Cancel</button></div>
 </div>
-
-<!-- Edit Target Modal -->
 <div class="modal-backdrop" id="editTargetModal">
   <div class="modal">
     <h3>Edit Target</h3>
     <label class="field-label">Subject</label>
-    <select id="editSubjectSelect">
-      <option value="Physics">Physics</option>
-      <option value="Chemistry">Chemistry</option>
-      <option value="Biology">Biology</option>
-      <option value="Others">Others</option>
-    </select>
-    <label class="field-label">Topic</label>
-    <input type="text" id="editTopicInput">
+    <select id="editSubjectSelect"><option value="Physics">Physics</option><option value="Chemistry">Chemistry</option><option value="Biology">Biology</option><option value="Others">Others</option></select>
+    <label class="field-label">Topic</label><input type="text" id="editTopicInput">
     <label class="field-label">Priority</label>
-    <div class="priority-toggle">
-      <button type="button" class="priority-btn active-normal" id="editPrioNormal">Normal</button>
-      <button type="button" class="priority-btn" id="editPrioImportant">⚠ Important</button>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-primary" id="saveEditTargetBtn" style="margin-top:0;flex:1;">Save</button>
-      <button class="btn-ghost" id="cancelEditTargetBtn">Cancel</button>
-    </div>
+    <div class="priority-toggle"><button type="button" class="priority-btn active-normal" id="editPrioNormal">Normal</button><button type="button" class="priority-btn" id="editPrioImportant">⚠ Important</button></div>
+    <div class="modal-footer"><button class="btn-primary" id="saveEditTargetBtn" style="margin-top:0;flex:1;">Save</button><button class="btn-ghost" id="cancelEditTargetBtn">Cancel</button></div>
   </div>
 </div>
-
-<!-- Preload Chapters Modal -->
 <div class="modal-backdrop" id="preloadModal">
   <div class="modal" style="max-width:480px;">
     <h3>📚 NEET Syllabus — Add Chapters</h3>
@@ -776,679 +593,735 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       <div class="filter-chip" data-preload-tab="Chemistry">🧪 Chemistry</div>
       <div class="filter-chip" data-preload-tab="Biology">🌿 Biology</div>
     </div>
-    <div style="font-size:11px;color:var(--ink-soft);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;">Click chapters to add them</div>
+    <div style="font-size:11px;color:var(--ink-soft);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;">Click to select, then Add Selected</div>
     <div class="preload-grid" id="preloadGrid"></div>
-    <div class="modal-footer">
-      <button class="btn-primary" id="addSelectedChaptersBtn" style="margin-top:0;flex:1;">Add Selected</button>
-      <button class="btn-ghost" id="closePreloadModal">Close</button>
-    </div>
+    <div class="modal-footer"><button class="btn-primary" id="addSelectedChaptersBtn" style="margin-top:0;flex:1;">Add Selected</button><button class="btn-ghost" id="closePreloadModal">Close</button></div>
   </div>
 </div>
 
 <script>
-/* ================== CONFIG ================== */
-const SUPABASE_URL = "https://ytuvjhjemkzcjldiwafv.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5";
-const ADMIN_PIN = "123";
-/* ============================================ */
+/* ══════════════════════════════════════
+   CONFIG — paste your keys here
+══════════════════════════════════════ */
+const SUPABASE_URL     = "https://ytuvjhjemkzcjldiwafv.supabase.co";
+const SUPABASE_ANON_KEY= "sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5";
+// AI powered by Claude (Anthropic) — no API key needed
+const ADMIN_PIN        = "123";
+/* ══════════════════════════════════════ */
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb  = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $   = id => document.getElementById(id);
 
-let isAdmin = false;
-let currentPriority = "normal";
-let editPriority = "normal";
-let allTargets = [];
-let allChapters = [];
-let currentDate = todayISO();
-let chapterFilter = "all";
-let editingTargetId = null;
-let fabOpen = false;
-let weekChart = null;
-let preloadTab = "Physics";
+let isAdmin = false, currentPriority = "normal", editPriority = "normal";
+let allTargets = [], allChapters = [];
+let currentDate = todayISO(), chapterFilter = "all", editingTargetId = null;
+let fabOpen = false, weekChart = null, preloadTab = "Physics";
 let selectedPreloadChapters = new Set();
+let aiLogItems = [];
+let briefingDone = false; // only once per page load
 
-const $ = id => document.getElementById(id);
+/* ══════════════════ CLAUDE AI ENGINE ══════════════════ */
+async function groqChat(systemPrompt, userPrompt, maxTokens=400){
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: Math.min(maxTokens, 1000),
+        system: systemPrompt,
+        messages:[{role:"user", content: userPrompt}]
+      })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text?.trim() || null;
+  } catch(e){ console.error("Claude API error",e); return null; }
+}
 
-/* ─── Motivational Quotes ─── */
+function buildContext(){
+  const name    = localStorage.getItem("shivam_name") || "Shivam";
+  const streak  = localStorage.getItem("shivam_streak") || "0";
+  const today   = todayISO();
+  const done    = allTargets.filter(t=>t.status==="done").length;
+  const total   = allTargets.length;
+  const revDue  = allChapters.filter(c=>c.next_revision && c.next_revision<=today);
+  const lowConf = allChapters.filter(c=>c.confidence<40 && c.status!=="not_started");
+  // subject counts
+  const subjTargets = {};
+  allTargets.forEach(t=>{ subjTargets[t.subject]=(subjTargets[t.subject]||0)+1; });
+  // last 7 days subjects
+  const last7 = new Set(allTargets.map(t=>t.subject));
+  const allSubjs = ["Physics","Chemistry","Biology"];
+  const neglected = allSubjs.filter(s=>!last7.has(s));
+
+  return {name, streak, today, done, total, revDue, lowConf, subjTargets, neglected,
+    chapsDone: allChapters.filter(c=>c.status==="done").length,
+    chapsTotal: allChapters.length,
+    phyPct: subjectPct("Physics"), chemPct: subjectPct("Chemistry"), bioPct: subjectPct("Biology")
+  };
+}
+
+function subjectPct(s){
+  const sub = allChapters.filter(c=>c.subject===s);
+  if(!sub.length) return 0;
+  return Math.round(sub.filter(c=>c.status==="done").length / sub.length * 100);
+}
+
+const SYSTEM = (name)=>`You are an elite NEET 2027 AI coach for ${name}. 
+You are direct, warm, personal and smart. Never generic. 
+Respond in 1-3 short punchy sentences. No bullet lists. 
+Mention specific chapter names, numbers, or subjects when you have data. 
+You know NEET exam patterns — mention weightage, important topics, common mistakes when relevant.
+You genuinely care about ${name}'s success. Be a mix of strict teacher + encouraging friend.`;
+
+/* ── 1. Daily Briefing (page load) ── */
+async function runDailyBriefing(){
+  if(briefingDone) return;
+  briefingDone = true;
+  const ctx = buildContext();
+
+  const msg = await groqChat(
+    SYSTEM(ctx.name),
+    `Daily morning briefing for ${ctx.name}.
+Streak: ${ctx.streak} days.
+Today's targets: ${ctx.total} added, ${ctx.done} done.
+Chapters completed overall: ${ctx.chapsDone}/${ctx.chapsTotal}.
+Revision due today: ${ctx.revDue.map(c=>c.chapter_name).join(", ")||"none"}.
+Low confidence chapters: ${ctx.lowConf.map(c=>c.chapter_name+" ("+c.subject+")").join(", ")||"none"}.
+Neglected subjects (no target today): ${ctx.neglected.join(", ")||"none"}.
+Physics syllabus: ${ctx.phyPct}%, Chemistry: ${ctx.chemPct}%, Biology: ${ctx.bioPct}%.
+Give a sharp, personalised morning briefing. Start with name.`,
+    250
+  );
+  if(msg){
+    showAiBanner("aiBriefingBanner","aiBriefingText","aiBriefingIcon","aiBriefingLabel",
+      msg,"🌅","type-praise","Daily Briefing");
+    logAi(msg,"praise");
+  }
+  // Also generate AI quote for header
+  loadAiQuote(ctx);
+}
+
+/* ── 2. AI Quote in header ── */
+async function loadAiQuote(ctx){
+  const msg = await groqChat(
+    `You write short, powerful motivational quotes for NEET aspirants. 1 sentence only. No attribution needed.`,
+    `Write one punchy quote specifically for a NEET 2027 aspirant named ${ctx.name} who has a ${ctx.streak}-day streak. Make it feel personal.`,
+    80
+  );
+  if(msg){
+    $("quoteText").textContent = msg.replace(/^[""]|[""]$/g,"");
+    $("quoteAuthor").textContent = "— AI Coach";
+  } else { loadFallbackQuote(); }
+}
+
+/* ── 3. Praise on task completion ── */
+async function aiPraiseTaskDone(target){
+  const ctx = buildContext();
+  const done = allTargets.filter(t=>t.status==="done").length;
+  const total = allTargets.length;
+  const msg = await groqChat(
+    SYSTEM(ctx.name),
+    `${ctx.name} just completed: "${target.topic}" (${target.subject}).
+Today: ${done}/${total} targets done. Streak: ${ctx.streak} days.
+All done for today: ${done===total?"YES":"NO"}.
+Give a short energetic compliment. If all done, make it celebratory. Mention the topic if possible.`,
+    150
+  );
+  if(msg){ showAiToast(msg,"🎉 Well done!"); logAi(msg,"praise"); }
+}
+
+/* ── 4. Praise on multiple targets added ── */
+async function aiPraiseTargetsAdded(count){
+  const ctx = buildContext();
+  if(count < 3) return; // only praise when 3+ targets added
+  const msg = await groqChat(
+    SYSTEM(ctx.name),
+    `${ctx.name} has added ${count} targets for today covering: ${[...new Set(allTargets.map(t=>t.subject))].join(", ")}.
+Give a short motivating comment about their planning. 1 sentence.`,
+    120
+  );
+  if(msg){ showAiBanner("aiAlertBanner","aiAlertText","aiAlertIcon","aiAlertLabel",msg,"💪","type-praise","Great planning!"); logAi(msg,"praise"); }
+}
+
+/* ── 5. Neglected subject warning ── */
+async function aiCheckNeglectedSubjects(){
+  const ctx = buildContext();
+  if(ctx.neglected.length===0){ if(isAdmin) toast("All subjects covered 👌"); return; }
+  const msg = await groqChat(
+    SYSTEM(ctx.name),
+    `${ctx.name} hasn't added any target for: ${ctx.neglected.join(", ")} today.
+${ctx.neglected[0]} syllabus completion: ${ctx["${ctx.neglected[0].toLowerCase()}Pct"]}%.
+Give a firm but caring warning. Mention which specific topics from that subject are high-weightage in NEET.`,
+    180
+  );
+  if(msg){ showAiBanner("aiAlertBanner","aiAlertText","aiAlertIcon","aiAlertLabel",msg,"⚠️","type-warn","Subject Alert"); logAi(msg,"warn"); }
+}
+
+/* ── 6. Overdue revision alert ── */
+async function aiCheckRevisions(){
+  const ctx = buildContext();
+  if(ctx.revDue.length===0){ if(isAdmin) toast("No revisions overdue ✓"); return; }
+  const overdueNames = ctx.revDue.slice(0,4).map(c=>c.chapter_name).join(", ");
+  const msg = await groqChat(
+    SYSTEM(ctx.name),
+    `${ctx.name} has ${ctx.revDue.length} chapters overdue for revision: ${overdueNames}.
+Remind them urgently but supportively. Mention NEET weightage if possible. 2 sentences max.`,
+    180
+  );
+  if(msg){ showAiBanner("aiAlertBanner","aiAlertText","aiAlertIcon","aiAlertLabel",msg,"📅","type-alert","Revision Alert"); logAi(msg,"alert"); }
+}
+
+/* ── 7. Weak chapters analysis ── */
+async function aiAnalyseWeakChapters(){
+  const ctx = buildContext();
+  if(ctx.lowConf.length===0){ if(isAdmin) toast("All chapters at good confidence!"); return; }
+  const weakNames = ctx.lowConf.slice(0,5).map(c=>c.chapter_name+" ("+c.subject+", "+c.confidence+"%)").join(", ");
+  const msg = await groqChat(
+    SYSTEM(ctx.name),
+    `${ctx.name}'s low-confidence chapters (below 40%): ${weakNames}.
+Identify the most critical one for NEET and give specific advice on how to improve that chapter. 2 sentences.`,
+    200
+  );
+  if(msg){ showAiBanner("aiAlertBanner","aiAlertText","aiAlertIcon","aiAlertLabel",msg,"📉","type-warn","Weak Spot Alert"); logAi(msg,"warn"); }
+}
+
+/* ── 8. AI Study Plan generator ── */
+async function generateStudyPlan(){
+  const ctx = buildContext();
+  const btn = $("generatePlanBtn");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="ai-dots"><span></span><span></span><span></span></div> Generating...`;
+  $("studyPlanOutput").style.display = "block";
+  $("studyPlanText").innerHTML = `<div class="ai-thinking"><div class="ai-dots"><span></span><span></span><span></span></div> AI is analysing your data...</div>`;
+
+  const revDueNames = ctx.revDue.slice(0,5).map(c=>c.chapter_name).join(", ");
+  const weakNames   = ctx.lowConf.slice(0,5).map(c=>c.chapter_name+" ("+c.subject+")").join(", ");
+  const pendingTargets = allTargets.filter(t=>t.status==="pending").map(t=>t.topic).join(", ");
+
+  const msg = await groqChat(
+    `You are a NEET 2027 study planner. Create practical, time-blocked study plans. Be specific with chapter names. Keep it tight and actionable.`,
+    `Create a detailed study plan for ${ctx.name} for today.
+
+Data:
+- Streak: ${ctx.streak} days
+- Today's pending targets: ${pendingTargets || "none added yet"}
+- Revision due: ${revDueNames || "none"}
+- Weak chapters (low confidence): ${weakNames || "none"}
+- Physics: ${ctx.phyPct}% done, Chemistry: ${ctx.chemPct}%, Biology: ${ctx.bioPct}%
+- Neglected subjects today: ${ctx.neglected.join(", ") || "none"}
+
+Create a time-blocked plan (e.g. 6-8am: ..., 9-11am: ...) covering study + revision + breaks. 
+Prioritise revision dues and weak chapters. Max 300 words. Include specific tips for key topics.`,
+    500
+  );
+
+  btn.disabled = false;
+  btn.innerHTML = "✨ Generate Today's Plan";
+  if(msg){
+    $("studyPlanText").textContent = msg;
+    logAi("Study plan generated for "+ctx.name, "praise");
+    $("studyPlanText").scrollIntoView({behavior:"smooth",block:"center"});
+  } else {
+    $("studyPlanText").textContent = "Could not generate plan. Please try again.";
+  }
+}
+
+/* ── 9. AI Chapter Insight (when marking revised) ── */
+async function aiChapterInsight(chapter){
+  const msg = await groqChat(
+    `You are a NEET expert. Give sharp, exam-focused tips. 2 sentences max.`,
+    `${chapter.chapter_name} (${chapter.subject}) — revision #${(chapter.revision_count||0)+1}.
+Give a specific tip: what to focus on, common mistakes, or high-weightage subtopics for NEET.`,
+    150
+  );
+  return msg;
+}
+
+/* ── 10. Streak milestone praise ── */
+async function aiStreakMilestone(streak){
+  const name = localStorage.getItem("shivam_name") || "Shivam";
+  if(streak % 5 !== 0 || streak === 0) return; // every 5 days
+  const msg = await groqChat(
+    SYSTEM(name),
+    `${name} just hit a ${streak}-day study streak! Give an energetic milestone celebration message. 1-2 sentences.`,
+    120
+  );
+  if(msg){ showAiBanner("aiAlertBanner","aiAlertText","aiAlertIcon","aiAlertLabel",msg,"🔥","type-praise","Streak Milestone!"); logAi(msg,"praise"); }
+}
+
+/* ══════════════════ AI UI HELPERS ══════════════════ */
+function showAiBanner(bannerId, textId, iconId, labelId, msg, icon, type, label){
+  const banner = $(bannerId);
+  $(textId).textContent = "";
+  $(iconId).textContent = icon;
+  $(labelId).textContent = label;
+  banner.className = "ai-banner show " + type;
+  typewriterEffect($(textId), msg, 18);
+}
+
+function typewriterEffect(el, text, speed=18){
+  el.textContent = "";
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "ai-cursor";
+  el.appendChild(cursor);
+  const iv = setInterval(()=>{
+    if(i < text.length){
+      el.insertBefore(document.createTextNode(text[i]), cursor);
+      i++;
+    } else {
+      clearInterval(iv);
+      cursor.remove();
+    }
+  }, speed);
+}
+
+let aiToastTimer;
+function showAiToast(msg, label="🤖 AI Coach"){
+  $("aiToastLabel").textContent = label;
+  $("aiToastText").textContent = msg;
+  $("aiToast").classList.add("show");
+  clearTimeout(aiToastTimer);
+  aiToastTimer = setTimeout(()=>$("aiToast").classList.remove("show"), 5000);
+}
+
+function logAi(msg, type="praise"){
+  aiLogItems.unshift({msg, type, time: new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
+  if(aiLogItems.length > 20) aiLogItems.pop();
+  renderAiLog();
+}
+
+function renderAiLog(){
+  const list = $("aiLogList");
+  if(!aiLogItems.length){ list.innerHTML=`<div class="empty"><span class="empty-icon">🤖</span>No AI activity yet.</div>`; return; }
+  list.innerHTML = aiLogItems.map(item=>`
+    <div class="ai-log-item ${item.type}">
+      ${escapeHtml(item.msg)}
+      <div class="ai-log-time">${item.time}</div>
+    </div>
+  `).join("");
+}
+
+/* ── Banner close handlers ── */
+$("aiBriefingClose").addEventListener("click",()=>{ $("aiBriefingBanner").className="ai-banner"; });
+$("aiAlertClose").addEventListener("click",()=>{ $("aiAlertBanner").className="ai-banner"; });
+
+/* ═══════════════════ STATIC FALLBACK ═══════════════════ */
 const QUOTES = [
   {text:"The secret of getting ahead is getting started.", author:"Mark Twain"},
-  {text:"Success is the sum of small efforts, repeated day in and day out.", author:"Robert Collier"},
   {text:"NEET is not about how smart you are. It's about how consistent you are.", author:"Every topper ever"},
   {text:"Don't watch the clock; do what it does. Keep going.", author:"Sam Levenson"},
-  {text:"Failure is the tuition you pay for success.", author:"Walter Brunell"},
-  {text:"It does not matter how slowly you go as long as you do not stop.", author:"Confucius"},
-  {text:"The harder you work for something, the greater you'll feel when you achieve it.", author:"Unknown"},
-  {text:"Study hard, for the well is deep and our brains are shallow.", author:"Richard Baxter"},
-  {text:"Believe you can and you're halfway there.", author:"Theodore Roosevelt"},
   {text:"Your only competition is who you were yesterday.", author:"Unknown"},
   {text:"One chapter a day keeps the regrets away.", author:"Every NEET aspirant"},
   {text:"Dream big. Study bigger. Revise the biggest.", author:"Topper's Mantra"},
 ];
-
-function loadQuote(){
-  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+function loadFallbackQuote(){
+  const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
   $("quoteText").textContent = `"${q.text}"`;
-  $("quoteAuthor").textContent = `— ${q.author}`;
+  $("quoteAuthor").textContent = "— "+q.author;
 }
 
-/* ─── Utils ─── */
+/* ═══════════════════ UTILS ═══════════════════ */
 function toast(msg, type="success"){
   const t = $("toast");
   t.textContent = msg;
-  t.style.background = type === "error" ? "var(--red)" : "var(--green-dark)";
+  t.style.background = type==="error"?"var(--red)":"var(--green-dark)";
   t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"), 2000);
+  setTimeout(()=>t.classList.remove("show"), 2200);
 }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function formatDate(iso){ return new Date(iso+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"}); }
+function escapeHtml(str){ const d=document.createElement("div"); d.textContent=str||""; return d.innerHTML; }
+function subjectClass(s){ return s==="Physics"?"phy":s==="Chemistry"?"chem":s==="Biology"?"bio":"other"; }
 
-function todayISO(){
-  return new Date().toISOString().slice(0,10);
-}
-
-function formatDate(iso){
-  const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"});
-}
-
-function escapeHtml(str){
-  const div = document.createElement("div");
-  div.textContent = str||"";
-  return div.innerHTML;
-}
-
-function subjectClass(s){
-  if(s==="Physics") return "phy";
-  if(s==="Chemistry") return "chem";
-  if(s==="Biology") return "bio";
-  return "other";
-}
-
-/* ─── Countdown ─── */
+/* ═══════════════════ COUNTDOWN ═══════════════════ */
 function renderCountdown(){
-  const exam = new Date("2027-05-02T00:00:00");
-  const diff = Math.ceil((exam - new Date())/(1000*60*60*24));
+  const diff = Math.ceil((new Date("2027-05-02")- new Date())/(864e5));
   $("daysLeft").textContent = diff > 0 ? diff : 0;
 }
 
-/* ─── Streak ─── */
+/* ═══════════════════ STREAK ═══════════════════ */
 function updateStreak(){
   const last = localStorage.getItem("shivam_last_active");
-  const streakVal = parseInt(localStorage.getItem("shivam_streak")||"0");
-  const today = todayISO();
-  if(last===today){ $("statStreak").textContent = streakVal; return; }
+  const val  = parseInt(localStorage.getItem("shivam_streak")||"0");
+  const today= todayISO();
+  if(last===today){ $("statStreak").textContent=val; return; }
   const yest = new Date(); yest.setDate(yest.getDate()-1);
   const yestISO = yest.toISOString().slice(0,10);
-  let newStreak = (last===yestISO) ? streakVal+1 : 1;
+  const newStreak = (last===yestISO) ? val+1 : 1;
   localStorage.setItem("shivam_last_active", today);
   localStorage.setItem("shivam_streak", newStreak);
   $("statStreak").textContent = newStreak;
+  aiStreakMilestone(newStreak);
 }
 
-/* ─── Flash Banner ─── */
+/* ═══════════════════ FLASH BANNER ═══════════════════ */
 async function loadFlashMessage(){
   try {
-    const { data } = await sb.from("profile").select("flash_message,flash_emoji").eq("id",1).maybeSingle();
-    if(data && data.flash_message){
-      $("flashIcon").textContent = data.flash_emoji || "📌";
+    const {data} = await sb.from("profile").select("flash_message,flash_emoji").eq("id",1).maybeSingle();
+    if(data?.flash_message){
+      $("flashIcon").textContent = data.flash_emoji||"📌";
       $("flashText").textContent = data.flash_message;
-      const banner = $("flashBanner");
-      banner.style.display = "flex";
+      $("flashBanner").style.display = "flex";
     }
-  } catch(e){ console.log("Flash message: profile table may not have flash columns yet"); }
+  } catch(e){}
 }
+$("flashClose").addEventListener("click",()=>{ $("flashBanner").style.display="none"; });
 
-$("flashClose").addEventListener("click",()=>{
-  $("flashBanner").style.display = "none";
-});
-
-/* ─── Name ─── */
+/* ═══════════════════ NAME ═══════════════════ */
 async function loadName(){
   const cached = localStorage.getItem("shivam_name");
   if(cached) $("greetName").textContent = cached;
-  const { data } = await sb.from("profile").select("*").eq("id",1).maybeSingle();
-  if(data && data.name){
-    $("greetName").textContent = data.name;
-    localStorage.setItem("shivam_name", data.name);
-  } else if(!cached){
-    $("nameModal").classList.add("show");
-  }
+  const {data} = await sb.from("profile").select("*").eq("id",1).maybeSingle();
+  if(data?.name){ $("greetName").textContent=data.name; localStorage.setItem("shivam_name",data.name); }
+  else if(!cached){ $("nameModal").classList.add("show"); }
 }
-
 $("editNameBtn").addEventListener("click",()=>$("nameModal").classList.add("show"));
 $("saveNameBtn").addEventListener("click", async ()=>{
-  const val = $("nameInput").value.trim();
-  if(!val) return;
-  $("greetName").textContent = val;
-  localStorage.setItem("shivam_name", val);
+  const val=$("nameInput").value.trim(); if(!val) return;
+  $("greetName").textContent=val; localStorage.setItem("shivam_name",val);
   $("nameModal").classList.remove("show");
-  await sb.from("profile").upsert({id:1, name:val, updated_at:new Date().toISOString()});
+  await sb.from("profile").upsert({id:1,name:val,updated_at:new Date().toISOString()});
   toast("Name saved ✓");
 });
 
-/* ─── Admin ─── */
+/* ═══════════════════ ADMIN ═══════════════════ */
 $("adminBtn").addEventListener("click",()=>{
-  if(isAdmin){
-    isAdmin = false;
-    $("adminBtn").textContent = "Admin login";
-    $("adminPanel").classList.remove("show");
-    toast("Admin mode off");
-    renderTargets();
-  } else {
-    $("adminModal").classList.add("show");
-    $("pinInput").focus();
-  }
+  if(isAdmin){ isAdmin=false; $("adminBtn").textContent="Admin login"; $("adminPanel").classList.remove("show"); toast("Admin mode off"); renderTargets(); }
+  else { $("adminModal").classList.add("show"); $("pinInput").focus(); }
 });
 $("cancelAdminBtn").addEventListener("click",()=>$("adminModal").classList.remove("show"));
-
 $("savePinBtn").addEventListener("click",()=>{
-  const val = $("pinInput").value.trim();
+  const val=$("pinInput").value.trim();
   if(val===ADMIN_PIN){
-    isAdmin = true;
-    $("adminBtn").textContent = "⚙ Admin: ON";
-    $("adminModal").classList.remove("show");
-    $("pinInput").value = "";
-    $("adminPanel").classList.add("show");
-    toast("Admin mode unlocked 🔓");
-    renderTargets();
-    renderAdminChapters();
-    loadAdminStats();
-    $("adminDatePicker").value = currentDate;
-    loadAdminTargetList();
-  } else {
-    toast("Wrong PIN", "error");
-    $("pinInput").value = "";
-  }
+    isAdmin=true; $("adminBtn").textContent="⚙ Admin: ON";
+    $("adminModal").classList.remove("show"); $("pinInput").value="";
+    $("adminPanel").classList.add("show"); toast("Admin unlocked 🔓");
+    renderTargets(); renderAdminChapters(); loadAdminStats();
+    $("adminDatePicker").value=currentDate; loadAdminTargetList();
+  } else { toast("Wrong PIN","error"); $("pinInput").value=""; }
 });
+$("closeAdminPanel").addEventListener("click",()=>{ $("adminPanel").classList.remove("show"); isAdmin=false; $("adminBtn").textContent="Admin login"; renderTargets(); });
 
-$("closeAdminPanel").addEventListener("click",()=>{
-  $("adminPanel").classList.remove("show");
-  isAdmin = false;
-  $("adminBtn").textContent = "Admin login";
-  renderTargets();
-});
-
-// Admin Tabs
 document.querySelectorAll(".admin-tab").forEach(tab=>{
   tab.addEventListener("click",()=>{
     document.querySelectorAll(".admin-tab").forEach(t=>t.classList.remove("active"));
     document.querySelectorAll(".admin-tab-content").forEach(c=>c.classList.remove("active"));
-    tab.classList.add("active");
-    $("tab-"+tab.dataset.tab).classList.add("active");
+    tab.classList.add("active"); $("tab-"+tab.dataset.tab).classList.add("active");
     if(tab.dataset.tab==="targets") loadAdminTargetList();
     if(tab.dataset.tab==="chapters") renderAdminChapters();
     if(tab.dataset.tab==="stats") loadAdminStats();
+    if(tab.dataset.tab==="ai") renderAiLog();
   });
 });
 
-// Flash message push
+// Admin AI buttons
+$("adminAiBriefingBtn").addEventListener("click", async ()=>{
+  briefingDone=false; $("adminAiBriefingBtn").disabled=true;
+  await runDailyBriefing(); $("adminAiBriefingBtn").disabled=false;
+});
+$("adminAiNeglectBtn").addEventListener("click", async ()=>{
+  $("adminAiNeglectBtn").disabled=true; await aiCheckNeglectedSubjects(); $("adminAiNeglectBtn").disabled=false; renderAiLog();
+});
+$("adminAiRevisionBtn").addEventListener("click", async ()=>{
+  $("adminAiRevisionBtn").disabled=true; await aiCheckRevisions(); $("adminAiRevisionBtn").disabled=false; renderAiLog();
+});
+$("adminAiWeakBtn").addEventListener("click", async ()=>{
+  $("adminAiWeakBtn").disabled=true; await aiAnalyseWeakChapters(); $("adminAiWeakBtn").disabled=false; renderAiLog();
+});
+
+// Flash
 $("pushFlashBtn").addEventListener("click", async ()=>{
-  const msg = $("flashMsgInput").value.trim();
-  const emoji = $("flashEmoji").value;
-  if(!msg){ toast("Enter a message first","error"); return; }
-  const { error } = await sb.from("profile").upsert({id:1, flash_message:msg, flash_emoji:emoji, updated_at:new Date().toISOString()});
-  if(error){ toast("Error pushing message","error"); console.error(error); return; }
+  const msg=$("flashMsgInput").value.trim(); const emoji=$("flashEmoji").value;
+  if(!msg){ toast("Enter a message","error"); return; }
+  const {error}=await sb.from("profile").upsert({id:1,flash_message:msg,flash_emoji:emoji,updated_at:new Date().toISOString()});
+  if(error){ toast("Error","error"); return; }
   toast("Message pushed! 📣");
-  // Show preview in admin panel
-  const prev = $("flashPreview");
-  prev.textContent = `${emoji} ${msg}`;
-  prev.classList.add("show");
-  // Also show the live banner at top so admin can preview it
-  $("flashIcon").textContent = emoji;
-  $("flashText").textContent = msg;
-  $("flashBanner").style.display = "flex";
+  $("flashPreview").textContent=`${emoji} ${msg}`; $("flashPreview").classList.add("show");
+  $("flashIcon").textContent=emoji; $("flashText").textContent=msg; $("flashBanner").style.display="flex";
 });
-
 $("clearFlashBtn").addEventListener("click", async ()=>{
-  await sb.from("profile").upsert({id:1, flash_message:null, flash_emoji:null, updated_at:new Date().toISOString()});
-  $("flashBanner").style.display = "none";
-  $("flashPreview").classList.remove("show");
-  $("flashMsgInput").value = "";
-  toast("Flash message cleared");
+  await sb.from("profile").upsert({id:1,flash_message:null,flash_emoji:null,updated_at:new Date().toISOString()});
+  $("flashBanner").style.display="none"; $("flashPreview").classList.remove("show"); $("flashMsgInput").value="";
+  toast("Flash cleared");
 });
-
 $("adminDatePicker").addEventListener("change",loadAdminTargetList);
 
 async function loadAdminTargetList(){
-  const date = $("adminDatePicker").value || currentDate;
-  const { data } = await sb.from("daily_targets").select("*").eq("target_date",date).order("created_at",{ascending:true});
-  const list = $("adminTargetList");
-  if(!data||data.length===0){
-    list.innerHTML=`<div class="empty"><span class="empty-icon">🎯</span>No targets for this date.</div>`;
-    return;
-  }
-  list.innerHTML = data.map(t=>`
-    <div class="target-item ${t.status==='done'?'done':''}" style="margin-bottom:6px;">
+  const date=$("adminDatePicker").value||currentDate;
+  const {data}=await sb.from("daily_targets").select("*").eq("target_date",date).order("created_at",{ascending:true});
+  const list=$("adminTargetList");
+  if(!data||!data.length){ list.innerHTML=`<div class="empty"><span class="empty-icon">🎯</span>No targets for this date.</div>`; return; }
+  list.innerHTML=data.map(t=>`
+    <div class="target-item ${t.status==="done"?"done":""}" style="margin-bottom:6px;">
       <div class="target-subject ${subjectClass(t.subject)}">${t.subject}</div>
-      <div class="target-topic ${t.status==='done'?'strike':''}">${escapeHtml(t.topic)}</div>
-      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-        <span class="badge ${t.priority==='important'?'badge-important':'badge-normal'}">${t.priority}</span>
-        <span class="badge" style="background:${t.status==='done'?'var(--green-pale)':'var(--red-pale)'};color:${t.status==='done'?'var(--green-dark)':'var(--red)'}">${t.status}</span>
+      <div class="target-topic ${t.status==="done"?"strike":""}">${escapeHtml(t.topic)}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="badge ${t.priority==="important"?"badge-important":"badge-normal"}">${t.priority}</span>
+        <span class="badge" style="background:${t.status==="done"?"var(--green-pale)":"var(--red-pale)"};color:${t.status==="done"?"var(--green-dark)":"var(--red)"}">${t.status}</span>
       </div>
       <div class="admin-comment-box">
-        <textarea placeholder="Leave a note for Shivam..." data-comment-input="${t.id}">${t.admin_comment||''}</textarea>
+        <textarea placeholder="Leave a note…" data-comment-input="${t.id}">${t.admin_comment||""}</textarea>
         <div style="display:flex;gap:6px;margin-top:6px;">
-          <button class="btn-ghost" data-save-comment="${t.id}">Save comment</button>
+          <button class="btn-ghost" data-save-comment="${t.id}">Save note</button>
           <button class="btn-danger" data-del-target="${t.id}">Delete</button>
         </div>
       </div>
     </div>
   `).join("");
-
-  list.querySelectorAll("[data-save-comment]").forEach(el=>{
-    el.addEventListener("click",()=>saveComment(el.dataset.saveComment, true));
-  });
-  list.querySelectorAll("[data-del-target]").forEach(el=>{
-    el.addEventListener("click",()=>deleteTarget(el.dataset.delTarget));
-  });
+  list.querySelectorAll("[data-save-comment]").forEach(el=>el.addEventListener("click",()=>saveComment(el.dataset.saveComment,true)));
+  list.querySelectorAll("[data-del-target]").forEach(el=>el.addEventListener("click",()=>deleteTarget(el.dataset.delTarget)));
 }
 
 async function loadAdminStats(){
-  const { data:targets } = await sb.from("daily_targets").select("status");
-  const { data:chapters } = await sb.from("chapters").select("status,next_revision");
-  const totalDone = (targets||[]).filter(t=>t.status==="done").length;
-  const chapsDone = (chapters||[]).filter(c=>c.status==="done").length;
-  const today = todayISO();
-  const revDue = (chapters||[]).filter(c=>c.next_revision && c.next_revision<=today);
-  $("adminTotalDone").textContent = totalDone;
-  $("adminTotalChapters").textContent = (chapters||[]).length;
-  $("adminChaptersDone").textContent = chapsDone;
-  $("adminRevDue").textContent = revDue.length;
-
-  const revList = $("revDueList");
-  if(revDue.length===0){
-    revList.innerHTML = `<div class="empty"><span class="empty-icon">✅</span>All clear! No revisions due.</div>`;
-  } else {
-    revList.innerHTML = revDue.map(c=>`
-      <div class="rev-due-item ${c.next_revision===today?'rev-due-today':''}">
-        <span>${c.chapter_name||'Chapter'}</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${c.next_revision===today?'TODAY':c.next_revision}</span>
-      </div>
-    `).join("");
-  }
+  const {data:targets}=await sb.from("daily_targets").select("status");
+  const {data:chapters}=await sb.from("chapters").select("status,next_revision,chapter_name");
+  const today=todayISO();
+  const revDue=(chapters||[]).filter(c=>c.next_revision&&c.next_revision<=today);
+  $("adminTotalDone").textContent=(targets||[]).filter(t=>t.status==="done").length;
+  $("adminTotalChapters").textContent=(chapters||[]).length;
+  $("adminChaptersDone").textContent=(chapters||[]).filter(c=>c.status==="done").length;
+  $("adminRevDue").textContent=revDue.length;
+  const revList=$("revDueList");
+  revList.innerHTML=revDue.length?revDue.map(c=>`
+    <div class="rev-due-item ${c.next_revision===today?"rev-due-today":""}">
+      <span>${c.chapter_name||"Chapter"}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${c.next_revision===today?"TODAY":c.next_revision}</span>
+    </div>`).join(""):
+    `<div class="empty"><span class="empty-icon">✅</span>No revisions due.</div>`;
 }
 
 function renderAdminChapters(){
-  const list = $("adminChapterList");
-  if(allChapters.length===0){
-    list.innerHTML=`<div class="empty"><span class="empty-icon">📖</span>No chapters tracked.</div>`;
-    return;
-  }
-  list.innerHTML = allChapters.map(c=>`
+  const list=$("adminChapterList");
+  if(!allChapters.length){ list.innerHTML=`<div class="empty"><span class="empty-icon">📖</span>No chapters tracked.</div>`; return; }
+  list.innerHTML=allChapters.map(c=>`
     <div class="chapter-item subj-${subjectClass(c.subject)}" style="margin-bottom:6px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div class="chapter-subject ${subjectClass(c.subject)}">${c.subject}</div>
-          <div class="chapter-name">${escapeHtml(c.chapter_name)}</div>
-        </div>
+        <div><div class="chapter-subject ${subjectClass(c.subject)}">${c.subject}</div><div class="chapter-name">${escapeHtml(c.chapter_name)}</div></div>
         <button class="btn-danger" data-del-chapter="${c.id}">Delete</button>
       </div>
       <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;font-family:'IBM Plex Mono',monospace;">
         Status: ${c.status} · Confidence: ${c.confidence}% · Revisions: ${c.revision_count||0}
       </div>
-    </div>
-  `).join("");
-  list.querySelectorAll("[data-del-chapter]").forEach(el=>{
-    el.addEventListener("click",()=>deleteChapter(el.dataset.delChapter));
-  });
+    </div>`).join("");
+  list.querySelectorAll("[data-del-chapter]").forEach(el=>el.addEventListener("click",()=>deleteChapter(el.dataset.delChapter)));
 }
 
-/* ─── Priority Toggle ─── */
-$("prioNormalBtn").addEventListener("click",()=>{
-  currentPriority="normal";
-  $("prioNormalBtn").classList.add("active-normal");
-  $("prioImportantBtn").classList.remove("active-important");
-});
-$("prioImportantBtn").addEventListener("click",()=>{
-  currentPriority="important";
-  $("prioImportantBtn").classList.add("active-important");
-  $("prioNormalBtn").classList.remove("active-normal");
-});
+/* ═══════════════════ PRIORITY TOGGLE ═══════════════════ */
+$("prioNormalBtn").addEventListener("click",()=>{ currentPriority="normal"; $("prioNormalBtn").classList.add("active-normal"); $("prioImportantBtn").classList.remove("active-important"); });
+$("prioImportantBtn").addEventListener("click",()=>{ currentPriority="important"; $("prioImportantBtn").classList.add("active-important"); $("prioNormalBtn").classList.remove("active-normal"); });
+$("editPrioNormal").addEventListener("click",()=>{ editPriority="normal"; $("editPrioNormal").classList.add("active-normal"); $("editPrioImportant").classList.remove("active-important"); });
+$("editPrioImportant").addEventListener("click",()=>{ editPriority="important"; $("editPrioImportant").classList.add("active-important"); $("editPrioNormal").classList.remove("active-normal"); });
 
-$("editPrioNormal").addEventListener("click",()=>{
-  editPriority="normal";
-  $("editPrioNormal").classList.add("active-normal");
-  $("editPrioImportant").classList.remove("active-important");
-});
-$("editPrioImportant").addEventListener("click",()=>{
-  editPriority="important";
-  $("editPrioImportant").classList.add("active-important");
-  $("editPrioNormal").classList.remove("active-normal");
-});
-
-/* ─── 7-Day Date Strip ─── */
+/* ═══════════════════ 7-DAY STRIP ═══════════════════ */
 function build7DayStrip(){
-  const strip = $("dateStrip");
-  strip.innerHTML = "";
+  const strip=$("dateStrip"); strip.innerHTML="";
   for(let i=6;i>=0;i--){
-    const d = new Date();
-    d.setDate(d.getDate()-i);
-    const iso = d.toISOString().slice(0,10);
-    const dayNames = ["Su","Mo","Tu","We","Th","Fr","Sa"];
-    const chip = document.createElement("div");
-    chip.className = "day-chip" + (iso===currentDate?" active":"");
-    chip.dataset.date = iso;
-    chip.innerHTML = `
-      <div class="day-name">${dayNames[d.getDay()]}</div>
-      <div class="day-num">${d.getDate()}</div>
-      <div class="day-dot"></div>
-    `;
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const iso=d.toISOString().slice(0,10);
+    const chip=document.createElement("div");
+    chip.className="day-chip"+(iso===currentDate?" active":"");
+    chip.dataset.date=iso;
+    chip.innerHTML=`<div class="day-name">${["Su","Mo","Tu","We","Th","Fr","Sa"][d.getDay()]}</div><div class="day-num">${d.getDate()}</div><div class="day-dot"></div>`;
     chip.addEventListener("click",()=>{
-      currentDate = iso;
+      currentDate=iso;
       document.querySelectorAll(".day-chip").forEach(c=>c.classList.remove("active"));
       chip.classList.add("active");
-      $("targetDateLabel").textContent = formatDate(iso);
+      $("targetDateLabel").textContent=formatDate(iso);
       loadTargets();
     });
     strip.appendChild(chip);
   }
-  $("targetDateLabel").textContent = formatDate(currentDate);
+  $("targetDateLabel").textContent=formatDate(currentDate);
   markDaysWithTasks();
 }
 
 async function markDaysWithTasks(){
-  const dates = [];
-  for(let i=6;i>=0;i--){
-    const d = new Date();
-    d.setDate(d.getDate()-i);
-    dates.push(d.toISOString().slice(0,10));
-  }
-  const { data } = await sb.from("daily_targets").select("target_date").in("target_date",dates);
-  if(!data) return;
-  const datesWithTasks = new Set(data.map(r=>r.target_date));
-  document.querySelectorAll(".day-chip").forEach(chip=>{
-    if(datesWithTasks.has(chip.dataset.date)) chip.classList.add("has-tasks");
-  });
-  buildWeekChart(dates, data);
+  const dates=[];
+  for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); dates.push(d.toISOString().slice(0,10)); }
+  const {data}=await sb.from("daily_targets").select("target_date").in("target_date",dates);
+  const datesWithTasks=new Set((data||[]).map(r=>r.target_date));
+  document.querySelectorAll(".day-chip").forEach(chip=>{ if(datesWithTasks.has(chip.dataset.date)) chip.classList.add("has-tasks"); });
+  buildWeekChart(dates);
 }
 
-async function buildWeekChart(dates, rawData){
-  const completionData = await Promise.all(dates.map(async date=>{
-    const { data } = await sb.from("daily_targets").select("status").eq("target_date",date);
-    if(!data||data.length===0) return 0;
-    const done = data.filter(t=>t.status==="done").length;
-    return Math.round((done/data.length)*100);
+async function buildWeekChart(dates){
+  const completionData=await Promise.all(dates.map(async date=>{
+    const {data}=await sb.from("daily_targets").select("status").eq("target_date",date);
+    if(!data||!data.length) return 0;
+    return Math.round(data.filter(t=>t.status==="done").length/data.length*100);
   }));
-
-  const labels = dates.map(d=>{
-    const dt = new Date(d+"T00:00:00");
-    return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getDay()];
-  });
-
+  const labels=dates.map(d=>["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d+"T00:00:00").getDay()]);
   if(weekChart) weekChart.destroy();
-  const ctx = $("weekChart").getContext("2d");
-  weekChart = new Chart(ctx,{
+  weekChart=new Chart($("weekChart").getContext("2d"),{
     type:"bar",
-    data:{
-      labels,
-      datasets:[{
-        label:"Completion %",
-        data:completionData,
-        backgroundColor: completionData.map(v=>
-          v>=80?"rgba(47,111,78,.85)":
-          v>=50?"rgba(176,141,87,.8)":
-          v>0?"rgba(193,68,45,.7)":
-          "rgba(200,200,200,.4)"
-        ),
-        borderRadius:6,
-        borderSkipped:false,
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          callbacks:{
-            label:ctx=>`${ctx.raw}% done`
-          }
-        }
-      },
+    data:{ labels, datasets:[{ label:"Completion %", data:completionData,
+      backgroundColor:completionData.map(v=>v>=80?"rgba(47,111,78,.85)":v>=50?"rgba(176,141,87,.8)":v>0?"rgba(193,68,45,.7)":"rgba(200,200,200,.4)"),
+      borderRadius:6, borderSkipped:false }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.raw}% done`}} },
       scales:{
-        y:{
-          min:0,max:100,
-          ticks:{
-            callback:v=>v+"%",
-            font:{family:"'IBM Plex Mono',monospace",size:10},
-            color:"#4C5F57",
-            maxTicksLimit:5,
-          },
-          grid:{color:"rgba(0,0,0,.05)"},
-        },
-        x:{
-          ticks:{font:{family:"'IBM Plex Mono',monospace",size:10},color:"#4C5F57"},
-          grid:{display:false},
-        }
-      }
-    }
+        y:{min:0,max:100,ticks:{callback:v=>v+"%",font:{family:"'IBM Plex Mono',monospace",size:10},color:"#4C5F57",maxTicksLimit:5},grid:{color:"rgba(0,0,0,.05)"}},
+        x:{ticks:{font:{family:"'IBM Plex Mono',monospace",size:10},color:"#4C5F57"},grid:{display:false}}
+      }}
   });
 }
 
-/* ─── Daily Targets ─── */
+/* ═══════════════════ TARGETS ═══════════════════ */
 $("addTargetBtn").addEventListener("click", async ()=>{
-  const topic = $("topicInput").value.trim();
-  if(!topic){ toast("Enter a topic first","error"); return; }
-  const btn = $("addTargetBtn");
-  btn.disabled = true; btn.textContent = "Adding...";
-  const row = {
-    target_date: currentDate,
-    subject: $("subjectSelect").value,
-    topic,
-    priority: currentPriority,
-    status: "pending"
-  };
-  const { error } = await sb.from("daily_targets").insert(row);
-  btn.disabled = false; btn.textContent = "+ Add Target";
-  if(error){ toast("Error saving","error"); console.error(error); return; }
-  $("topicInput").value = "";
-  toast("Target added ✓");
-  loadTargets();
-  markDaysWithTasks();
+  const topic=$("topicInput").value.trim(); if(!topic){ toast("Enter a topic","error"); return; }
+  const btn=$("addTargetBtn"); btn.disabled=true; btn.textContent="Adding...";
+  const {error}=await sb.from("daily_targets").insert({
+    target_date:currentDate, subject:$("subjectSelect").value, topic, priority:currentPriority, status:"pending"
+  });
+  btn.disabled=false; btn.textContent="+ Add Target";
+  if(error){ toast("Error saving","error"); return; }
+  $("topicInput").value=""; toast("Target added ✓");
+  await loadTargets(); markDaysWithTasks();
+  // Praise when 3+ targets
+  if(allTargets.length>=3) await aiPraiseTargetsAdded(allTargets.length);
 });
 
 async function loadTargets(){
-  $("targetSkeleton").style.display="block";
-  $("targetList").style.display="none";
-  const { data, error } = await sb.from("daily_targets").select("*").eq("target_date",currentDate).order("created_at",{ascending:true});
-  $("targetSkeleton").style.display="none";
-  $("targetList").style.display="block";
+  $("targetSkeleton").style.display="block"; $("targetList").style.display="none";
+  const {data,error}=await sb.from("daily_targets").select("*").eq("target_date",currentDate).order("created_at",{ascending:true});
+  $("targetSkeleton").style.display="none"; $("targetList").style.display="block";
   if(error){ console.error(error); return; }
-  allTargets = data||[];
-  renderTargets();
-  updateStats();
+  allTargets=data||[];
+  renderTargets(); updateStats();
 }
 
 function renderTargets(){
-  const list = $("targetList");
-  if(allTargets.length===0){
-    list.innerHTML=`<div class="empty"><span class="empty-icon">🎯</span>No targets yet. Add one above!</div>`;
-    return;
-  }
-  list.innerHTML = allTargets.map(t=>`
-    <div class="target-item ${t.status==='done'?'done':''}" data-id="${t.id}">
+  const list=$("targetList");
+  if(!allTargets.length){ list.innerHTML=`<div class="empty"><span class="empty-icon">🎯</span>No targets yet. Add one above!</div>`; return; }
+  list.innerHTML=allTargets.map(t=>`
+    <div class="target-item ${t.status==="done"?"done":""}" data-id="${t.id}">
       <div class="target-top">
-        <div class="check ${t.status==='done'?'checked':''}" data-check="${t.id}">${t.status==='done'?'✓':''}</div>
+        <div class="check ${t.status==="done"?"checked":""}" data-check="${t.id}">${t.status==="done"?"✓":""}</div>
         <div class="target-body">
           <div class="target-subject ${subjectClass(t.subject)}">${t.subject}</div>
-          <div class="target-topic ${t.status==='done'?'strike':''}">${escapeHtml(t.topic)}</div>
+          <div class="target-topic ${t.status==="done"?"strike":""}">${escapeHtml(t.topic)}</div>
           <div>
-            <span class="badge ${t.priority==='important'?'badge-important':'badge-normal'}">${t.priority==='important'?'⚠ Important':'Normal'}</span>
-            ${t.revised?`<span class="badge badge-revised">✓ Revised</span>`:''}
+            <span class="badge ${t.priority==="important"?"badge-important":"badge-normal"}">${t.priority==="important"?"⚠ Important":"Normal"}</span>
+            ${t.revised?`<span class="badge badge-revised">✓ Revised</span>`:""}
           </div>
-          ${t.admin_comment?`<div class="existing-comment"><strong>Satyam:</strong> ${escapeHtml(t.admin_comment)}</div>`:''}
+          ${t.admin_comment?`<div class="existing-comment"><strong>Satyam:</strong> ${escapeHtml(t.admin_comment)}</div>`:""}
           <div class="target-actions">
-            <button class="btn-ghost" style="font-size:11px;" data-mark-revised="${t.id}">${t.revised?'✓ Revised':'Mark revised'}</button>
+            <button class="btn-ghost" style="font-size:11px;" data-mark-revised="${t.id}">${t.revised?"✓ Revised":"Mark revised"}</button>
             <button class="btn-ghost" style="font-size:11px;" data-edit-target="${t.id}">Edit</button>
             <button class="btn-danger" data-del-target="${t.id}">Delete</button>
           </div>
-          ${isAdmin?`
-            <div class="admin-comment-box">
-              <textarea placeholder="Comment as admin…" data-comment-input="${t.id}">${t.admin_comment||''}</textarea>
-              <button class="btn-ghost" data-save-comment="${t.id}">Save comment</button>
-            </div>
-          `:''}
+          ${isAdmin?`<div class="admin-comment-box"><textarea placeholder="Comment as admin…" data-comment-input="${t.id}">${t.admin_comment||""}</textarea><button class="btn-ghost" data-save-comment="${t.id}">Save comment</button></div>`:""}
         </div>
       </div>
-    </div>
-  `).join("");
+    </div>`).join("");
 
-  list.querySelectorAll("[data-check]").forEach(el=>{
-    el.addEventListener("click",()=>toggleTarget(el.dataset.check));
-  });
-  list.querySelectorAll("[data-edit-target]").forEach(el=>{
-    el.addEventListener("click",()=>openEditTarget(el.dataset.editTarget));
-  });
-  list.querySelectorAll("[data-del-target]").forEach(el=>{
-    el.addEventListener("click",()=>deleteTarget(el.dataset.delTarget));
-  });
-  list.querySelectorAll("[data-mark-revised]").forEach(el=>{
-    el.addEventListener("click",()=>markRevised(el.dataset.markRevised));
-  });
-  if(isAdmin){
-    list.querySelectorAll("[data-save-comment]").forEach(el=>{
-      el.addEventListener("click",()=>saveComment(el.dataset.saveComment, false));
-    });
-  }
+  list.querySelectorAll("[data-check]").forEach(el=>el.addEventListener("click",()=>toggleTarget(el.dataset.check)));
+  list.querySelectorAll("[data-edit-target]").forEach(el=>el.addEventListener("click",()=>openEditTarget(el.dataset.editTarget)));
+  list.querySelectorAll("[data-del-target]").forEach(el=>el.addEventListener("click",()=>deleteTarget(el.dataset.delTarget)));
+  list.querySelectorAll("[data-mark-revised]").forEach(el=>el.addEventListener("click",()=>markRevised(el.dataset.markRevised)));
+  if(isAdmin) list.querySelectorAll("[data-save-comment]").forEach(el=>el.addEventListener("click",()=>saveComment(el.dataset.saveComment,false)));
 }
 
 async function toggleTarget(id){
-  const t = allTargets.find(x=>x.id===id);
-  const newStatus = t.status==="done"?"pending":"done";
-  const { error } = await sb.from("daily_targets").update({status:newStatus}).eq("id",id);
+  const t=allTargets.find(x=>x.id===id);
+  const newStatus=t.status==="done"?"pending":"done";
+  const {error}=await sb.from("daily_targets").update({status:newStatus}).eq("id",id);
   if(error){ console.error(error); return; }
-  t.status = newStatus;
-  renderTargets();
-  updateStats();
-  rebuildChart();
-  if(newStatus==="done") toast("✓ Target completed!");
+  t.status=newStatus; renderTargets(); updateStats(); rebuildChart();
+  if(newStatus==="done") await aiPraiseTaskDone(t);
 }
 
 async function markRevised(id){
-  const t = allTargets.find(x=>x.id===id);
-  const newVal = !t.revised;
-  const { error } = await sb.from("daily_targets").update({revised:newVal}).eq("id",id);
+  const t=allTargets.find(x=>x.id===id); const newVal=!t.revised;
+  const {error}=await sb.from("daily_targets").update({revised:newVal}).eq("id",id);
   if(error){ console.error(error); return; }
-  t.revised = newVal;
-  renderTargets();
-  toast(newVal?"Marked as revised ✓":"Revision mark removed");
+  t.revised=newVal; renderTargets();
+  toast(newVal?"Marked revised ✓":"Revision mark removed");
 }
 
 function openEditTarget(id){
-  const t = allTargets.find(x=>x.id===id);
-  if(!t) return;
-  editingTargetId = id;
-  $("editSubjectSelect").value = t.subject;
-  $("editTopicInput").value = t.topic;
-  editPriority = t.priority||"normal";
-  if(editPriority==="normal"){
-    $("editPrioNormal").classList.add("active-normal");
-    $("editPrioImportant").classList.remove("active-important");
-  } else {
-    $("editPrioImportant").classList.add("active-important");
-    $("editPrioNormal").classList.remove("active-normal");
-  }
+  const t=allTargets.find(x=>x.id===id); if(!t) return;
+  editingTargetId=id; $("editSubjectSelect").value=t.subject; $("editTopicInput").value=t.topic;
+  editPriority=t.priority||"normal";
+  $("editPrioNormal").classList.toggle("active-normal",editPriority==="normal");
+  $("editPrioImportant").classList.toggle("active-important",editPriority==="important");
   $("editTargetModal").classList.add("show");
 }
-
 $("saveEditTargetBtn").addEventListener("click", async ()=>{
-  const topic = $("editTopicInput").value.trim();
-  if(!topic){ toast("Enter topic","error"); return; }
-  const { error } = await sb.from("daily_targets").update({
-    topic, subject:$("editSubjectSelect").value, priority:editPriority
-  }).eq("id",editingTargetId);
+  const topic=$("editTopicInput").value.trim(); if(!topic){ toast("Enter topic","error"); return; }
+  const {error}=await sb.from("daily_targets").update({topic,subject:$("editSubjectSelect").value,priority:editPriority}).eq("id",editingTargetId);
   if(error){ toast("Error saving","error"); return; }
-  $("editTargetModal").classList.remove("show");
-  toast("Target updated ✓");
-  loadTargets();
+  $("editTargetModal").classList.remove("show"); toast("Target updated ✓"); loadTargets();
 });
 $("cancelEditTargetBtn").addEventListener("click",()=>$("editTargetModal").classList.remove("show"));
 
 async function deleteTarget(id){
   if(!confirm("Delete this target?")) return;
-  const { error } = await sb.from("daily_targets").delete().eq("id",id);
+  const {error}=await sb.from("daily_targets").delete().eq("id",id);
   if(error){ toast("Error deleting","error"); return; }
-  allTargets = allTargets.filter(t=>t.id!==id);
-  renderTargets();
-  updateStats();
-  rebuildChart();
-  toast("Target deleted");
+  allTargets=allTargets.filter(t=>t.id!==id); renderTargets(); updateStats(); rebuildChart(); toast("Target deleted");
 }
 
-async function saveComment(id, fromAdmin=false){
-  const val = document.querySelector(`[data-comment-input="${id}"]`).value.trim();
-  const { error } = await sb.from("daily_targets").update({admin_comment:val}).eq("id",id);
+async function saveComment(id,fromAdmin=false){
+  const val=document.querySelector(`[data-comment-input="${id}"]`).value.trim();
+  const {error}=await sb.from("daily_targets").update({admin_comment:val}).eq("id",id);
   if(error){ toast("Could not save comment","error"); return; }
-  const t = allTargets.find(x=>x.id===id);
-  if(t) t.admin_comment = val;
-  if(!fromAdmin) renderTargets();
-  else loadAdminTargetList();
+  const t=allTargets.find(x=>x.id===id); if(t) t.admin_comment=val;
+  if(!fromAdmin) renderTargets(); else loadAdminTargetList();
   toast("Comment saved ✓");
 }
 
 function updateStats(){
-  if(allTargets.length===0){ $("statToday").textContent = "0%"; return; }
-  const done = allTargets.filter(t=>t.status==="done").length;
-  $("statToday").textContent = Math.round((done/allTargets.length)*100)+"%";
+  if(!allTargets.length){ $("statToday").textContent="0%"; return; }
+  const done=allTargets.filter(t=>t.status==="done").length;
+  $("statToday").textContent=Math.round((done/allTargets.length)*100)+"%";
 }
 
 async function rebuildChart(){
-  const dates = [];
-  for(let i=6;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    dates.push(d.toISOString().slice(0,10));
-  }
-  await buildWeekChart(dates, []);
+  const dates=[];
+  for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); dates.push(d.toISOString().slice(0,10)); }
+  await buildWeekChart(dates);
 }
 
-/* ─── Chapters ─── */
+/* ═══════════════════ CHAPTERS ═══════════════════ */
 $("addChapterBtn").addEventListener("click", async ()=>{
-  const name = $("chName").value.trim();
-  if(!name){ toast("Enter chapter name","error"); return; }
-  const row = {subject:$("chSubject").value, chapter_name:name, status:"not_started", confidence:0, revision_count:0};
-  const { error } = await sb.from("chapters").insert(row);
-  if(error){ toast("Error — check Supabase setup","error"); console.error(error); return; }
-  $("chName").value = "";
-  toast("Chapter added ✓");
-  loadChapters();
+  const name=$("chName").value.trim(); if(!name){ toast("Enter chapter name","error"); return; }
+  const {error}=await sb.from("chapters").insert({subject:$("chSubject").value,chapter_name:name,status:"not_started",confidence:0,revision_count:0});
+  if(error){ toast("Error — check Supabase","error"); return; }
+  $("chName").value=""; toast("Chapter added ✓"); loadChapters();
 });
 
 async function loadChapters(){
-  $("chapterSkeleton").style.display="block";
-  $("chapterList").style.display="none";
-  const { data, error } = await sb.from("chapters").select("*").order("created_at",{ascending:true});
-  $("chapterSkeleton").style.display="none";
-  $("chapterList").style.display="block";
+  $("chapterSkeleton").style.display="block"; $("chapterList").style.display="none";
+  const {data,error}=await sb.from("chapters").select("*").order("created_at",{ascending:true});
+  $("chapterSkeleton").style.display="none"; $("chapterList").style.display="block";
   if(error){ console.error(error); return; }
-  allChapters = data||[];
-  renderChapters();
-  updateRevisionStat();
-  updateSyllabusProgress();
+  allChapters=data||[];
+  renderChapters(); updateRevisionStat(); updateSyllabusProgress();
+  // After data loads, trigger AI checks on page load
+  setTimeout(()=>{ aiCheckRevisions(); aiCheckNeglectedSubjects(); },3000);
 }
 
 function renderChapters(){
-  const list = $("chapterList");
-  const today = todayISO();
-  let filtered = [...allChapters];
-  if(chapterFilter==="Physics") filtered = filtered.filter(c=>c.subject==="Physics");
-  else if(chapterFilter==="Chemistry") filtered = filtered.filter(c=>c.subject==="Chemistry");
-  else if(chapterFilter==="Biology") filtered = filtered.filter(c=>c.subject==="Biology");
-  else if(chapterFilter==="done") filtered = filtered.filter(c=>c.status==="done");
-  else if(chapterFilter==="revision") filtered = filtered.filter(c=>c.next_revision && c.next_revision<=today);
+  const list=$("chapterList"); const today=todayISO();
+  let filtered=[...allChapters];
+  if(chapterFilter==="Physics") filtered=filtered.filter(c=>c.subject==="Physics");
+  else if(chapterFilter==="Chemistry") filtered=filtered.filter(c=>c.subject==="Chemistry");
+  else if(chapterFilter==="Biology") filtered=filtered.filter(c=>c.subject==="Biology");
+  else if(chapterFilter==="done") filtered=filtered.filter(c=>c.status==="done");
+  else if(chapterFilter==="revision") filtered=filtered.filter(c=>c.next_revision&&c.next_revision<=today);
 
-  if(filtered.length===0){
-    list.innerHTML=`<div class="empty"><span class="empty-icon">📖</span>No chapters here. Add one above!</div>`;
-    return;
-  }
-  list.innerHTML = filtered.map(c=>`
+  if(!filtered.length){ list.innerHTML=`<div class="empty"><span class="empty-icon">📖</span>No chapters here.</div>`; return; }
+  list.innerHTML=filtered.map(c=>`
     <div class="chapter-item subj-${subjectClass(c.subject)}" data-id="${c.id}">
       <div class="chapter-top">
-        <div>
-          <div class="chapter-subject ${subjectClass(c.subject)}">${c.subject}</div>
-          <div class="chapter-name">${escapeHtml(c.chapter_name)}</div>
-        </div>
+        <div><div class="chapter-subject ${subjectClass(c.subject)}">${c.subject}</div><div class="chapter-name">${escapeHtml(c.chapter_name)}</div></div>
         <select class="status-select" data-status="${c.id}">
-          <option value="not_started" ${c.status==='not_started'?'selected':''}>Not started</option>
-          <option value="in_progress" ${c.status==='in_progress'?'selected':''}>In progress</option>
-          <option value="done" ${c.status==='done'?'selected':''}>Done ✓</option>
+          <option value="not_started" ${c.status==="not_started"?"selected":""}>Not started</option>
+          <option value="in_progress" ${c.status==="in_progress"?"selected":""}>In progress</option>
+          <option value="done" ${c.status==="done"?"selected":""}>Done ✓</option>
         </select>
       </div>
       <div class="conf-row">
@@ -1457,38 +1330,26 @@ function renderChapters(){
       </div>
       <div class="chapter-footer">
         <div>
-          ${c.next_revision
-            ? `<div class="next-rev">📅 Next rev: ${c.next_revision} ${c.next_revision<=today?'← <b>TODAY</b>':''}</div>`
-            : `<div class="next-rev">Mark Done to start revision cycle</div>`
-          }
-          <div class="rev-count">Revised ${c.revision_count||0} times</div>
+          ${c.next_revision?`<div class="next-rev">📅 Next rev: ${c.next_revision}${c.next_revision<=today?" ← <b style='color:var(--red)'>TODAY</b>":""}</div>`:`<div class="next-rev">Mark Done to start spaced revision</div>`}
+          <div class="rev-count">Revised ${c.revision_count||0}×</div>
         </div>
-        ${c.status==='done' ? `<button class="mark-revised-btn" data-mark-chapter-revised="${c.id}">📝 Revised</button>` : ''}
+        ${c.status==="done"?`<button class="mark-revised-btn" data-mark-chapter-revised="${c.id}">📝 Revised</button>`:""}
       </div>
-    </div>
-  `).join("");
+      <div class="ai-chapter-insight" id="aiInsight-${c.id}"></div>
+    </div>`).join("");
 
-  list.querySelectorAll("[data-status]").forEach(el=>{
-    el.addEventListener("change",e=>updateChapterStatus(el.dataset.status, e.target.value));
-  });
+  list.querySelectorAll("[data-status]").forEach(el=>el.addEventListener("change",e=>updateChapterStatus(el.dataset.status,e.target.value)));
   list.querySelectorAll("[data-conf]").forEach(el=>{
-    el.addEventListener("input",e=>{
-      $("confVal-"+el.dataset.conf).textContent = e.target.value+"%";
-    });
-    el.addEventListener("change",e=>updateChapterConfidence(el.dataset.conf, e.target.value));
+    el.addEventListener("input",e=>{ $("confVal-"+el.dataset.conf).textContent=e.target.value+"%"; });
+    el.addEventListener("change",e=>updateChapterConfidence(el.dataset.conf,e.target.value));
   });
-  list.querySelectorAll("[data-mark-chapter-revised]").forEach(el=>{
-    el.addEventListener("click",()=>markChapterRevised(el.dataset.markChapterRevised));
-  });
+  list.querySelectorAll("[data-mark-chapter-revised]").forEach(el=>el.addEventListener("click",()=>markChapterRevised(el.dataset.markChapterRevised)));
 }
 
-// Chapter filter chips
 document.querySelectorAll("[data-filter]").forEach(chip=>{
   chip.addEventListener("click",()=>{
-    chapterFilter = chip.dataset.filter;
-    document.querySelectorAll("[data-filter]").forEach(c=>{
-      c.className="filter-chip";
-    });
+    chapterFilter=chip.dataset.filter;
+    document.querySelectorAll("[data-filter]").forEach(c=>c.className="filter-chip");
     if(chapterFilter==="all") chip.classList.add("active-all");
     else if(chapterFilter==="Physics") chip.classList.add("active-phy");
     else if(chapterFilter==="Chemistry") chip.classList.add("active-chem");
@@ -1498,269 +1359,159 @@ document.querySelectorAll("[data-filter]").forEach(chip=>{
   });
 });
 
-const REVISION_GAPS = [1,3,7,15,30,60];
+const REVISION_GAPS=[1,3,7,15,30,60];
 
-async function updateChapterStatus(id, status){
-  const c = allChapters.find(x=>x.id===id);
-  const update = {status};
-  if(status==="done" && !c.next_revision){
-    const next = new Date();
-    next.setDate(next.getDate()+REVISION_GAPS[0]);
-    update.last_revision = todayISO();
-    update.next_revision = next.toISOString().slice(0,10);
-    update.revision_count = 0;
+async function updateChapterStatus(id,status){
+  const c=allChapters.find(x=>x.id===id);
+  const update={status};
+  if(status==="done"&&!c.next_revision){
+    const next=new Date(); next.setDate(next.getDate()+REVISION_GAPS[0]);
+    update.last_revision=todayISO(); update.next_revision=next.toISOString().slice(0,10); update.revision_count=0;
     toast("Chapter done! 🎉 First revision in 1 day.");
   }
-  const { error } = await sb.from("chapters").update(update).eq("id",id);
+  const {error}=await sb.from("chapters").update(update).eq("id",id);
   if(error){ console.error(error); return; }
-  Object.assign(c,update);
-  renderChapters();
-  updateRevisionStat();
-  updateSyllabusProgress();
+  Object.assign(c,update); renderChapters(); updateRevisionStat(); updateSyllabusProgress();
 }
 
-async function updateChapterConfidence(id, val){
-  const { error } = await sb.from("chapters").update({confidence:parseInt(val)}).eq("id",id);
+async function updateChapterConfidence(id,val){
+  const {error}=await sb.from("chapters").update({confidence:parseInt(val)}).eq("id",id);
   if(error){ console.error(error); return; }
-  const c = allChapters.find(x=>x.id===id);
-  c.confidence = parseInt(val);
-  updateSyllabusProgress();
+  const c=allChapters.find(x=>x.id===id); c.confidence=parseInt(val); updateSyllabusProgress();
 }
 
 async function markChapterRevised(id){
-  const c = allChapters.find(x=>x.id===id);
-  if(!c) return;
-  const revCount = (c.revision_count||0)+1;
-  const gapIdx = Math.min(revCount, REVISION_GAPS.length-1);
-  const next = new Date();
-  next.setDate(next.getDate()+REVISION_GAPS[gapIdx]);
-  const update = {
-    revision_count: revCount,
-    last_revision: todayISO(),
-    next_revision: next.toISOString().slice(0,10)
-  };
-  const { error } = await sb.from("chapters").update(update).eq("id",id);
+  const c=allChapters.find(x=>x.id===id); if(!c) return;
+  const revCount=(c.revision_count||0)+1;
+  const gapIdx=Math.min(revCount,REVISION_GAPS.length-1);
+  const next=new Date(); next.setDate(next.getDate()+REVISION_GAPS[gapIdx]);
+  const update={revision_count:revCount,last_revision:todayISO(),next_revision:next.toISOString().slice(0,10)};
+  const {error}=await sb.from("chapters").update(update).eq("id",id);
   if(error){ toast("Error","error"); return; }
-  Object.assign(c,update);
-  renderChapters();
-  updateRevisionStat();
-  toast(`Revision #${revCount} recorded! Next in ${REVISION_GAPS[gapIdx]} days 📅`);
+  Object.assign(c,update); renderChapters(); updateRevisionStat();
+  toast(`Revision #${revCount} done! Next in ${REVISION_GAPS[gapIdx]} days 📅`);
+  // AI chapter insight
+  const insightEl=$("aiInsight-"+id);
+  if(insightEl){
+    insightEl.textContent="🤖 Getting NEET tip..."; insightEl.classList.add("show");
+    const insight=await aiChapterInsight(c);
+    if(insight){ insightEl.textContent="🤖 "+insight; }
+    else { insightEl.classList.remove("show"); }
+  }
 }
 
 async function deleteChapter(id){
   if(!confirm("Delete this chapter?")) return;
-  const { error } = await sb.from("chapters").delete().eq("id",id);
+  const {error}=await sb.from("chapters").delete().eq("id",id);
   if(error){ toast("Error deleting","error"); return; }
-  allChapters = allChapters.filter(c=>c.id!==id);
-  renderChapters();
-  updateRevisionStat();
-  updateSyllabusProgress();
-  renderAdminChapters();
+  allChapters=allChapters.filter(c=>c.id!==id); renderChapters(); updateRevisionStat(); updateSyllabusProgress(); renderAdminChapters();
   toast("Chapter deleted");
 }
 
 function updateRevisionStat(){
-  const today = todayISO();
-  const due = allChapters.filter(c=>c.next_revision && c.next_revision<=today).length;
-  $("statRevisions").textContent = due;
+  const today=todayISO();
+  $("statRevisions").textContent=allChapters.filter(c=>c.next_revision&&c.next_revision<=today).length;
 }
 
 function updateSyllabusProgress(){
-  const subjects = ["Physics","Chemistry","Biology"];
-  let totalDone = 0, totalAll = 0;
-  subjects.forEach(s=>{
-    const sub = allChapters.filter(c=>c.subject===s);
-    const done = sub.filter(c=>c.status==="done").length;
-    const pct = sub.length ? Math.round((done/sub.length)*100) : 0;
-    if(s==="Physics"){ $("phyPct").textContent=pct+"%"; $("phyBar").style.width=pct+"%"; }
-    if(s==="Chemistry"){ $("chemPct").textContent=pct+"%"; $("chemBar").style.width=pct+"%"; }
-    if(s==="Biology"){ $("bioPct").textContent=pct+"%"; $("bioBar").style.width=pct+"%"; }
-    totalDone += done;
-    totalAll += sub.length;
+  ["Physics","Chemistry","Biology"].forEach(s=>{
+    const sub=allChapters.filter(c=>c.subject===s);
+    const pct=sub.length?Math.round(sub.filter(c=>c.status==="done").length/sub.length*100):0;
+    const key=s==="Physics"?"phy":s==="Chemistry"?"chem":"bio";
+    $(key+"Pct").textContent=pct+"%"; $(key+"Bar").style.width=pct+"%";
   });
-  const overall = totalAll ? Math.round((totalDone/totalAll)*100) : 0;
-  $("statSyllabus").textContent = overall+"%";
+  const all=allChapters; const done=all.filter(c=>c.status==="done").length;
+  $("statSyllabus").textContent=all.length?Math.round(done/all.length*100)+"%":"0%";
 }
 
-/* ─── Preloaded Chapters ─── */
-const NEET_SYLLABUS = {
-  Physics:[
-    "Physical World & Measurement","Kinematics","Laws of Motion",
-    "Work, Energy & Power","Motion of System of Particles & Rigid Body",
-    "Gravitation","Properties of Bulk Matter","Thermodynamics",
-    "Behaviour of Perfect Gas & Kinetic Theory","Oscillations & Waves",
-    "Electrostatics","Current Electricity","Magnetic Effects of Current",
-    "Magnetism & Matter","Electromagnetic Induction","Alternating Currents",
-    "Electromagnetic Waves","Ray Optics & Optical Instruments","Wave Optics",
-    "Dual Nature of Radiation & Matter","Atoms","Nuclei",
-    "Electronic Devices","Communication Systems"
-  ],
-  Chemistry:[
-    "Some Basic Concepts of Chemistry","Structure of Atom",
-    "Classification of Elements & Periodicity in Properties",
-    "Chemical Bonding & Molecular Structure","States of Matter",
-    "Thermodynamics","Equilibrium","Redox Reactions","Hydrogen",
-    "The s-Block Elements","The p-Block Elements (11th)","Organic Chemistry – Basic Principles",
-    "Hydrocarbons","Environmental Chemistry",
-    "The Solid State","Solutions","Electrochemistry","Chemical Kinetics",
-    "Surface Chemistry","General Principles of Extraction of Elements",
-    "The p-Block Elements (12th)","The d- and f-Block Elements",
-    "Coordination Compounds","Haloalkanes & Haloarenes",
-    "Alcohols, Phenols & Ethers","Aldehydes, Ketones & Carboxylic Acids",
-    "Organic Compounds Containing Nitrogen","Biomolecules","Polymers",
-    "Chemistry in Everyday Life"
-  ],
-  Biology:[
-    "The Living World","Biological Classification","Plant Kingdom","Animal Kingdom",
-    "Morphology of Flowering Plants","Anatomy of Flowering Plants",
-    "Structural Organisation in Animals","Cell: The Unit of Life",
-    "Biomolecules","Cell Cycle & Cell Division","Transport in Plants",
-    "Mineral Nutrition","Photosynthesis in Higher Plants",
-    "Respiration in Plants","Plant Growth & Development",
-    "Digestion & Absorption","Breathing & Exchange of Gases",
-    "Body Fluids & Circulation","Excretory Products & their Elimination",
-    "Locomotion & Movement","Neural Control & Coordination",
-    "Chemical Coordination & Integration",
-    "Reproduction in Organisms","Sexual Reproduction in Flowering Plants",
-    "Human Reproduction","Reproductive Health",
-    "Principles of Inheritance & Variation","Molecular Basis of Inheritance",
-    "Evolution","Human Health & Disease",
-    "Strategies for Enhancement in Food Production",
-    "Microbes in Human Welfare","Biotechnology: Principles & Processes",
-    "Biotechnology & its Applications","Organisms & Populations",
-    "Ecosystem","Biodiversity & Conservation","Environmental Issues"
-  ]
+/* ═══════════════════ PRELOADED CHAPTERS ═══════════════════ */
+const NEET_SYLLABUS={
+  Physics:["Physical World & Measurement","Kinematics","Laws of Motion","Work, Energy & Power","Motion of System of Particles & Rigid Body","Gravitation","Properties of Bulk Matter","Thermodynamics","Behaviour of Perfect Gas & Kinetic Theory","Oscillations & Waves","Electrostatics","Current Electricity","Magnetic Effects of Current","Magnetism & Matter","Electromagnetic Induction","Alternating Currents","Electromagnetic Waves","Ray Optics & Optical Instruments","Wave Optics","Dual Nature of Radiation & Matter","Atoms","Nuclei","Electronic Devices","Communication Systems"],
+  Chemistry:["Some Basic Concepts of Chemistry","Structure of Atom","Classification of Elements & Periodicity in Properties","Chemical Bonding & Molecular Structure","States of Matter","Thermodynamics","Equilibrium","Redox Reactions","Hydrogen","The s-Block Elements","The p-Block Elements (11th)","Organic Chemistry – Basic Principles","Hydrocarbons","Environmental Chemistry","The Solid State","Solutions","Electrochemistry","Chemical Kinetics","Surface Chemistry","General Principles of Extraction of Elements","The p-Block Elements (12th)","The d- and f-Block Elements","Coordination Compounds","Haloalkanes & Haloarenes","Alcohols, Phenols & Ethers","Aldehydes, Ketones & Carboxylic Acids","Organic Compounds Containing Nitrogen","Biomolecules","Polymers","Chemistry in Everyday Life"],
+  Biology:["The Living World","Biological Classification","Plant Kingdom","Animal Kingdom","Morphology of Flowering Plants","Anatomy of Flowering Plants","Structural Organisation in Animals","Cell: The Unit of Life","Biomolecules","Cell Cycle & Cell Division","Transport in Plants","Mineral Nutrition","Photosynthesis in Higher Plants","Respiration in Plants","Plant Growth & Development","Digestion & Absorption","Breathing & Exchange of Gases","Body Fluids & Circulation","Excretory Products & their Elimination","Locomotion & Movement","Neural Control & Coordination","Chemical Coordination & Integration","Reproduction in Organisms","Sexual Reproduction in Flowering Plants","Human Reproduction","Reproductive Health","Principles of Inheritance & Variation","Molecular Basis of Inheritance","Evolution","Human Health & Disease","Strategies for Enhancement in Food Production","Microbes in Human Welfare","Biotechnology: Principles & Processes","Biotechnology & its Applications","Organisms & Populations","Ecosystem","Biodiversity & Conservation","Environmental Issues"]
 };
 
-$("preloadChaptersBtn").addEventListener("click",()=>{
-  selectedPreloadChapters = new Set();
-  renderPreloadGrid();
-  $("preloadModal").classList.add("show");
-});
+$("preloadChaptersBtn").addEventListener("click",()=>{ selectedPreloadChapters=new Set(); renderPreloadGrid(); $("preloadModal").classList.add("show"); });
 $("closePreloadModal").addEventListener("click",()=>$("preloadModal").classList.remove("show"));
 
 document.querySelectorAll("[data-preload-tab]").forEach(tab=>{
   tab.addEventListener("click",()=>{
-    preloadTab = tab.dataset.preloadTab;
-    document.querySelectorAll("[data-preload-tab]").forEach(t=>{
-      t.className="filter-chip";
-    });
-    if(preloadTab==="Physics") tab.classList.add("active-phy");
-    else if(preloadTab==="Chemistry") tab.classList.add("active-chem");
-    else tab.classList.add("active-bio");
+    preloadTab=tab.dataset.preloadTab;
+    document.querySelectorAll("[data-preload-tab]").forEach(t=>t.className="filter-chip");
+    tab.classList.add(preloadTab==="Physics"?"active-phy":preloadTab==="Chemistry"?"active-chem":"active-bio");
     renderPreloadGrid();
   });
 });
 
 function renderPreloadGrid(){
-  const grid = $("preloadGrid");
-  const chapters = NEET_SYLLABUS[preloadTab];
-  const existing = new Set(allChapters.filter(c=>c.subject===preloadTab).map(c=>c.chapter_name));
-  const dotColor = preloadTab==="Physics"?"var(--phy)":preloadTab==="Chemistry"?"var(--chem)":"var(--bio)";
-
-  grid.innerHTML = chapters.map(name=>{
-    const alreadyAdded = existing.has(name);
-    const selected = selectedPreloadChapters.has(name);
-    return `
-      <div class="preload-chip ${alreadyAdded?'added':''} ${selected?'selected':''}" 
-           data-chapter="${escapeHtml(name)}" 
-           style="${selected?'border-color:var(--green);background:var(--green-pale);':''}${alreadyAdded?'':'cursor:pointer;'}">
-        <span class="chip-dot" style="background:${alreadyAdded?'#ccc':dotColor};"></span>
-        <span>${escapeHtml(name)}</span>
-        ${alreadyAdded?'<span style="margin-left:auto;font-size:10px;color:#aaa;">✓</span>':''}
-        ${selected?'<span style="margin-left:auto;font-size:10px;color:var(--green);">✓</span>':''}
-      </div>
-    `;
+  const grid=$("preloadGrid");
+  const chapters=NEET_SYLLABUS[preloadTab];
+  const existing=new Set(allChapters.filter(c=>c.subject===preloadTab).map(c=>c.chapter_name));
+  const dotColor=preloadTab==="Physics"?"var(--phy)":preloadTab==="Chemistry"?"var(--chem)":"var(--bio)";
+  grid.innerHTML=chapters.map(name=>{
+    const added=existing.has(name); const sel=selectedPreloadChapters.has(name);
+    return `<div class="preload-chip ${added?"added":""}" data-chapter="${escapeHtml(name)}" style="${sel?"border-color:var(--green);background:var(--green-pale);":""}">
+      <span class="chip-dot" style="background:${added?"#ccc":dotColor};"></span>
+      <span>${escapeHtml(name)}</span>
+      ${added?`<span style="margin-left:auto;font-size:10px;color:#aaa;">✓</span>`:""}
+      ${sel&&!added?`<span style="margin-left:auto;font-size:10px;color:var(--green);">✓</span>`:""}
+    </div>`;
   }).join("");
-
   grid.querySelectorAll(".preload-chip:not(.added)").forEach(chip=>{
     chip.addEventListener("click",()=>{
-      const name = chip.dataset.chapter;
-      if(selectedPreloadChapters.has(name)) selectedPreloadChapters.delete(name);
-      else selectedPreloadChapters.add(name);
+      const name=chip.dataset.chapter;
+      if(selectedPreloadChapters.has(name)) selectedPreloadChapters.delete(name); else selectedPreloadChapters.add(name);
       renderPreloadGrid();
     });
   });
 }
 
 $("addSelectedChaptersBtn").addEventListener("click", async ()=>{
-  if(selectedPreloadChapters.size===0){ toast("Select at least one chapter","error"); return; }
-  const btn = $("addSelectedChaptersBtn");
-  btn.disabled=true; btn.textContent="Adding...";
-  const rows = [...selectedPreloadChapters].map(name=>({
-    subject:preloadTab, chapter_name:name, status:"not_started", confidence:0, revision_count:0
-  }));
-  const { error } = await sb.from("chapters").insert(rows);
+  if(!selectedPreloadChapters.size){ toast("Select chapters first","error"); return; }
+  const btn=$("addSelectedChaptersBtn"); btn.disabled=true; btn.textContent="Adding...";
+  const rows=[...selectedPreloadChapters].map(name=>({subject:preloadTab,chapter_name:name,status:"not_started",confidence:0,revision_count:0}));
+  const {error}=await sb.from("chapters").insert(rows);
   btn.disabled=false; btn.textContent="Add Selected";
-  if(error){ toast("Error adding chapters","error"); console.error(error); return; }
-  toast(`${rows.length} chapters added ✓`);
-  selectedPreloadChapters = new Set();
-  $("preloadModal").classList.remove("show");
-  loadChapters();
+  if(error){ toast("Error adding chapters","error"); return; }
+  toast(`${rows.length} chapters added ✓`); selectedPreloadChapters=new Set(); $("preloadModal").classList.remove("show"); loadChapters();
 });
 
-/* ─── Floating Action Button ─── */
+/* ═══════════════════ AI STUDY PLAN ═══════════════════ */
+$("generatePlanBtn").addEventListener("click", generateStudyPlan);
+
+/* ═══════════════════ FAB ═══════════════════ */
 $("fabBtn").addEventListener("click",()=>{
-  fabOpen = !fabOpen;
-  $("fabMenu").classList.toggle("open",fabOpen);
-  $("fabBtn").textContent = fabOpen ? "✕" : "＋";
-  $("fabBtn").style.transform = fabOpen ? "rotate(45deg)" : "";
+  fabOpen=!fabOpen; $("fabMenu").classList.toggle("open",fabOpen);
+  $("fabBtn").textContent=fabOpen?"✕":"＋"; $("fabBtn").style.transform=fabOpen?"rotate(45deg)":"";
 });
-
-$("fabTarget").addEventListener("click",()=>{
-  fabOpen=false;
-  $("fabMenu").classList.remove("open");
-  $("fabBtn").textContent="＋";
-  $("topicInput").scrollIntoView({behavior:"smooth",block:"center"});
-  setTimeout(()=>$("topicInput").focus(),500);
+$("fabAiPlan").addEventListener("click",()=>{
+  fabOpen=false; $("fabMenu").classList.remove("open"); $("fabBtn").textContent="＋";
+  $("generatePlanBtn").scrollIntoView({behavior:"smooth",block:"center"});
+  setTimeout(()=>generateStudyPlan(),600);
 });
+$("fabTarget").addEventListener("click",()=>{ fabOpen=false; $("fabMenu").classList.remove("open"); $("fabBtn").textContent="＋"; $("topicInput").scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(()=>$("topicInput").focus(),500); });
+$("fabChapter").addEventListener("click",()=>{ fabOpen=false; $("fabMenu").classList.remove("open"); $("fabBtn").textContent="＋"; $("chName").scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(()=>$("chName").focus(),500); });
+$("fabScrollTop").addEventListener("click",()=>{ fabOpen=false; $("fabMenu").classList.remove("open"); $("fabBtn").textContent="＋"; window.scrollTo({top:0,behavior:"smooth"}); });
+document.addEventListener("click",e=>{ if(fabOpen&&!e.target.closest(".fab")&&!e.target.closest(".fab-menu")){ fabOpen=false; $("fabMenu").classList.remove("open"); $("fabBtn").textContent="＋"; } });
 
-$("fabChapter").addEventListener("click",()=>{
-  fabOpen=false;
-  $("fabMenu").classList.remove("open");
-  $("fabBtn").textContent="＋";
-  $("chName").scrollIntoView({behavior:"smooth",block:"center"});
-  setTimeout(()=>$("chName").focus(),500);
-});
-
-$("fabScrollTop").addEventListener("click",()=>{
-  fabOpen=false;
-  $("fabMenu").classList.remove("open");
-  $("fabBtn").textContent="＋";
-  window.scrollTo({top:0,behavior:"smooth"});
-});
-
-// Close FAB when clicking outside
-document.addEventListener("click",e=>{
-  if(fabOpen && !e.target.closest(".fab") && !e.target.closest(".fab-menu")){
-    fabOpen=false;
-    $("fabMenu").classList.remove("open");
-    $("fabBtn").textContent="＋";
-  }
-});
-
-// Close modals clicking backdrop
-document.querySelectorAll(".modal-backdrop").forEach(bd=>{
-  bd.addEventListener("click",e=>{
-    if(e.target===bd) bd.classList.remove("show");
-  });
-});
-
-// Enter key on name
+/* ═══════════════════ MODAL CLOSE ═══════════════════ */
+document.querySelectorAll(".modal-backdrop").forEach(bd=>bd.addEventListener("click",e=>{ if(e.target===bd) bd.classList.remove("show"); }));
 $("nameInput").addEventListener("keydown",e=>{ if(e.key==="Enter") $("saveNameBtn").click(); });
 $("pinInput").addEventListener("keydown",e=>{ if(e.key==="Enter") $("savePinBtn").click(); });
 $("topicInput").addEventListener("keydown",e=>{ if(e.key==="Enter") $("addTargetBtn").click(); });
 $("chName").addEventListener("keydown",e=>{ if(e.key==="Enter") $("addChapterBtn").click(); });
 
-/* ─── Init ─── */
-renderCountdown();
-loadQuote();
-loadName();
-loadFlashMessage();
-build7DayStrip();
-loadTargets();
-loadChapters();
-updateStreak();
+/* ═══════════════════ INIT ═══════════════════ */
+renderCountdown(); loadFallbackQuote();
+loadName(); loadFlashMessage();
+build7DayStrip(); updateStreak();
+// Load data then trigger AI briefing
+(async ()=>{
+  await loadTargets();
+  await loadChapters();
+  // Small delay so page is visible before AI starts
+  setTimeout(()=>runDailyBriefing(), 1500);
+})();
 </script>
 </body>
 </html>
