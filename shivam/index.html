@@ -293,6 +293,105 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
 .rev-due-today{background:var(--red-pale);border-left-color:var(--red);}
 
 footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+
+/* ══════════════════ NEW FEATURES ══════════════════ */
+
+/* Reality Board */
+.reality-board{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-top:12px;overflow:hidden;}
+.rb-item{text-align:center;padding:10px 6px;}
+.rb-item:not(:last-child){border-right:1px solid var(--line);}
+.rb-num{font-family:'IBM Plex Mono';font-size:19px;font-weight:700;color:var(--green-dark);}
+.rb-num.urgent{color:var(--red);}
+.rb-label{font-size:8.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-top:2px;font-family:'IBM Plex Mono';}
+
+/* DPS Card */
+.dps-card{background:linear-gradient(135deg,#1D4ED8,#7C3AED);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-top:12px;display:flex;align-items:center;gap:14px;}
+.dps-left{flex-shrink:0;text-align:center;min-width:64px;}
+.dps-score{font-family:'IBM Plex Mono';font-size:44px;font-weight:700;line-height:1;}
+.dps-lbl{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;font-family:'IBM Plex Mono';margin-top:2px;}
+.dps-right{flex:1;}
+.dps-bd{font-size:10.5px;opacity:.85;line-height:1.85;font-family:'IBM Plex Mono';}
+.dps-bar{background:rgba(255,255,255,.25);border-radius:99px;height:6px;margin-top:8px;overflow:hidden;}
+.dps-bar-fill{background:#fff;height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.16,1,.3,1);width:0%;}
+
+/* Subject Balance Alarm */
+.subj-alarm{border-radius:var(--radius);padding:10px 14px;background:linear-gradient(135deg,#6D28D9,#7C3AED);color:#fff;font-size:13px;font-weight:500;line-height:1.5;margin-top:10px;display:none;animation:slideDown .4s cubic-bezier(.16,1,.3,1);}
+.subj-alarm.show{display:block;}
+
+/* Heatmap */
+.hm-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;}
+.hm-subj{margin-bottom:14px;}
+.hm-subj:last-child{margin-bottom:0;}
+.hm-subj-lbl{font-size:11px;font-weight:700;font-family:'IBM Plex Mono';text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:flex;justify-content:space-between;}
+.hm-grid{display:flex;flex-wrap:wrap;gap:3px;}
+.hm-cell{width:25px;height:25px;border-radius:5px;cursor:pointer;font-size:7px;font-family:'IBM Plex Mono';font-weight:700;position:relative;transition:transform .12s,box-shadow .12s;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;}
+.hm-cell:hover{transform:scale(1.3);z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+.hm-cell.ns{background:#E5E7EB;color:#9CA3AF;border-color:#D1D5DB;}
+.hm-cell.ip-lo{background:#FCA5A5;color:#7F1D1D;border-color:#F87171;}
+.hm-cell.ip-md{background:#FDE68A;color:#78350F;border-color:#FCD34D;}
+.hm-cell.ip-hi{background:#86EFAC;color:#14532D;border-color:#4ADE80;}
+.hm-cell.dn{background:#16A34A;color:#fff;border-color:#15803D;}
+.hm-tooltip{position:fixed;background:#1a1a1a;color:#fff;padding:8px 10px;border-radius:8px;font-size:11px;line-height:1.5;z-index:9999;pointer-events:none;max-width:190px;display:none;box-shadow:0 4px 16px rgba(0,0,0,.35);}
+.hm-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+.hm-leg{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ink-soft);font-family:'IBM Plex Mono';}
+.hm-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+/* MCQ Challenge */
+.mcq-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+.mcq-hdr{background:linear-gradient(135deg,#0F766E,#0D9488);padding:13px 16px;display:flex;gap:10px;align-items:center;}
+.mcq-hdr-info h4{font-family:'Spectral';font-size:16px;font-weight:600;color:#fff;margin:0;}
+.mcq-hdr-info p{font-size:10.5px;color:rgba(255,255,255,.75);font-family:'IBM Plex Mono';margin-top:2px;}
+.mcq-body{padding:14px;}
+.mcq-prog-row{display:flex;gap:5px;margin-bottom:12px;align-items:center;}
+.mcq-pdot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:background .3s;}
+.mcq-pdot.c{background:var(--green);}
+.mcq-pdot.w{background:var(--red);}
+.mcq-score-lbl{margin-left:auto;font-size:10px;font-family:'IBM Plex Mono';color:var(--ink-soft);}
+.mcq-q{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+.mcq-q:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.mcq-ctag{font-size:9.5px;font-family:'IBM Plex Mono';color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.mcq-qtext{font-size:13.5px;font-weight:600;line-height:1.5;margin-bottom:8px;}
+.mcq-opts{display:flex;flex-direction:column;gap:5px;}
+.mcq-opt{padding:9px 12px;border-radius:8px;border:1.5px solid var(--line);cursor:pointer;font-size:12.5px;transition:all .12s;background:#FCFDFC;}
+.mcq-opt:hover:not(.disabled){border-color:var(--green);background:var(--green-pale);}
+.mcq-opt.correct{background:var(--green-pale);border-color:var(--green);color:var(--green-dark);font-weight:600;}
+.mcq-opt.wrong{background:var(--red-pale);border-color:var(--red);color:var(--red);}
+.mcq-opt.reveal{background:var(--green-pale);border-color:var(--green);color:var(--green-dark);opacity:.6;}
+.mcq-opt.disabled{pointer-events:none;}
+.mcq-exp{margin-top:7px;font-size:12px;background:var(--gold-pale);border-left:3px solid var(--gold);padding:7px 10px;border-radius:0 8px 8px 0;display:none;line-height:1.6;color:var(--ink);}
+.mcq-exp.show{display:block;}
+.mcq-result{background:var(--green-pale);border:1px solid var(--green);border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:700;color:var(--green-dark);display:none;margin-top:8px;}
+.mcq-result.show{display:block;}
+
+/* Time Budget */
+.budget-wrap{background:var(--blue-pale);border:1px solid #BFDBFE;border-radius:var(--radius);padding:14px;margin-top:10px;}
+.budget-inp-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+.budget-hrs{width:68px;text-align:center;font-family:'IBM Plex Mono';font-size:20px;font-weight:700;color:var(--blue);}
+.budget-out{background:#fff;border:1px solid #BFDBFE;border-radius:9px;padding:12px;font-size:13px;line-height:1.85;white-space:pre-wrap;display:none;color:var(--ink);}
+.budget-out.show{display:block;}
+
+/* Trophy Wall */
+.trophy-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.trophy-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 5px;text-align:center;transition:transform .15s;}
+.trophy-card.earned{border-color:var(--gold);background:var(--gold-pale);box-shadow:0 2px 10px rgba(176,141,87,.2);}
+.trophy-card.earned:hover{transform:translateY(-2px);}
+.trophy-em{font-size:22px;display:block;margin-bottom:4px;}
+.trophy-card:not(.earned) .trophy-em{filter:grayscale(1);opacity:.25;}
+.trophy-nm{font-size:8.5px;font-family:'IBM Plex Mono';color:var(--ink-soft);line-height:1.3;}
+.trophy-card.earned .trophy-nm{color:#92400E;font-weight:700;}
+
+/* Notes Modal */
+.notes-sub{font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono';margin-bottom:12px;margin-top:-6px;}
+.notes-area{min-height:100px;font-size:13px;line-height:1.7;}
+.notes-ai-row{display:flex;gap:8px;margin-top:10px;}
+.notes-ai-inp{flex:1;font-size:13px;}
+.notes-status{font-size:12px;background:var(--blue-pale);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:9px 11px;display:none;line-height:1.6;margin-top:8px;color:var(--ink);}
+.notes-status.show{display:block;}
+.notes-status.ok{background:var(--green-pale);border-color:var(--green);color:var(--green-dark);}
+.notes-status.ng{background:var(--red-pale);border-color:var(--red);color:var(--red);}
+.notes-btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.mark-revised-btn[data-notes-btn]{background:var(--blue-pale);border-color:var(--blue);color:var(--blue);}
+
 </style>
 </head>
 <body>
@@ -359,12 +458,33 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
     <div class="stat"><div class="stat-num" id="statSyllabus">0%</div><div class="stat-label">Syllabus</div></div>
   </div>
 
+
+  <!-- DPS CARD -->
+  <div class="dps-card" id="dpsCard">
+    <div class="dps-left">
+      <div class="dps-score" id="dpsScore">—</div>
+      <div class="dps-lbl">DPS</div>
+    </div>
+    <div class="dps-right">
+      <div class="dps-bd" id="dpsBd">Calculating daily score...</div>
+      <div class="dps-bar"><div class="dps-bar-fill" id="dpsFill"></div></div>
+    </div>
+  </div>
+
   <!-- SUBJECT LEGEND -->
   <div class="subject-legend">
     <div class="subj-pill pill-phy"><span class="subj-dot" style="background:var(--phy)"></span>Physics</div>
     <div class="subj-pill pill-chem"><span class="subj-dot" style="background:var(--chem)"></span>Chemistry</div>
     <div class="subj-pill pill-bio"><span class="subj-dot" style="background:var(--bio)"></span>Biology</div>
     <div class="subj-pill pill-other"><span class="subj-dot" style="background:var(--other)"></span>Others</div>
+  </div>
+
+
+  <!-- REALITY BOARD -->
+  <div class="reality-board" id="realityBoard">
+    <div class="rb-item"><div class="rb-num" id="rbDays">—</div><div class="rb-label">Days Left</div></div>
+    <div class="rb-item"><div class="rb-num urgent" id="rbPending">—</div><div class="rb-label">Chapters Pending</div></div>
+    <div class="rb-item"><div class="rb-num" id="rbRate">—</div><div class="rb-label">Needed/Day</div></div>
   </div>
 
   <!-- 7-DAY STRIP + GRAPH -->
@@ -400,6 +520,19 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
     </div>
   </div>
 
+
+  <!-- CHAPTER HEATMAP -->
+  <div class="section" id="heatmapSection">
+    <div class="section-head">
+      <div class="section-title">📊 Chapter Heatmap</div>
+      <div class="section-note">tap any cell for details</div>
+    </div>
+    <div class="hm-wrap" id="heatmapWrap">
+      <div style="font-size:13px;color:var(--ink-soft);text-align:center;padding:16px 0;">Loading chapters...</div>
+    </div>
+  </div>
+  <div class="hm-tooltip" id="hmTooltip"></div>
+
   <!-- AI STUDY PLAN SECTION -->
   <div class="section">
     <div class="section-head">
@@ -415,6 +548,49 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       </div>
     </div>
   </div>
+
+
+  <!-- MCQ MORNING CHALLENGE -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">🧠 3-MCQ Daily Challenge</div>
+    </div>
+    <div class="mcq-wrap" id="mcqWrap">
+      <div class="mcq-hdr">
+        <span style="font-size:22px;">🎯</span>
+        <div class="mcq-hdr-info">
+          <h4>Morning Challenge</h4>
+          <p>AI picks 3 questions from your weak/revision-due chapters</p>
+        </div>
+      </div>
+      <div class="mcq-body" id="mcqBody">
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;line-height:1.5;">
+          Test your knowledge daily. Confidence auto-updates on your answers.
+        </div>
+        <button class="btn-ai" id="generateMCQBtn" style="background:linear-gradient(135deg,#0F766E,#0D9488);">🎯 Generate Today's Challenge</button>
+        <div id="mcqContent" style="margin-top:14px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMART TIME BUDGET -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">⏱ Smart Time Budget</div>
+    </div>
+    <div class="budget-wrap">
+      <div style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;">Tell AI how many hours you have — it distributes across subjects based on your weak data.</div>
+      <div class="budget-inp-row">
+        <input type="number" class="budget-hrs" id="budgetHrsInput" min="1" max="16" value="6" placeholder="hrs">
+        <label style="font-size:13px;color:var(--ink-soft);">hours available today</label>
+      </div>
+      <button class="btn-ai" id="budgetBtn" style="background:linear-gradient(135deg,#1D4ED8,#2563EB);width:100%;">⏱ Distribute My Time</button>
+      <div class="budget-out" id="budgetOut"></div>
+    </div>
+  </div>
+
+  <!-- SUBJECT BALANCE ALARM -->
+  <div class="subj-alarm" id="subjectAlarm"></div>
 
   <!-- DAILY TARGETS -->
   <div class="section">
@@ -477,6 +653,16 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
       </div>
     </div>
     <div id="chapterList" style="display:none;"></div>
+  </div>
+
+
+  <!-- TROPHY WALL -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">🏅 Trophy Wall</div>
+      <div class="section-note" id="trophyCount">0 earned</div>
+    </div>
+    <div class="trophy-grid" id="trophyGrid"></div>
   </div>
 
   <!-- ADMIN PANEL -->
@@ -1284,9 +1470,11 @@ async function saveComment(id,fromAdmin=false){
 }
 
 function updateStats(){
-  if(!allTargets.length){ $("statToday").textContent="0%"; return; }
+  if(!allTargets.length){ $("statToday").textContent="0%"; calcAndRenderDPS(); return; }
   const done=allTargets.filter(t=>t.status==="done").length;
   $("statToday").textContent=Math.round((done/allTargets.length)*100)+"%";
+  calcAndRenderDPS();
+  checkTrophies();
 }
 
 async function rebuildChart(){
@@ -1310,8 +1498,12 @@ async function loadChapters(){
   if(error){ console.error(error); return; }
   allChapters=data||[];
   renderChapters(); updateRevisionStat(); updateSyllabusProgress();
+  renderHeatmap();
+  renderRealityBoard();
+  calcAndRenderDPS();
+  checkTrophies();
   // After data loads, trigger AI checks on page load
-  setTimeout(()=>{ aiCheckRevisions(); aiCheckNeglectedSubjects(); },3000);
+  setTimeout(()=>{ aiCheckRevisions(); aiCheckNeglectedSubjects(); checkSubjectBalance(); },3000);
 }
 
 function renderChapters(){
@@ -1344,6 +1536,7 @@ function renderChapters(){
           <div class="rev-count">Revised ${c.revision_count||0}×</div>
         </div>
         ${c.status==="done"?`<button class="mark-revised-btn" data-mark-chapter-revised="${c.id}">📝 Revised</button>`:""}
+        <button class="mark-revised-btn" style="background:var(--blue-pale);color:var(--blue);border-color:var(--blue);" data-notes-btn="${c.id}" data-chapter-name="${escapeHtml(c.chapter_name)}" data-subject="${c.subject}">🗒 Notes</button>
       </div>
       <div class="ai-chapter-insight" id="aiInsight-${c.id}"></div>
     </div>`).join("");
@@ -1354,6 +1547,7 @@ function renderChapters(){
     el.addEventListener("change",e=>updateChapterConfidence(el.dataset.conf,e.target.value));
   });
   list.querySelectorAll("[data-mark-chapter-revised]").forEach(el=>el.addEventListener("click",()=>markChapterRevised(el.dataset.markChapterRevised)));
+  list.querySelectorAll("[data-notes-btn]").forEach(el=>el.addEventListener("click",()=>openNotesModal(el.dataset)));
 }
 
 document.querySelectorAll("[data-filter]").forEach(chip=>{
@@ -1522,6 +1716,436 @@ build7DayStrip(); updateStreak();
   // Small delay so page is visible before AI starts
   setTimeout(()=>runDailyBriefing(), 1500);
 })();
+/* ═══════════════════════════════════════════════════════
+   NEW FEATURES JS
+═══════════════════════════════════════════════════════ */
+
+/* ── PYQ WEIGHTAGE DATA ── */
+const PYQ = {
+  Physics:{"Physical World & Measurement":1,"Kinematics":3,"Laws of Motion":3,"Work, Energy & Power":4,"Motion of System of Particles & Rigid Body":2,"Gravitation":2,"Properties of Bulk Matter":2,"Thermodynamics":3,"Behaviour of Perfect Gas & Kinetic Theory":2,"Oscillations & Waves":3,"Electrostatics":5,"Current Electricity":5,"Magnetic Effects of Current":4,"Magnetism & Matter":2,"Electromagnetic Induction":3,"Alternating Currents":2,"Electromagnetic Waves":1,"Ray Optics & Optical Instruments":5,"Wave Optics":2,"Dual Nature of Radiation & Matter":2,"Atoms":2,"Nuclei":2,"Electronic Devices":1,"Communication Systems":0},
+  Chemistry:{"Some Basic Concepts of Chemistry":2,"Structure of Atom":3,"Classification of Elements & Periodicity in Properties":2,"Chemical Bonding & Molecular Structure":4,"States of Matter":2,"Thermodynamics":3,"Equilibrium":4,"Redox Reactions":1,"Hydrogen":1,"The s-Block Elements":2,"The p-Block Elements (11th)":3,"Organic Chemistry \u2013 Basic Principles":3,"Hydrocarbons":2,"Environmental Chemistry":1,"The Solid State":3,"Solutions":3,"Electrochemistry":3,"Chemical Kinetics":3,"Surface Chemistry":1,"General Principles of Extraction of Elements":1,"The p-Block Elements (12th)":4,"The d- and f-Block Elements":3,"Coordination Compounds":4,"Haloalkanes & Haloarenes":2,"Alcohols, Phenols & Ethers":2,"Aldehydes, Ketones & Carboxylic Acids":3,"Organic Compounds Containing Nitrogen":2,"Biomolecules":2,"Polymers":1,"Chemistry in Everyday Life":1},
+  Biology:{"The Living World":1,"Biological Classification":2,"Plant Kingdom":3,"Animal Kingdom":3,"Morphology of Flowering Plants":4,"Anatomy of Flowering Plants":2,"Structural Organisation in Animals":1,"Cell: The Unit of Life":4,"Biomolecules":3,"Cell Cycle & Cell Division":3,"Transport in Plants":2,"Mineral Nutrition":2,"Photosynthesis in Higher Plants":3,"Respiration in Plants":2,"Plant Growth & Development":1,"Digestion & Absorption":3,"Breathing & Exchange of Gases":2,"Body Fluids & Circulation":3,"Excretory Products & their Elimination":3,"Locomotion & Movement":2,"Neural Control & Coordination":4,"Chemical Coordination & Integration":3,"Reproduction in Organisms":2,"Sexual Reproduction in Flowering Plants":3,"Human Reproduction":4,"Reproductive Health":2,"Principles of Inheritance & Variation":5,"Molecular Basis of Inheritance":6,"Evolution":3,"Human Health & Disease":4,"Strategies for Enhancement in Food Production":2,"Microbes in Human Welfare":2,"Biotechnology: Principles & Processes":3,"Biotechnology & its Applications":3,"Organisms & Populations":3,"Ecosystem":3,"Biodiversity & Conservation":3,"Environmental Issues":2}
+};
+
+/* ── REALITY BOARD ── */
+function renderRealityBoard(){
+  const today = todayISO();
+  const diff = Math.ceil((new Date("2027-05-02") - new Date()) / 864e5);
+  const pending = allChapters.filter(c=>c.status!=="done").length;
+  const rate = diff > 0 && pending > 0 ? (pending/diff).toFixed(2) : "0.00";
+  $("rbDays").textContent = diff;
+  $("rbPending").textContent = pending;
+  $("rbRate").textContent = rate;
+  $("rbRate").className = "rb-num" + (parseFloat(rate) > 1 ? " urgent" : "");
+}
+
+/* ── DPS CALCULATION ── */
+function calcAndRenderDPS(){
+  const streak = parseInt(localStorage.getItem("shivam_streak")||"0");
+  const total = allTargets.length;
+  const done = allTargets.filter(t=>t.status==="done").length;
+  const subjects = new Set(allTargets.map(t=>t.subject));
+  const today = todayISO();
+  const revDueCount = allChapters.filter(c=>c.next_revision&&c.next_revision<=today).length;
+  const allDone = allChapters.filter(c=>c.status==="done").length;
+  const avgConf = allChapters.length ? Math.round(allChapters.reduce((a,c)=>a+c.confidence,0)/allChapters.length) : 0;
+
+  // Scoring
+  const taskScore = total ? Math.round((done/total)*35) : 0;
+  const subjScore = Math.min(subjects.size,3)*5;
+  const streakScore = Math.min(Math.round(streak/30*10),10);
+  const syllScore = allChapters.length ? Math.round((allDone/allChapters.length)*20) : 0;
+  const revScore = revDueCount===0 ? 10 : Math.max(0,10-revDueCount*2);
+  const dps = taskScore + subjScore + streakScore + syllScore + revScore;
+
+  const grade = dps>=90?"S Rank 🔥":dps>=75?"A Rank ⭐":dps>=60?"B Rank 💪":dps>=40?"C Rank 📖":"D Rank 😤";
+  $("dpsScore").textContent = dps;
+  $("dpsFill").style.width = dps + "%";
+  $("dpsBd").innerHTML = `Tasks ${taskScore}/35  Subjects ${subjScore}/15\nStreak ${streakScore}/10  Syllabus ${syllScore}/20\nRevisions ${revScore}/10  — ${grade}`;
+}
+
+/* ── CHAPTER HEATMAP ── */
+function renderHeatmap(){
+  const wrap = $("heatmapWrap");
+  const subjects = ["Physics","Chemistry","Biology"];
+  const colors = {Physics:"var(--phy)",Chemistry:"var(--chem)",Biology:"var(--bio)"};
+  const labels = {Physics:"⚡",Chemistry:"🧪",Biology:"🌿"};
+
+  if(!allChapters.length){
+    wrap.innerHTML=`<div style="font-size:13px;color:var(--ink-soft);text-align:center;padding:20px 0;">Add chapters to see heatmap 📊</div>`;
+    return;
+  }
+
+  let html = "";
+  subjects.forEach(subj=>{
+    const sylList = NEET_SYLLABUS[subj] || [];
+    const chMap = {};
+    allChapters.filter(c=>c.subject===subj).forEach(c=>{ chMap[c.chapter_name]=c; });
+    const cells = sylList.map((name,i)=>{
+      const c = chMap[name];
+      const pyq = PYQ[subj]?.[name] || 0;
+      const pyqStr = pyq>=5?"◆◆◆":pyq>=3?"◆◆":pyq>=1?"◆":"";
+      if(!c){
+        return `<div class="hm-cell ns" data-tooltip="${escapeHtml(name)}\nPYQ: ${pyq}q\nNot in tracker">${pyqStr}</div>`;
+      }
+      let cls="ns";
+      if(c.status==="done") cls="dn";
+      else if(c.status==="in_progress"){
+        cls=c.confidence>=70?"ip-hi":c.confidence>=40?"ip-md":"ip-lo";
+      }
+      const revTxt = c.next_revision?(c.next_revision<=todayISO()?"Rev: TODAY":"Rev: "+c.next_revision):"No revision set";
+      return `<div class="hm-cell ${cls}" data-tooltip="${escapeHtml(name)}\n${subj} · ${c.status.replace("_"," ")}\nConf: ${c.confidence}%  PYQ: ${pyq}q\n${revTxt}">${pyqStr}</div>`;
+    }).join("");
+    const done = allChapters.filter(c=>c.subject===subj&&c.status==="done").length;
+    const tracked = allChapters.filter(c=>c.subject===subj).length;
+    html += `<div class="hm-subj"><div class="hm-subj-lbl"><span style="color:${colors[subj]}">${labels[subj]} ${subj}</span><span style="font-weight:400;color:var(--ink-soft)">${done}/${sylList.length} done</span></div><div class="hm-grid">${cells}</div></div>`;
+  });
+
+  html += `<div class="hm-legend">
+    <div class="hm-leg"><div class="hm-leg-dot" style="background:#E5E7EB"></div>Not started</div>
+    <div class="hm-leg"><div class="hm-leg-dot" style="background:#FCA5A5"></div>In progress (low)</div>
+    <div class="hm-leg"><div class="hm-leg-dot" style="background:#FDE68A"></div>In progress (mid)</div>
+    <div class="hm-leg"><div class="hm-leg-dot" style="background:#86EFAC"></div>In progress (high)</div>
+    <div class="hm-leg"><div class="hm-leg-dot" style="background:#16A34A"></div>Done ◆=PYQ qs</div>
+  </div>`;
+  wrap.innerHTML = html;
+
+  // Tooltip on tap/hover
+  const tooltip = $("hmTooltip");
+  wrap.querySelectorAll(".hm-cell").forEach(cell=>{
+    const show = (e)=>{
+      const tip = cell.dataset.tooltip;
+      if(!tip) return;
+      tooltip.innerHTML = tip.split("\n").map(l=>`<div>${escapeHtml(l)}</div>`).join("");
+      tooltip.style.display = "block";
+      const rect = cell.getBoundingClientRect();
+      let top = rect.top - tooltip.offsetHeight - 6;
+      if(top<8) top = rect.bottom+6;
+      let left = rect.left - 20;
+      if(left+190>window.innerWidth) left=window.innerWidth-196;
+      tooltip.style.top = top+"px";
+      tooltip.style.left = left+"px";
+    };
+    cell.addEventListener("mouseenter",show);
+    cell.addEventListener("touchstart",show,{passive:true});
+    cell.addEventListener("mouseleave",()=>{ tooltip.style.display="none"; });
+    cell.addEventListener("touchend",()=>setTimeout(()=>tooltip.style.display="none",2000));
+  });
+}
+
+/* ── MCQ MORNING CHALLENGE ── */
+let mcqData = [];
+let mcqAnswered = [];
+
+$("generateMCQBtn").addEventListener("click", async ()=>{
+  const btn = $("generateMCQBtn");
+  btn.disabled=true;
+  btn.innerHTML = `<div class="ai-dots"><span></span><span></span><span></span></div> Generating...`;
+  $("mcqContent").style.display="none";
+
+  const today = todayISO();
+  let chapters = allChapters.filter(c=>c.next_revision&&c.next_revision<=today);
+  if(chapters.length<3) chapters = [...chapters,...allChapters.filter(c=>c.confidence<50&&c.status!=="not_started")];
+  if(chapters.length<3) chapters = [...chapters,...allChapters.filter(c=>c.status!=="not_started")];
+  if(!chapters.length){ $("mcqContent").style.display="block"; $("mcqContent").innerHTML=`<div class="mcq-empty">📖 Add and start some chapters first to get MCQ challenges!</div>`; btn.disabled=false; btn.innerHTML="🎯 Generate Today's Challenge"; return; }
+
+  const picks = [...new Set(chapters)].slice(0,3);
+  const chStr = picks.map(c=>c.chapter_name+" ("+c.subject+")").join(", ");
+
+  const raw = await groqChat(
+    `You are a NEET 2027 MCQ expert. Return ONLY valid JSON, no extra text, no markdown backticks.`,
+    `Generate exactly 3 NEET-style MCQs for these chapters: ${chStr}.
+Return ONLY this JSON structure:
+{"questions":[{"chapter":"name","subject":"subj","q":"question?","opts":["A","B","C","D"],"ans":0,"exp":"short explanation"}]}
+ans is 0-3 index. Make questions genuinely NEET-level difficult.`,
+    800
+  );
+
+  btn.disabled=false;
+  btn.innerHTML="🎯 Generate Today's Challenge";
+
+  let parsed = null;
+  if(raw){
+    try { parsed = JSON.parse(raw); }
+    catch(e){
+      const m = raw.match(/\{[\s\S]*\}/);
+      if(m){ try{ parsed=JSON.parse(m[0]); }catch(e2){} }
+    }
+  }
+
+  if(!parsed||!parsed.questions||!parsed.questions.length){
+    $("mcqContent").style.display="block";
+    $("mcqContent").innerHTML=`<div class="mcq-empty">Could not generate. Try again.</div>`;
+    return;
+  }
+
+  mcqData = parsed.questions;
+  mcqAnswered = new Array(mcqData.length).fill(null);
+  renderMCQ();
+});
+
+function renderMCQ(){
+  const cont = $("mcqContent"); cont.style.display="block";
+  const correct = mcqAnswered.filter(a=>a==="correct").length;
+  const answered = mcqAnswered.filter(a=>a!==null).length;
+  const allDone = answered===mcqData.length;
+
+  let dotsHtml = mcqAnswered.map(a=>`<div class="mcq-pdot ${a==="correct"?"c":a==="wrong"?"w":""}"></div>`).join("");
+  let scoreHtml = allDone ? `<span class="mcq-score-lbl">${correct}/${mcqData.length} correct</span>` : `<span class="mcq-score-lbl">${answered}/${mcqData.length} answered</span>`;
+
+  let qsHtml = mcqData.map((q,qi)=>{
+    const answered = mcqAnswered[qi]!==null;
+    const optsHtml = q.opts.map((opt,oi)=>{
+      let cls="mcq-opt";
+      if(answered){
+        cls+=" disabled";
+        if(oi===q.ans) cls+=" correct";
+        else if(mcqAnswered[qi]===oi) cls+=" wrong";
+      }
+      return `<div class="${cls}" data-qi="${qi}" data-oi="${oi}">${String.fromCharCode(65+oi)}. ${escapeHtml(opt)}</div>`;
+    }).join("");
+    return `<div class="mcq-q">
+      <div class="mcq-ctag">${escapeHtml(q.subject)} · ${escapeHtml(q.chapter)}</div>
+      <div class="mcq-qtext">Q${qi+1}. ${escapeHtml(q.q)}</div>
+      <div class="mcq-opts">${optsHtml}</div>
+      <div class="mcq-exp ${answered?"show":""}" id="mcqExp${qi}">${answered?"💡 "+escapeHtml(q.exp):""}</div>
+    </div>`;
+  }).join("");
+
+  let resultHtml = allDone ? `<div class="mcq-result show">${correct===3?"🔥 Perfect Score! All 3 correct!":correct===2?"✅ 2/3 — Strong! Review the missed one.":correct===1?"📖 1/3 — Needs more revision.":"😤 0/3 — Time to revisit these chapters!"}</div>` : "";
+
+  cont.innerHTML = `<div class="mcq-prog-row">${dotsHtml}${scoreHtml}</div>${qsHtml}${resultHtml}`;
+
+  cont.querySelectorAll(".mcq-opt:not(.disabled)").forEach(opt=>{
+    opt.addEventListener("click",()=>handleMCQAnswer(parseInt(opt.dataset.qi),parseInt(opt.dataset.oi)));
+  });
+}
+
+function handleMCQAnswer(qi,oi){
+  if(mcqAnswered[qi]!==null) return;
+  const q = mcqData[qi];
+  mcqAnswered[qi] = oi===q.ans ? "correct" : oi;
+  renderMCQ();
+}
+
+/* ── SMART TIME BUDGET ── */
+$("budgetBtn").addEventListener("click", async ()=>{
+  const hrs = parseFloat($("budgetHrsInput").value)||6;
+  const btn=$("budgetBtn"); btn.disabled=true;
+  btn.innerHTML=`<div class="ai-dots"><span></span><span></span><span></span></div> Calculating...`;
+  const ctx=buildContext();
+  const today=todayISO();
+  const revDue=allChapters.filter(c=>c.next_revision&&c.next_revision<=today).map(c=>c.chapter_name+" ("+c.subject+")");
+  const weak=allChapters.filter(c=>c.confidence<40&&c.status!=="not_started").map(c=>c.chapter_name+" ("+c.subject+")");
+
+  const msg=await groqChat(
+    `You are a NEET study time planner. Create short, practical time allocations. No headers. Concise.`,
+    `${ctx.name} has exactly ${hrs} hours today.
+Physics: ${ctx.phyPct}% done. Chemistry: ${ctx.chemPct}%. Biology: ${ctx.bioPct}%.
+Revision due: ${revDue.slice(0,4).join(", ")||"none"}.
+Weak chapters: ${weak.slice(0,4).join(", ")||"none"}.
+Neglected subjects: ${ctx.neglected.join(", ")||"none"}.
+Distribute the ${hrs}h smartly across subjects. Show time blocks like:
+Physics – 1.5h: [specific chapter]
+Chemistry – 1h: [specific chapter]
+Biology – 2h: [specific chapters + revision]
+Break – 30min
+Be specific with chapter names. Total must equal ${hrs}h.`,
+    300
+  );
+  btn.disabled=false; btn.innerHTML="⏱ Distribute My Time";
+  const out=$("budgetOut");
+  if(msg){ out.textContent=msg; out.classList.add("show"); }
+  else { out.textContent="Could not generate. Try again."; out.classList.add("show"); }
+});
+
+/* ── SUBJECT BALANCE ALARM ── */
+async function checkSubjectBalance(){
+  const dates=[];
+  for(let i=1;i<=2;i++){ const d=new Date(); d.setDate(d.getDate()-i); dates.push(d.toISOString().slice(0,10)); }
+  try{
+    const {data}=await sb.from("daily_targets").select("subject,target_date").in("target_date",dates);
+    const recent=new Set((data||[]).map(r=>r.subject));
+    const neglected=["Physics","Chemistry","Biology"].filter(s=>!recent.has(s));
+    const alarm=$("subjectAlarm");
+    if(neglected.length){
+      alarm.innerHTML=`⚠️ <strong>${neglected.join(", ")}</strong> not studied in 2+ days. NEET is all-or-nothing — every subject counts!`;
+      alarm.classList.add("show");
+    } else { alarm.classList.remove("show"); }
+  }catch(e){}
+}
+
+/* ══════════════════ TROPHIES ══════════════════ */
+const TROPHY_DEFS=[
+  {id:"first_target",emoji:"🌱",name:"First Step",check:()=>allTargets.length>0||parseInt(localStorage.getItem("neet_total_tasks")||"0")>0},
+  {id:"streak_3",emoji:"💪",name:"3-Day Run",check:()=>parseInt(localStorage.getItem("shivam_streak")||"0")>=3},
+  {id:"streak_7",emoji:"🔥",name:"On Fire",check:()=>parseInt(localStorage.getItem("shivam_streak")||"0")>=7},
+  {id:"streak_30",emoji:"🏅",name:"Month Warrior",check:()=>parseInt(localStorage.getItem("shivam_streak")||"0")>=30},
+  {id:"chapters_10",emoji:"📖",name:"10 Chapters",check:()=>allChapters.length>=10},
+  {id:"done_25",emoji:"✅",name:"25 Done",check:()=>allChapters.filter(c=>c.status==="done").length>=25},
+  {id:"perfect_day",emoji:"🎯",name:"Perfect Day",check:()=>allTargets.length>0&&allTargets.every(t=>t.status==="done")},
+  {id:"bio_100",emoji:"🧬",name:"Bio Master",check:()=>{ const b=allChapters.filter(c=>c.subject==="Biology"); return b.length>0&&b.every(c=>c.status==="done"); }},
+  {id:"phy_100",emoji:"⚡",name:"Phy Conqueror",check:()=>{ const p=allChapters.filter(c=>c.subject==="Physics"); return p.length>0&&p.every(c=>c.status==="done"); }},
+  {id:"chem_100",emoji:"🧪",name:"Chem Wizard",check:()=>{ const c=allChapters.filter(c=>c.subject==="Chemistry"); return c.length>0&&c.every(ch=>ch.status==="done"); }},
+  {id:"all_done",emoji:"🏆",name:"NEET Ready",check:()=>allChapters.length>5&&allChapters.every(c=>c.status==="done")},
+  {id:"high_dps",emoji:"⭐",name:"Peak Perf.",check:()=>{ const s=parseInt($("dpsScore").textContent||"0"); return s>=90; }},
+];
+
+function checkTrophies(){
+  const earned=new Set(JSON.parse(localStorage.getItem("neet_trophies")||"[]"));
+  let newEarned=false;
+  TROPHY_DEFS.forEach(t=>{ if(!earned.has(t.id)&&t.check()){ earned.add(t.id); newEarned=true; } });
+  if(newEarned) localStorage.setItem("neet_trophies",JSON.stringify([...earned]));
+  renderTrophies(earned);
+}
+
+function renderTrophies(earned){
+  if(!earned) earned=new Set(JSON.parse(localStorage.getItem("neet_trophies")||"[]"));
+  $("trophyGrid").innerHTML=TROPHY_DEFS.map(t=>`
+    <div class="trophy-card ${earned.has(t.id)?"earned":""}">
+      <span class="trophy-em">${t.emoji}</span>
+      <div class="trophy-nm">${t.name}</div>
+    </div>`).join("");
+  const count=[...earned].length;
+  $("trophyCount").textContent=count+" earned";
+}
+
+/* ══════════════════ CHAPTER NOTES ══════════════════ */
+let currentNoteChapterId=null;
+let currentNoteChapterName="";
+let currentNoteSubject="";
+let aiGeneratedNotes="";
+
+function openNotesModal(dataset){
+  currentNoteChapterId = dataset.notesBtn||dataset.chapterId||null;
+  currentNoteChapterName = dataset.chapterName||"Chapter";
+  currentNoteSubject = dataset.subject||"";
+  $("notesChapterTitle").textContent = "📝 "+currentNoteChapterName;
+  $("notesChapterSub").textContent = currentNoteSubject+" — Notes & Key Points";
+  const saved=loadNotes(currentNoteChapterId);
+  $("notesTextarea").value=saved||"";
+  $("notesStatus").className="notes-status";
+  $("notesStatus").textContent="";
+  $("notesAiInput").value="";
+  $("notesRecreateBtn").style.display="none";
+  aiGeneratedNotes="";
+  $("notesModal").classList.add("show");
+}
+
+function loadNotes(id){ return localStorage.getItem("note_"+id)||""; }
+function saveNotes(id,text){ localStorage.setItem("note_"+id,text); localStorage.setItem("note_"+id+"_date",new Date().toISOString()); }
+
+$("notesSaveBtn").addEventListener("click",()=>{
+  const txt=$("notesTextarea").value.trim();
+  if(!txt){ toast("Write something first","error"); return; }
+  saveNotes(currentNoteChapterId,txt);
+  toast("Notes saved ✓");
+  $("notesStatus").className="notes-status ok show";
+  $("notesStatus").textContent="✅ Notes permanently saved!";
+});
+
+$("notesAiGenerateBtn").addEventListener("click", async ()=>{
+  const topic=$("notesAiInput").value.trim();
+  if(!topic){ toast("Enter a topic to generate notes for","error"); return; }
+  const btn=$("notesAiGenerateBtn"); btn.disabled=true; btn.textContent="...";
+  $("notesStatus").className="notes-status show";
+  $("notesStatus").textContent="🤖 Generating one-liner notes...";
+
+  const msg=await groqChat(
+    `You are a NEET notes expert. Create concise, exam-focused one-liner notes.`,
+    `Chapter: ${currentNoteChapterName} (${currentNoteSubject})
+Topic: ${topic}
+Write 5-8 crisp one-liner notes. Each line should be a key fact or formula directly useful for NEET. 
+Format: • Fact/formula/concept
+Be specific, no fluff.`,
+    350
+  );
+  btn.disabled=false; btn.textContent="✨ Generate";
+  if(msg){
+    aiGeneratedNotes=msg;
+    const existing=$("notesTextarea").value.trim();
+    $("notesTextarea").value = existing?(existing+"\n\n"+msg):msg;
+    $("notesStatus").className="notes-status show";
+    $("notesStatus").textContent="✨ AI notes added. Review and save, or ask AI to analyse.";
+    $("notesRecreateBtn").style.display="inline-flex";
+  } else {
+    $("notesStatus").className="notes-status ng show";
+    $("notesStatus").textContent="Could not generate. Try again.";
+  }
+});
+
+$("notesAnalyzeBtn").addEventListener("click", async ()=>{
+  const txt=$("notesTextarea").value.trim();
+  if(!txt){ toast("Write some notes first","error"); return; }
+  const btn=$("notesAnalyzeBtn"); btn.disabled=true; btn.textContent="Analysing...";
+  $("notesStatus").className="notes-status show";
+  $("notesStatus").textContent="🤖 Analysing your notes...";
+
+  const msg=await groqChat(
+    `You are a NEET study expert who evaluates notes quality strictly.`,
+    `Chapter: ${currentNoteChapterName} (${currentNoteSubject})
+Notes to analyse:
+${txt}
+
+Evaluate: Are these notes complete, accurate, and useful for NEET?
+Reply in this exact format:
+VERDICT: SATISFIED or NOT_SATISFIED
+REASON: [one sentence why]
+${txt.length<100?"TIP: Notes seem too short. Add more key points.":""}`,
+    180
+  );
+  btn.disabled=false; btn.textContent="🤖 Analyse Notes";
+  if(msg){
+    const satisfied=msg.includes("SATISFIED")&&!msg.includes("NOT_SATISFIED");
+    $("notesStatus").className="notes-status show "+(satisfied?"ok":"ng");
+    $("notesStatus").textContent=msg.replace(/VERDICT:\s*/,"").replace(/REASON:\s*/,"\n").trim();
+    $("notesRecreateBtn").style.display=satisfied?"none":"inline-flex";
+    if(satisfied){
+      $("notesStatus").textContent="✅ AI is satisfied with these notes! Save them.";
+    }
+  } else {
+    $("notesStatus").className="notes-status ng show";
+    $("notesStatus").textContent="Could not analyse. Try again.";
+  }
+});
+
+$("notesRecreateBtn").addEventListener("click", async ()=>{
+  const topic=$("notesAiInput").value.trim()||currentNoteChapterName;
+  $("notesAiInput").value=topic;
+  $("notesTextarea").value="";
+  aiGeneratedNotes="";
+  $("notesRecreateBtn").style.display="none";
+  $("notesAiGenerateBtn").click();
+});
+
+$("notesCloseBtn").addEventListener("click",()=>$("notesModal").classList.remove("show"));
+
+/* ── INIT ADDITIONAL FEATURES ── */
+renderTrophies();
+
 </script>
+
+<!-- Notes Modal -->
+<div class="modal-backdrop" id="notesModal">
+  <div class="modal notes-modal" style="max-width:460px;">
+    <h3 id="notesChapterTitle">Chapter Notes</h3>
+    <div class="notes-sub" id="notesChapterSub"></div>
+    <label class="field-label">Your Notes</label>
+    <textarea class="notes-area" id="notesTextarea" placeholder="Write key points, mnemonics, formulas..."></textarea>
+    <label class="field-label" style="margin-top:10px;">AI Generate Notes</label>
+    <div class="notes-ai-row">
+      <input type="text" class="notes-ai-inp" id="notesAiInput" placeholder="Enter topic e.g. Transcription mechanism">
+      <button class="btn-ai" id="notesAiGenerateBtn" style="padding:10px 12px;white-space:nowrap;">✨ Generate</button>
+    </div>
+    <div class="notes-status" id="notesStatus"></div>
+    <div class="notes-btn-row">
+      <button class="btn-ai" id="notesAnalyzeBtn" style="background:linear-gradient(135deg,#0F766E,#0D9488);flex:1;">🤖 Analyse Notes</button>
+      <button class="btn-ai" id="notesRecreateBtn" style="background:linear-gradient(135deg,#B45309,#D97706);flex:1;display:none;">🔄 Recreate</button>
+      <button class="btn-primary" id="notesSaveBtn" style="margin-top:0;flex:1;">💾 Save</button>
+    </div>
+    <button class="btn-ghost" id="notesCloseBtn" style="margin-top:8px;width:100%;">Close</button>
+  </div>
+</div>
+
 </body>
 </html>
