@@ -463,7 +463,7 @@ footer{text-align:center;margin-top:30px;font-size:11px;color:var(--ink-soft);fo
   <div class="dps-card" id="dpsCard">
     <div class="dps-left">
       <div class="dps-score" id="dpsScore">—</div>
-      <div class="dps-lbl">DPS</div>
+      <div class="dps-lbl">/ 100 DPS</div>
     </div>
     <div class="dps-right">
       <div class="dps-bd" id="dpsBd">Calculating daily score...</div>
@@ -1729,14 +1729,16 @@ const PYQ = {
 
 /* ── REALITY BOARD ── */
 function renderRealityBoard(){
-  const today = todayISO();
   const diff = Math.ceil((new Date("2027-05-02") - new Date()) / 864e5);
-  const pending = allChapters.filter(c=>c.status!=="done").length;
-  const rate = diff > 0 && pending > 0 ? (pending/diff).toFixed(2) : "0.00";
+  const pending = allChapters.filter(c=>c.status!=="done");
+  const phyP  = pending.filter(c=>c.subject==="Physics").length;
+  const chemP = pending.filter(c=>c.subject==="Chemistry").length;
+  const bioP  = pending.filter(c=>c.subject==="Biology").length;
+  const rate  = diff>0&&pending.length>0 ? (pending.length/diff).toFixed(2) : "0.00";
   $("rbDays").textContent = diff;
-  $("rbPending").textContent = pending;
-  $("rbRate").textContent = rate;
-  $("rbRate").className = "rb-num" + (parseFloat(rate) > 1 ? " urgent" : "");
+  $("rbPending").innerHTML = `${pending.length}<div style="font-size:8px;font-weight:500;margin-top:3px;color:var(--ink-soft);line-height:1.6">⚡${phyP}&nbsp;🧪${chemP}&nbsp;🌿${bioP}</div>`;
+  $("rbRate").textContent = parseFloat(rate)>=1 ? rate : (pending.length>0 ? "<1" : "0");
+  $("rbRate").className = "rb-num" + (parseFloat(rate)>=1 ? " urgent" : "");
 }
 
 /* ── DPS CALCULATION ── */
@@ -1761,7 +1763,10 @@ function calcAndRenderDPS(){
   const grade = dps>=90?"S Rank 🔥":dps>=75?"A Rank ⭐":dps>=60?"B Rank 💪":dps>=40?"C Rank 📖":"D Rank 😤";
   $("dpsScore").textContent = dps;
   $("dpsFill").style.width = dps + "%";
-  $("dpsBd").innerHTML = `Tasks ${taskScore}/35  Subjects ${subjScore}/15\nStreak ${streakScore}/10  Syllabus ${syllScore}/20\nRevisions ${revScore}/10  — ${grade}`;
+  const taskDisp = total ? `${done}/${total} tasks done` : "no tasks yet";
+  const subjDisp = `${subjects.size}/3 subjects covered`;
+  const revDisp = revDueCount===0 ? "clear ✓" : `${revDueCount} due`;
+  $("dpsBd").innerHTML = `${taskDisp} · ${subjDisp}\nStreak: ${streak}d · Revisions: ${revDisp}\nTotal: ${dps}/100 pts — ${grade}`;
 }
 
 /* ── CHAPTER HEATMAP ── */
