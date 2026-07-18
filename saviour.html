@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saviours — Group Order</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --card: #22263a;
+    --accent: #f7c948;
+    --accent2: #ff6b6b;
+    --green: #4ade80;
+    --text: #f0f0f5;
+    --muted: #8a8fac;
+    --border: #2e324a;
+    --radius: 16px;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .session-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--border);
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 14px 0;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab.active { color: var(--accent); border-color: var(--accent); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 20px; max-width: 480px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── ORDER FORM ── */
+  .form-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .name-input {
+    width: 100%;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+  }
+  .name-input:focus { border-color: var(--accent); }
+  .name-input::placeholder { color: var(--muted); font-weight: 600; }
+
+  /* ── ITEMS GRID ── */
+  .items-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .item-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    position: relative;
+    user-select: none;
+  }
+  .item-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .item-card.selected { border-color: var(--accent); background: rgba(247,201,72,0.1); }
+
+  .item-emoji { font-size: 2rem; display: block; margin-bottom: 6px; }
+  .item-name { font-size: 0.82rem; font-weight: 800; color: var(--text); }
+
+  .qty-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .qty-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border);
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .qty-btn:hover { background: var(--accent); color: #000; }
+  .qty-num { font-size: 1rem; font-weight: 900; color: var(--accent); min-width: 20px; text-align: center; }
+
+  /* ── CUSTOM ITEM ── */
+  .custom-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .custom-input {
+    flex: 1;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .custom-input:focus { border-color: var(--accent); }
+  .custom-input::placeholder { color: var(--muted); }
+  .custom-qty-input {
+    width: 60px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 12px 8px;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .custom-qty-input:focus { border-color: var(--accent); }
+  .add-custom-btn {
+    background: var(--border);
+    border: none;
+    border-radius: var(--radius);
+    color: var(--accent);
+    font-size: 1.4rem;
+    font-weight: 900;
+    width: 48px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .add-custom-btn:hover { background: var(--accent); color: #000; }
+
+  /* ── CUSTOM ITEMS LIST ── */
+  .custom-items-list { margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .custom-item-tag {
+    background: rgba(247,201,72,0.12);
+    border: 1px solid rgba(247,201,72,0.3);
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+  .remove-custom { background: none; border: none; color: var(--accent2); cursor: pointer; font-size: 1.1rem; }
+
+  /* ── SUBMIT BTN ── */
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 900;
+    padding: 16px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: #000;
+    font-weight: 800;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--accent2); color: #fff; }
+
+  /* ── DASHBOARD ── */
+  .session-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .session-input-small {
+    flex: 1;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 10px 12px;
+    outline: none;
+  }
+  .session-input-small:focus { border-color: var(--accent); }
+  .load-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+
+  /* ── SUMMARY CARD ── */
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .summary-header {
+    background: rgba(247,201,72,0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    font-weight: 900;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .summary-header .person-name { color: var(--accent); }
+  .summary-header .time { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+  .summary-items { padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .order-pill {
+    background: var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .order-pill .pill-qty { color: var(--accent); }
+
+  /* ── TOTAL SECTION ── */
+  .total-section {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .total-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .total-grid { display: flex; flex-direction: column; gap: 8px; }
+  .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .total-item-name { font-weight: 700; font-size: 0.95rem; }
+  .total-qty {
+    background: var(--accent);
+    color: #000;
+    font-weight: 900;
+    font-size: 0.9rem;
+    padding: 3px 12px;
+    border-radius: 20px;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+  .delete-order-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: color 0.15s;
+  }
+  .delete-order-btn:hover { color: var(--accent2); }
+
+  .refresh-btn {
+    background: var(--border);
+    border: none;
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .refresh-btn:hover { background: var(--accent); color: #000; }
+
+  .loader {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .new-session-btn {
+    width: 100%;
+    background: transparent;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s;
+  }
+  .new-session-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .persons-count {
+    font-size: 0.72rem;
+    background: var(--border);
+    padding: 3px 9px;
+    border-radius: 20px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🫡 <span>Saviours</span> Order</div>
+  <div class="session-badge" id="sessionBadge" title="Click to copy session ID">📋 Session: <span id="sessionShort">—</span></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('order')">🛒 My Order</div>
+  <div class="tab" onclick="showTab('dashboard')">📊 Dashboard</div>
+</div>
+
+<!-- ORDER PAGE -->
+<div class="page active" id="page-order">
+  <br>
+  <label class="form-label">Tera naam kya hai?</label>
+  <input type="text" class="name-input" id="personName" placeholder="Apna naam likho..." maxlength="30">
+
+  <span class="items-section-title">Kya lena hai? 👇</span>
+  <div class="items-grid" id="itemsGrid"></div>
+
+  <span class="items-section-title">Kuch aur? (Custom item)</span>
+  <div class="custom-row">
+    <input type="text" class="custom-input" id="customItemName" placeholder="Item ka naam..." maxlength="40">
+    <input type="number" class="custom-qty-input" id="customItemQty" placeholder="Qty" min="1" max="99" value="1">
+    <button class="add-custom-btn" onclick="addCustomItem()">+</button>
+  </div>
+  <div class="custom-items-list" id="customItemsList"></div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitOrder()">✅ Order Daalo</button>
+  <button class="new-session-btn" onclick="newSession()">🔄 Naya Session Start Karo</button>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="page" id="page-dashboard">
+  <br>
+  <div class="session-row">
+    <input type="text" class="session-input-small" id="dashSessionInput" placeholder="Session ID daalo...">
+    <button class="load-btn" onclick="loadDashboard()">Load</button>
+  </div>
+
+  <button class="refresh-btn" onclick="loadDashboard()">🔃 Refresh</button>
+
+  <div id="totalSection"></div>
+  <div id="ordersList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const SUPABASE_URL = 'https://ytuvjhjemkzcjldiwafv.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_pihMOJH4lCX_JWEGIdXLXg_eFC6g1X5';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── PRESET ITEMS ──
+const PRESET_ITEMS = [
+  { emoji: '🥟', name: 'Samosa' },
+  { emoji: '🍬', name: 'Jalebi' },
+  { emoji: '🍌', name: 'Banana' },
+  { emoji: '☕', name: 'Chai' },
+  { emoji: '🫓', name: 'Bread' },
+  { emoji: '🥛', name: 'Milk' },
+  { emoji: '🧃', name: 'Juice' },
+  { emoji: '🍫', name: 'Biscuit' },
+];
+
+// ── STATE ──
+let quantities = {}; // { itemName: qty }
+let customItems = []; // [{ name, qty }]
+let currentSession = '';
+
+// ── SESSION ──
+function generateSession() {
+  return 'sav-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+function getSession() {
+  let s = localStorage.getItem('sav_session');
+  if (!s) { s = generateSession(); localStorage.setItem('sav_session', s); }
+  return s;
+}
+
+function newSession() {
+  if (!confirm('Naya session start karoge? Purana session delete nahi hoga, dashboard pe puraana ID se dekh sakte ho.')) return;
+  const s = generateSession();
+  localStorage.setItem('sav_session', s);
+  currentSession = s;
+  updateSessionBadge();
+  showToast('Naya session: ' + s);
+}
+
+function updateSessionBadge() {
+  document.getElementById('sessionShort').textContent = currentSession;
+  document.getElementById('dashSessionInput').value = currentSession;
+}
+
+document.getElementById('sessionBadge').onclick = () => {
+  navigator.clipboard.writeText(currentSession).then(() => showToast('Session ID copy ho gaya!'));
+};
+
+// ── ITEMS GRID ──
+function renderGrid() {
+  const grid = document.getElementById('itemsGrid');
+  grid.innerHTML = '';
+  PRESET_ITEMS.forEach(item => {
+    const qty = quantities[item.name] || 0;
+    const card = document.createElement('div');
+    card.className = 'item-card' + (qty > 0 ? ' selected' : '');
+    card.innerHTML = `
+      <span class="item-emoji">${item.emoji}</span>
+      <div class="item-name">${item.name}</div>
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="changeQty('${item.name}', -1, event)">−</button>
+        <span class="qty-num">${qty > 0 ? qty : '0'}</span>
+        <button class="qty-btn" onclick="changeQty('${item.name}', 1, event)">+</button>
+      </div>
+    `;
+    card.onclick = () => { if (qty === 0) changeQty(item.name, 1); };
+    grid.appendChild(card);
+  });
+}
+
+function changeQty(name, delta, e) {
+  if (e) e.stopPropagation();
+  const cur = quantities[name] || 0;
+  const next = Math.max(0, cur + delta);
+  if (next === 0) delete quantities[name];
+  else quantities[name] = next;
+  renderGrid();
+}
+
+// ── CUSTOM ITEMS ──
+function addCustomItem() {
+  const name = document.getElementById('customItemName').value.trim();
+  const qty = parseInt(document.getElementById('customItemQty').value) || 1;
+  if (!name) { showToast('Item ka naam likho!', true); return; }
+  const existing = customItems.findIndex(i => i.name.toLowerCase() === name.toLowerCase());
+  if (existing >= 0) customItems[existing].qty += qty;
+  else customItems.push({ name, qty });
+  document.getElementById('customItemName').value = '';
+  document.getElementById('customItemQty').value = '1';
+  renderCustomList();
+}
+
+function removeCustom(idx) {
+  customItems.splice(idx, 1);
+  renderCustomList();
+}
+
+function renderCustomList() {
+  const list = document.getElementById('customItemsList');
+  list.innerHTML = '';
+  customItems.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'custom-item-tag';
+    div.innerHTML = `<span>✏️ ${item.name} × ${item.qty}</span><button class="remove-custom" onclick="removeCustom(${i})">✕</button>`;
+    list.appendChild(div);
+  });
+}
+
+// ── SUBMIT ──
+async function submitOrder() {
+  const name = document.getElementById('personName').value.trim();
+  if (!name) { showToast('Pehle apna naam likho!', true); return; }
+
+  const allItems = {};
+  Object.entries(quantities).forEach(([k, v]) => { allItems[k] = v; });
+  customItems.forEach(({ name: n, qty }) => {
+    allItems[n] = (allItems[n] || 0) + qty;
+  });
+
+  if (Object.keys(allItems).length === 0) { showToast('Kuch toh order karo yaar!', true); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Bhej raha hoon...';
+
+  const { error } = await db.from('saviour_orders').insert({
+    person_name: name,
+    items: allItems,
+    session_id: currentSession
+  });
+
+  btn.disabled = false;
+  btn.textContent = '✅ Order Daalo';
+
+  if (error) { showToast('Error: ' + error.message, true); return; }
+
+  showToast('🎉 Order daal diya, ' + name + '!');
+  // Reset
+  quantities = {};
+  customItems = [];
+  document.getElementById('personName').value = '';
+  renderGrid();
+  renderCustomList();
+}
+
+// ── TABS ──
+function showTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'dashboard') loadDashboard();
+}
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+  const sessionId = document.getElementById('dashSessionInput').value.trim() || currentSession;
+  if (!sessionId) { showToast('Session ID daalo', true); return; }
+
+  document.getElementById('ordersList').innerHTML = '<div class="loader">⏳ Load ho raha hai...</div>';
+  document.getElementById('totalSection').innerHTML = '';
+
+  const { data, error } = await db
+    .from('saviour_orders')
+    .select('*')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: true });
+
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  if (!data || data.length === 0) {
+    document.getElementById('ordersList').innerHTML = '<div class="empty-state"><span class="empty-icon">🛒</span>Abhi koi order nahi hai is session mein</div>';
+    return;
+  }
+
+  // Calculate totals
+  const totals = {};
+  data.forEach(row => {
+    Object.entries(row.items).forEach(([item, qty]) => {
+      totals[item] = (totals[item] || 0) + qty;
+    });
+  });
+
+  // Render totals
+  let totalHTML = `<div class="total-section"><div class="total-title">📦 Total milake chahiye</div><div class="total-grid">`;
+  Object.entries(totals).sort((a,b) => b[1]-a[1]).forEach(([item, qty]) => {
+    const emoji = (PRESET_ITEMS.find(p => p.name === item) || {}).emoji || '📦';
+    totalHTML += `<div class="total-row"><span class="total-item-name">${emoji} ${item}</span><span class="total-qty">${qty}</span></div>`;
+  });
+  totalHTML += '</div></div>';
+  document.getElementById('totalSection').innerHTML = totalHTML;
+
+  // Render individual orders
+  let ordersHTML = `<span class="persons-count">👥 ${data.length} log ne order diya</span>`;
+  data.forEach(row => {
+    const time = new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    const pills = Object.entries(row.items).map(([item, qty]) => {
+      const emoji = (PRESET_ITEMS.find(p => p.name === item) || {}).emoji || '📦';
+      return `<div class="order-pill">${emoji} ${item} <span class="pill-qty">×${qty}</span></div>`;
+    }).join('');
+    ordersHTML += `
+      <div class="summary-card">
+        <div class="summary-header">
+          <span class="person-name">🧑 ${row.person_name}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="time">${time}</span>
+            <button class="delete-order-btn" onclick="deleteOrder('${row.id}', '${sessionId}')" title="Delete">🗑️</button>
+          </div>
+        </div>
+        <div class="summary-items">${pills}</div>
+      </div>`;
+  });
+  document.getElementById('ordersList').innerHTML = ordersHTML;
+}
+
+async function deleteOrder(id, sessionId) {
+  if (!confirm('Is order ko delete karein?')) return;
+  const { error } = await db.from('saviour_orders').delete().eq('id', id);
+  if (error) { showToast('Delete nahi hua: ' + error.message, true); return; }
+  showToast('Order hata diya!');
+  document.getElementById('dashSessionInput').value = sessionId;
+  loadDashboard();
+}
+
+// ── TOAST ──
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──
+currentSession = getSession();
+updateSessionBadge();
+renderGrid();
+
+// Enter key for custom item
+document.getElementById('customItemName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addCustomItem();
+});
+</script>
+</body>
+</html>
