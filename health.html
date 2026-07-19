@@ -1294,42 +1294,636 @@ const MEASUREMENTS = [
   'Left Thigh','Right Thigh','Left Calf','Right Calf'
 ];
 
-// Nutrition DB (per 100g unless noted)
+// ================================================================
+// NUTRITION ENGINE v2.0 — Indian Food Database (300+ items)
+// Values per 100g cooked/as-eaten unless 'defaultQty' is set.
+// defaultQty = realistic single-serve grams for that food.
+// Sources: NIN Hyderabad (IFCT 2017), USDA, ICMR RDA tables.
+// ================================================================
+
 const FOOD_DB = {
-  // proteins
-  'egg': {cal:155,prot:13,carb:1.1,fat:11,fiber:0,unit:50},
-  'eggs': {cal:155,prot:13,carb:1.1,fat:11,fiber:0,unit:50},
-  'chicken': {cal:165,prot:31,carb:0,fat:3.6,fiber:0},
-  'paneer': {cal:265,prot:18,carb:3.6,fat:20,fiber:0},
-  'whey': {cal:120,prot:25,carb:3,fat:2,fiber:0,unit:30},
-  'tuna': {cal:132,prot:29,carb:0,fat:1,fiber:0},
-  'fish': {cal:120,prot:22,carb:0,fat:3,fiber:0},
-  'tofu': {cal:76,prot:8,carb:2,fat:4,fiber:0.3},
-  'dal': {cal:116,prot:9,carb:20,fat:0.4,fiber:8},
-  'rajma': {cal:127,prot:9,carb:23,fat:0.5,fiber:6},
-  // carbs
-  'rice': {cal:130,prot:2.7,carb:28,fat:0.3,fiber:0.4},
-  'oats': {cal:389,prot:17,carb:66,fat:7,fiber:11,unit:40},
-  'roti': {cal:300,prot:9,carb:60,fat:3,fiber:4,unit:30},
-  'bread': {cal:265,prot:9,carb:49,fat:3.2,fiber:2.7,unit:30},
-  'pasta': {cal:131,prot:5,carb:25,fat:1.1,fiber:1.8},
-  'potato': {cal:77,prot:2,carb:17,fat:0.1,fiber:2.2},
-  'chapati': {cal:300,prot:9,carb:60,fat:3,fiber:4,unit:30},
-  // fruits
-  'banana': {cal:89,prot:1.1,carb:23,fat:0.3,fiber:2.6,unit:120},
-  'apple': {cal:52,prot:0.3,carb:14,fat:0.2,fiber:2.4,unit:150},
-  'mango': {cal:60,prot:0.8,carb:15,fat:0.4,fiber:1.6,unit:200},
-  'orange': {cal:47,prot:0.9,carb:12,fat:0.1,fiber:2.4,unit:130},
-  'grapes': {cal:67,prot:0.6,carb:17,fat:0.4,fiber:0.9,unit:150},
-  // fats/misc
-  'almonds': {cal:579,prot:21,carb:22,fat:50,fiber:12.5,unit:28},
-  'peanut': {cal:567,prot:26,carb:16,fat:49,fiber:8.5},
-  'butter': {cal:717,prot:0.9,carb:0.1,fat:81,fiber:0,unit:10},
-  'milk': {cal:61,prot:3.2,carb:4.8,fat:3.3,fiber:0},
-  'curd': {cal:61,prot:3.5,carb:4.7,fat:3.3,fiber:0},
-  'broccoli': {cal:34,prot:2.8,carb:7,fat:0.4,fiber:2.6},
-  'spinach': {cal:23,prot:2.9,carb:3.6,fat:0.4,fiber:2.2},
+  // ── EGGS ────────────────────────────────────────────────────────
+  'egg':              {cal:143,prot:12.6,carb:0.7,fat:9.5,fiber:0,   defaultQty:55},   // 1 medium egg ~55g
+  'boiled egg':       {cal:143,prot:12.6,carb:0.7,fat:9.5,fiber:0,   defaultQty:55},
+  'egg white':        {cal:52, prot:10.9,carb:0.7,fat:0.2,fiber:0,   defaultQty:33},   // white only
+  'egg yolk':         {cal:322,prot:15.9,carb:3.6,fat:26.5,fiber:0,  defaultQty:17},
+  'scrambled egg':    {cal:148,prot:10.1,carb:1.5,fat:11.0,fiber:0,  defaultQty:100},
+  'omelette':         {cal:154,prot:10.6,carb:1.2,fat:11.6,fiber:0,  defaultQty:120},
+
+  // ── POULTRY ─────────────────────────────────────────────────────
+  'chicken':          {cal:165,prot:31.0,carb:0,  fat:3.6, fiber:0,  defaultQty:150},
+  'chicken breast':   {cal:165,prot:31.0,carb:0,  fat:3.6, fiber:0,  defaultQty:150},
+  'chicken leg':      {cal:184,prot:26.0,carb:0,  fat:8.5, fiber:0,  defaultQty:150},
+  'chicken curry':    {cal:132,prot:14.0,carb:5.0,fat:6.5, fiber:0.5,defaultQty:200},
+  'tandoori chicken': {cal:153,prot:25.0,carb:3.5,fat:4.5, fiber:0,  defaultQty:150},
+  'grilled chicken':  {cal:165,prot:31.0,carb:0,  fat:3.6, fiber:0,  defaultQty:150},
+  'keema':            {cal:218,prot:17.0,carb:3.0,fat:15.0,fiber:0.5,defaultQty:150},
+  'mutton':           {cal:206,prot:17.5,carb:0,  fat:14.8,fiber:0,  defaultQty:150},
+  'mutton curry':     {cal:185,prot:15.0,carb:4.0,fat:12.0,fiber:0.3,defaultQty:200},
+
+  // ── FISH & SEAFOOD ───────────────────────────────────────────────
+  'fish':             {cal:105,prot:22.0,carb:0,  fat:1.5, fiber:0,  defaultQty:150},
+  'rohu':             {cal:97, prot:16.6,carb:0,  fat:3.0, fiber:0,  defaultQty:150},
+  'catla':            {cal:111,prot:19.0,carb:0,  fat:3.2, fiber:0,  defaultQty:150},
+  'pomfret':          {cal:102,prot:17.8,carb:0,  fat:3.0, fiber:0,  defaultQty:150},
+  'tuna':             {cal:132,prot:29.0,carb:0,  fat:1.0, fiber:0,  defaultQty:100},
+  'salmon':           {cal:208,prot:20.0,carb:0,  fat:13.0,fiber:0,  defaultQty:150},
+  'prawn':            {cal:106,prot:20.3,carb:0.9,fat:1.7, fiber:0,  defaultQty:100},
+  'shrimp':           {cal:106,prot:20.3,carb:0.9,fat:1.7, fiber:0,  defaultQty:100},
+  'fish curry':       {cal:118,prot:14.0,carb:4.5,fat:5.0, fiber:0.5,defaultQty:200},
+
+  // ── DAIRY ────────────────────────────────────────────────────────
+  'milk':             {cal:61, prot:3.2, carb:4.8,fat:3.3, fiber:0,  defaultQty:250},  // 1 glass
+  'full fat milk':    {cal:61, prot:3.2, carb:4.8,fat:3.3, fiber:0,  defaultQty:250},
+  'toned milk':       {cal:44, prot:3.3, carb:4.8,fat:1.5, fiber:0,  defaultQty:250},
+  'skimmed milk':     {cal:35, prot:3.4, carb:4.9,fat:0.1, fiber:0,  defaultQty:250},
+  'curd':             {cal:60, prot:3.1, carb:4.7,fat:3.0, fiber:0,  defaultQty:150},  // 1 katori
+  'dahi':             {cal:60, prot:3.1, carb:4.7,fat:3.0, fiber:0,  defaultQty:150},
+  'greek yogurt':     {cal:59, prot:10.0,carb:3.6,fat:0.4, fiber:0,  defaultQty:150},
+  'buttermilk':       {cal:40, prot:3.3, carb:4.8,fat:0.9, fiber:0,  defaultQty:200},  // 1 glass chaach
+  'chaach':           {cal:40, prot:3.3, carb:4.8,fat:0.9, fiber:0,  defaultQty:200},
+  'lassi':            {cal:72, prot:3.0, carb:9.0,fat:3.0, fiber:0,  defaultQty:250},
+  'sweet lassi':      {cal:118,prot:3.0, carb:19.0,fat:3.2,fiber:0,  defaultQty:250},
+  'paneer':           {cal:265,prot:18.3,carb:3.4,fat:20.8,fiber:0,  defaultQty:100},  // 1 serving
+  'low fat paneer':   {cal:155,prot:19.1,carb:3.6,fat:7.0, fiber:0,  defaultQty:100},
+  'cheese':           {cal:402,prot:25.0,carb:1.3,fat:33.0,fiber:0,  defaultQty:30},   // 1 slice
+  'cheddar':          {cal:402,prot:25.0,carb:1.3,fat:33.0,fiber:0,  defaultQty:30},
+  'butter':           {cal:717,prot:0.9, carb:0.1,fat:81.0,fiber:0,  defaultQty:10},   // 1 tsp ~5g, 1 tbsp ~10g
+  'ghee':             {cal:900,prot:0,   carb:0,  fat:99.8,fiber:0,  defaultQty:10},   // 1 tsp
+  'cream':            {cal:195,prot:2.1, carb:3.7,fat:19.3,fiber:0,  defaultQty:30},
+  'khoya':            {cal:421,prot:14.0,carb:47.0,fat:20.0,fiber:0, defaultQty:50},
+  'condensed milk':   {cal:321,prot:8.0, carb:54.0,fat:8.7,fiber:0,  defaultQty:30},
+
+  // ── PLANT PROTEINS ───────────────────────────────────────────────
+  'tofu':             {cal:76, prot:8.0, carb:1.9,fat:4.8, fiber:0.3,defaultQty:100},
+  'soya chunks':      {cal:336,prot:52.0,carb:33.0,fat:0.5,fiber:13.0,defaultQty:50}, // dry weight
+  'soy milk':         {cal:33, prot:2.9, carb:1.7,fat:1.5, fiber:0.6,defaultQty:250},
+  'tempeh':           {cal:193,prot:19.0,carb:9.4,fat:11.0,fiber:0,  defaultQty:100},
+
+  // ── DALS (COOKED) ────────────────────────────────────────────────
+  // All values for cooked dal, 1 katori ≈ 150g cooked
+  'dal':              {cal:116,prot:9.0, carb:20.0,fat:0.4,fiber:8.0, defaultQty:150},
+  'moong dal':        {cal:105,prot:7.2, carb:19.0,fat:0.4,fiber:7.6, defaultQty:150},
+  'masoor dal':       {cal:116,prot:9.0, carb:20.0,fat:0.4,fiber:7.9, defaultQty:150},
+  'toor dal':         {cal:119,prot:8.5, carb:21.0,fat:0.4,fiber:6.0, defaultQty:150},
+  'arhar dal':        {cal:119,prot:8.5, carb:21.0,fat:0.4,fiber:6.0, defaultQty:150},
+  'urad dal':         {cal:127,prot:9.0, carb:22.0,fat:0.7,fiber:9.0, defaultQty:150},
+  'chana dal':        {cal:164,prot:8.9, carb:28.0,fat:2.7,fiber:7.6, defaultQty:150},
+  'moong dal whole':  {cal:105,prot:7.0, carb:19.0,fat:0.4,fiber:8.0, defaultQty:150},
+  'mixed dal':        {cal:118,prot:8.5, carb:20.5,fat:0.5,fiber:7.5, defaultQty:150},
+  'dal fry':          {cal:140,prot:8.0, carb:18.0,fat:4.5,fiber:6.0, defaultQty:150},
+  'dal tadka':        {cal:145,prot:8.2, carb:18.5,fat:5.0,fiber:5.5, defaultQty:150},
+  'sambar':           {cal:55, prot:3.0, carb:9.0, fat:1.2,fiber:2.5, defaultQty:200},
+
+  // ── BEANS & LEGUMES (COOKED) ─────────────────────────────────────
+  'rajma':            {cal:127,prot:8.7, carb:22.8,fat:0.5,fiber:6.4, defaultQty:150},
+  'kidney beans':     {cal:127,prot:8.7, carb:22.8,fat:0.5,fiber:6.4, defaultQty:150},
+  'black chana':      {cal:164,prot:8.9, carb:27.0,fat:2.6,fiber:7.6, defaultQty:150},
+  'kala chana':       {cal:164,prot:8.9, carb:27.0,fat:2.6,fiber:7.6, defaultQty:150},
+  'kabuli chana':     {cal:164,prot:8.9, carb:27.4,fat:2.7,fiber:7.6, defaultQty:150},
+  'chole':            {cal:160,prot:8.0, carb:26.0,fat:3.5,fiber:6.5, defaultQty:150},
+  'chickpeas':        {cal:164,prot:8.9, carb:27.4,fat:2.7,fiber:7.6, defaultQty:150},
+  'white chana':      {cal:164,prot:8.9, carb:27.4,fat:2.7,fiber:7.6, defaultQty:150},
+  'green peas':       {cal:81, prot:5.4, carb:14.5,fat:0.4,fiber:5.1, defaultQty:100},
+  'matar':            {cal:81, prot:5.4, carb:14.5,fat:0.4,fiber:5.1, defaultQty:100},
+  'lobia':            {cal:116,prot:7.7, carb:21.0,fat:0.9,fiber:6.0, defaultQty:150},
+  'cowpea':           {cal:116,prot:7.7, carb:21.0,fat:0.9,fiber:6.0, defaultQty:150},
+
+  // ── VEGETABLES (COOKED, per 100g) ───────────────────────────────
+  'potato':           {cal:77, prot:2.0, carb:17.0,fat:0.1,fiber:2.2, defaultQty:150},
+  'aloo':             {cal:77, prot:2.0, carb:17.0,fat:0.1,fiber:2.2, defaultQty:150},
+  'sweet potato':     {cal:86, prot:1.6, carb:20.1,fat:0.1,fiber:3.0, defaultQty:150},
+  'shakarkand':       {cal:86, prot:1.6, carb:20.1,fat:0.1,fiber:3.0, defaultQty:150},
+  'tomato':           {cal:18, prot:0.9, carb:3.9, fat:0.2,fiber:1.2, defaultQty:100},
+  'tamatar':          {cal:18, prot:0.9, carb:3.9, fat:0.2,fiber:1.2, defaultQty:100},
+  'onion':            {cal:40, prot:1.1, carb:9.3, fat:0.1,fiber:1.7, defaultQty:50},
+  'pyaz':             {cal:40, prot:1.1, carb:9.3, fat:0.1,fiber:1.7, defaultQty:50},
+  'spinach':          {cal:23, prot:2.9, carb:3.6, fat:0.4,fiber:2.2, defaultQty:100},
+  'palak':            {cal:23, prot:2.9, carb:3.6, fat:0.4,fiber:2.2, defaultQty:100},
+  'methi':            {cal:49, prot:4.4, carb:6.0, fat:0.9,fiber:7.2, defaultQty:100},
+  'fenugreek':        {cal:49, prot:4.4, carb:6.0, fat:0.9,fiber:7.2, defaultQty:100},
+  'bottle gourd':     {cal:14, prot:0.6, carb:3.4, fat:0.0,fiber:0.5, defaultQty:150},
+  'lauki':            {cal:14, prot:0.6, carb:3.4, fat:0.0,fiber:0.5, defaultQty:150},
+  'ghiya':            {cal:14, prot:0.6, carb:3.4, fat:0.0,fiber:0.5, defaultQty:150},
+  'pumpkin':          {cal:26, prot:1.0, carb:6.5, fat:0.1,fiber:0.5, defaultQty:150},
+  'kaddu':            {cal:26, prot:1.0, carb:6.5, fat:0.1,fiber:0.5, defaultQty:150},
+  'kohda':            {cal:26, prot:1.0, carb:6.5, fat:0.1,fiber:0.5, defaultQty:150},
+  'brinjal':          {cal:25, prot:1.0, carb:6.0, fat:0.2,fiber:3.0, defaultQty:100},
+  'baingan':          {cal:25, prot:1.0, carb:6.0, fat:0.2,fiber:3.0, defaultQty:100},
+  'eggplant':         {cal:25, prot:1.0, carb:6.0, fat:0.2,fiber:3.0, defaultQty:100},
+  'cauliflower':      {cal:25, prot:1.9, carb:5.0, fat:0.3,fiber:2.0, defaultQty:150},
+  'gobhi':            {cal:25, prot:1.9, carb:5.0, fat:0.3,fiber:2.0, defaultQty:150},
+  'cabbage':          {cal:25, prot:1.3, carb:5.8, fat:0.1,fiber:2.5, defaultQty:100},
+  'patta gobhi':      {cal:25, prot:1.3, carb:5.8, fat:0.1,fiber:2.5, defaultQty:100},
+  'carrot':           {cal:41, prot:0.9, carb:9.6, fat:0.2,fiber:2.8, defaultQty:100},
+  'gajar':            {cal:41, prot:0.9, carb:9.6, fat:0.2,fiber:2.8, defaultQty:100},
+  'beetroot':         {cal:43, prot:1.6, carb:9.6, fat:0.2,fiber:2.8, defaultQty:100},
+  'chukandar':        {cal:43, prot:1.6, carb:9.6, fat:0.2,fiber:2.8, defaultQty:100},
+  'lady finger':      {cal:33, prot:1.9, carb:7.5, fat:0.2,fiber:3.2, defaultQty:100},
+  'okra':             {cal:33, prot:1.9, carb:7.5, fat:0.2,fiber:3.2, defaultQty:100},
+  'bhindi':           {cal:33, prot:1.9, carb:7.5, fat:0.2,fiber:3.2, defaultQty:100},
+  'capsicum':         {cal:31, prot:1.0, carb:6.0, fat:0.3,fiber:2.1, defaultQty:80},
+  'shimla mirch':     {cal:31, prot:1.0, carb:6.0, fat:0.3,fiber:2.1, defaultQty:80},
+  'bell pepper':      {cal:31, prot:1.0, carb:6.0, fat:0.3,fiber:2.1, defaultQty:80},
+  'cucumber':         {cal:16, prot:0.7, carb:3.6, fat:0.1,fiber:0.5, defaultQty:100},
+  'kheera':           {cal:16, prot:0.7, carb:3.6, fat:0.1,fiber:0.5, defaultQty:100},
+  'radish':           {cal:16, prot:0.7, carb:3.4, fat:0.1,fiber:1.6, defaultQty:100},
+  'mooli':            {cal:16, prot:0.7, carb:3.4, fat:0.1,fiber:1.6, defaultQty:100},
+  'turnip':           {cal:28, prot:0.9, carb:6.4, fat:0.1,fiber:1.8, defaultQty:100},
+  'shalgam':          {cal:28, prot:0.9, carb:6.4, fat:0.1,fiber:1.8, defaultQty:100},
+  'bitter gourd':     {cal:17, prot:1.0, carb:3.7, fat:0.2,fiber:2.8, defaultQty:100},
+  'karela':           {cal:17, prot:1.0, carb:3.7, fat:0.2,fiber:2.8, defaultQty:100},
+  'ridge gourd':      {cal:18, prot:1.2, carb:3.5, fat:0.2,fiber:1.0, defaultQty:100},
+  'turai':            {cal:18, prot:1.2, carb:3.5, fat:0.2,fiber:1.0, defaultQty:100},
+  'snake gourd':      {cal:18, prot:0.5, carb:3.9, fat:0.3,fiber:0.8, defaultQty:100},
+  'chichinda':        {cal:18, prot:0.5, carb:3.9, fat:0.3,fiber:0.8, defaultQty:100},
+  'mushroom':         {cal:22, prot:3.1, carb:3.3, fat:0.3,fiber:1.0, defaultQty:100},
+  'broccoli':         {cal:34, prot:2.8, carb:6.6, fat:0.4,fiber:2.6, defaultQty:100},
+  'corn':             {cal:86, prot:3.3, carb:19.0,fat:1.4,fiber:2.7, defaultQty:100},
+  'maize':            {cal:86, prot:3.3, carb:19.0,fat:1.4,fiber:2.7, defaultQty:100},
+  'bhutta':           {cal:86, prot:3.3, carb:19.0,fat:1.4,fiber:2.7, defaultQty:100},
+  'peas':             {cal:81, prot:5.4, carb:14.5,fat:0.4,fiber:5.1, defaultQty:100},
+  'colocasia':        {cal:97, prot:1.5, carb:23.0,fat:0.1,fiber:4.1, defaultQty:100},
+  'arbi':             {cal:97, prot:1.5, carb:23.0,fat:0.1,fiber:4.1, defaultQty:100},
+  'taro':             {cal:97, prot:1.5, carb:23.0,fat:0.1,fiber:4.1, defaultQty:100},
+  'drumstick':        {cal:37, prot:2.1, carb:8.5, fat:0.2,fiber:3.2, defaultQty:100},
+  'sehjan':           {cal:37, prot:2.1, carb:8.5, fat:0.2,fiber:3.2, defaultQty:100},
+  'raw banana':       {cal:89, prot:1.3, carb:23.0,fat:0.3,fiber:2.6, defaultQty:100},
+  'plantain':         {cal:89, prot:1.3, carb:23.0,fat:0.3,fiber:2.6, defaultQty:100},
+  'ginger':           {cal:80, prot:1.8, carb:17.8,fat:0.8,fiber:2.0, defaultQty:5},
+  'adrak':            {cal:80, prot:1.8, carb:17.8,fat:0.8,fiber:2.0, defaultQty:5},
+  'garlic':           {cal:149,prot:6.4, carb:33.1,fat:0.5,fiber:2.1, defaultQty:5},
+  'lehsun':           {cal:149,prot:6.4, carb:33.1,fat:0.5,fiber:2.1, defaultQty:5},
+
+  // ── FRUITS ──────────────────────────────────────────────────────
+  'banana':           {cal:89, prot:1.1, carb:22.8,fat:0.3,fiber:2.6, defaultQty:120},
+  'kela':             {cal:89, prot:1.1, carb:22.8,fat:0.3,fiber:2.6, defaultQty:120},
+  'apple':            {cal:52, prot:0.3, carb:13.8,fat:0.2,fiber:2.4, defaultQty:150},
+  'seb':              {cal:52, prot:0.3, carb:13.8,fat:0.2,fiber:2.4, defaultQty:150},
+  'orange':           {cal:47, prot:0.9, carb:11.8,fat:0.1,fiber:2.4, defaultQty:130},
+  'santra':           {cal:47, prot:0.9, carb:11.8,fat:0.1,fiber:2.4, defaultQty:130},
+  'mosambi':          {cal:43, prot:0.8, carb:10.5,fat:0.1,fiber:1.5, defaultQty:130},
+  'sweet lime':       {cal:43, prot:0.8, carb:10.5,fat:0.1,fiber:1.5, defaultQty:130},
+  'mango':            {cal:60, prot:0.8, carb:14.8,fat:0.4,fiber:1.6, defaultQty:200},
+  'aam':              {cal:60, prot:0.8, carb:14.8,fat:0.4,fiber:1.6, defaultQty:200},
+  'papaya':           {cal:43, prot:0.5, carb:10.8,fat:0.3,fiber:1.7, defaultQty:150},
+  'papita':           {cal:43, prot:0.5, carb:10.8,fat:0.3,fiber:1.7, defaultQty:150},
+  'watermelon':       {cal:30, prot:0.6, carb:7.6, fat:0.2,fiber:0.4, defaultQty:300},
+  'tarbooz':          {cal:30, prot:0.6, carb:7.6, fat:0.2,fiber:0.4, defaultQty:300},
+  'muskmelon':        {cal:34, prot:0.8, carb:8.2, fat:0.2,fiber:0.9, defaultQty:200},
+  'kharbuja':         {cal:34, prot:0.8, carb:8.2, fat:0.2,fiber:0.9, defaultQty:200},
+  'guava':            {cal:68, prot:2.6, carb:14.3,fat:1.0,fiber:5.4, defaultQty:120},
+  'amrood':           {cal:68, prot:2.6, carb:14.3,fat:1.0,fiber:5.4, defaultQty:120},
+  'pineapple':        {cal:50, prot:0.5, carb:13.1,fat:0.1,fiber:1.4, defaultQty:150},
+  'ananas':           {cal:50, prot:0.5, carb:13.1,fat:0.1,fiber:1.4, defaultQty:150},
+  'litchi':           {cal:66, prot:0.8, carb:16.5,fat:0.4,fiber:1.3, defaultQty:100},
+  'lychee':           {cal:66, prot:0.8, carb:16.5,fat:0.4,fiber:1.3, defaultQty:100},
+  'grapes':           {cal:67, prot:0.6, carb:17.2,fat:0.4,fiber:0.9, defaultQty:150},
+  'angur':            {cal:67, prot:0.6, carb:17.2,fat:0.4,fiber:0.9, defaultQty:150},
+  'pear':             {cal:57, prot:0.4, carb:15.2,fat:0.1,fiber:3.1, defaultQty:150},
+  'nashpati':         {cal:57, prot:0.4, carb:15.2,fat:0.1,fiber:3.1, defaultQty:150},
+  'kiwi':             {cal:61, prot:1.1, carb:14.7,fat:0.5,fiber:3.0, defaultQty:80},
+  'strawberry':       {cal:32, prot:0.7, carb:7.7, fat:0.3,fiber:2.0, defaultQty:100},
+  'pomegranate':      {cal:83, prot:1.7, carb:18.7,fat:1.2,fiber:4.0, defaultQty:150},
+  'anar':             {cal:83, prot:1.7, carb:18.7,fat:1.2,fiber:4.0, defaultQty:150},
+  'fig':              {cal:74, prot:0.8, carb:19.2,fat:0.3,fiber:2.9, defaultQty:80},
+  'anjeer':           {cal:74, prot:0.8, carb:19.2,fat:0.3,fiber:2.9, defaultQty:80},
+  'dates':            {cal:282,prot:2.5, carb:75.0,fat:0.4,fiber:8.0, defaultQty:30},  // 4-5 dates
+  'khajoor':          {cal:282,prot:2.5, carb:75.0,fat:0.4,fiber:8.0, defaultQty:30},
+  'coconut':          {cal:354,prot:3.3, carb:15.2,fat:33.5,fiber:9.0,defaultQty:50},
+  'nariyal':          {cal:354,prot:3.3, carb:15.2,fat:33.5,fiber:9.0,defaultQty:50},
+
+  // ── GRAINS & STAPLES ─────────────────────────────────────────────
+  'rice':             {cal:130,prot:2.7, carb:28.2,fat:0.3,fiber:0.4, defaultQty:200},  // 1 katori cooked
+  'chawal':           {cal:130,prot:2.7, carb:28.2,fat:0.3,fiber:0.4, defaultQty:200},
+  'brown rice':       {cal:123,prot:2.6, carb:25.6,fat:1.0,fiber:1.8, defaultQty:200},
+  'roti':             {cal:297,prot:9.0, carb:61.0,fat:3.0,fiber:4.0, defaultQty:35},   // 1 roti
+  'chapati':          {cal:297,prot:9.0, carb:61.0,fat:3.0,fiber:4.0, defaultQty:35},
+  'chapatti':         {cal:297,prot:9.0, carb:61.0,fat:3.0,fiber:4.0, defaultQty:35},
+  'phulka':           {cal:280,prot:8.5, carb:60.0,fat:1.2,fiber:4.2, defaultQty:30},
+  'bread':            {cal:265,prot:9.0, carb:49.0,fat:3.2,fiber:2.7, defaultQty:30},   // 1 slice
+  'brown bread':      {cal:247,prot:9.7, carb:46.0,fat:3.5,fiber:6.0, defaultQty:30},
+  'whole wheat bread':{cal:247,prot:9.7, carb:46.0,fat:3.5,fiber:6.0, defaultQty:30},
+  'oats':             {cal:389,prot:16.9,carb:66.3,fat:6.9,fiber:10.6,defaultQty:40},   // 1 serving dry
+  'poha':             {cal:333,prot:6.7, carb:73.0,fat:1.2,fiber:3.0, defaultQty:75},   // dry
+  'upma':             {cal:170,prot:4.0, carb:29.0,fat:5.0,fiber:2.0, defaultQty:200},  // cooked
+  'suji':             {cal:360,prot:12.7,carb:73.8,fat:1.0,fiber:3.9, defaultQty:50},
+  'rava':             {cal:360,prot:12.7,carb:73.8,fat:1.0,fiber:3.9, defaultQty:50},
+  'semolina':         {cal:360,prot:12.7,carb:73.8,fat:1.0,fiber:3.9, defaultQty:50},
+  'dalia':            {cal:342,prot:11.9,carb:73.3,fat:1.3,fiber:9.5, defaultQty:40},
+  'broken wheat':     {cal:342,prot:11.9,carb:73.3,fat:1.3,fiber:9.5, defaultQty:40},
+  'cornflakes':       {cal:357,prot:7.5, carb:84.0,fat:0.4,fiber:1.2, defaultQty:40},
+  'muesli':           {cal:352,prot:9.0, carb:68.0,fat:5.5,fiber:7.0, defaultQty:45},
+  'pasta':            {cal:131,prot:5.0, carb:25.0,fat:1.1,fiber:1.8, defaultQty:150},  // cooked
+  'noodles':          {cal:138,prot:4.5, carb:25.0,fat:2.0,fiber:0.8, defaultQty:150},
+  'maggi':            {cal:438,prot:10.0,carb:58.0,fat:18.0,fiber:2.0,defaultQty:70},   // 1 packet dry
+  'vermicelli':       {cal:350,prot:10.0,carb:75.0,fat:1.5,fiber:2.0, defaultQty:50},
+  'wheat flour':      {cal:341,prot:11.8,carb:71.2,fat:1.7,fiber:12.0,defaultQty:30},
+  'maida':            {cal:348,prot:10.0,carb:74.0,fat:0.9,fiber:2.7, defaultQty:30},
+  'besan':            {cal:387,prot:22.5,carb:58.0,fat:6.7,fiber:10.9,defaultQty:30},
+  'chickpea flour':   {cal:387,prot:22.5,carb:58.0,fat:6.7,fiber:10.9,defaultQty:30},
+  'bajra':            {cal:347,prot:11.6,carb:67.5,fat:5.0,fiber:1.2, defaultQty:30},
+  'pearl millet':     {cal:347,prot:11.6,carb:67.5,fat:5.0,fiber:1.2, defaultQty:30},
+  'jowar':            {cal:349,prot:10.4,carb:72.6,fat:1.9,fiber:1.6, defaultQty:30},
+  'sorghum':          {cal:349,prot:10.4,carb:72.6,fat:1.9,fiber:1.6, defaultQty:30},
+  'ragi':             {cal:328,prot:7.3, carb:72.0,fat:1.5,fiber:3.6, defaultQty:30},
+  'finger millet':    {cal:328,prot:7.3, carb:72.0,fat:1.5,fiber:3.6, defaultQty:30},
+  'quinoa':           {cal:120,prot:4.4, carb:21.3,fat:1.9,fiber:2.8, defaultQty:150},  // cooked
+
+  // ── INDIAN PREPARED DISHES ───────────────────────────────────────
+  'idli':             {cal:58, prot:2.0, carb:12.0,fat:0.2,fiber:0.5, defaultQty:50},   // 1 idli
+  'dosa':             {cal:168,prot:3.8, carb:27.0,fat:5.0,fiber:0.8, defaultQty:100},  // 1 plain dosa
+  'masala dosa':      {cal:206,prot:4.5, carb:30.0,fat:7.5,fiber:1.5, defaultQty:130},
+  'uttapam':          {cal:145,prot:4.0, carb:24.0,fat:4.0,fiber:1.2, defaultQty:100},
+  'khichdi':          {cal:124,prot:4.5, carb:22.0,fat:2.5,fiber:2.5, defaultQty:200},
+  'paratha':          {cal:297,prot:6.3, carb:42.0,fat:11.5,fiber:3.5,defaultQty:70},   // 1 plain paratha
+  'aloo paratha':     {cal:312,prot:7.0, carb:45.0,fat:12.0,fiber:3.0,defaultQty:100},
+  'methi paratha':    {cal:280,prot:7.5, carb:40.0,fat:10.0,fiber:4.5,defaultQty:70},
+  'poori':            {cal:338,prot:7.5, carb:43.0,fat:15.0,fiber:3.0,defaultQty:40},   // 1 poori
+  'puri':             {cal:338,prot:7.5, carb:43.0,fat:15.0,fiber:3.0,defaultQty:40},
+  'bhature':          {cal:370,prot:8.0, carb:48.0,fat:16.0,fiber:2.0,defaultQty:80},
+  'naan':             {cal:310,prot:9.2, carb:57.0,fat:6.0, fiber:2.5,defaultQty:90},   // 1 naan
+  'tandoori roti':    {cal:232,prot:8.0, carb:48.0,fat:1.5, fiber:5.0,defaultQty:70},
+  'pulao':            {cal:154,prot:3.5, carb:28.5,fat:3.5, fiber:1.0,defaultQty:200},
+  'veg pulao':        {cal:154,prot:3.5, carb:28.5,fat:3.5, fiber:1.5,defaultQty:200},
+  'biryani':          {cal:185,prot:8.0, carb:28.0,fat:5.0, fiber:1.5,defaultQty:250},  // 1 serving
+  'chicken biryani':  {cal:200,prot:12.0,carb:27.0,fat:6.0, fiber:1.0,defaultQty:250},
+  'veg biryani':      {cal:175,prot:5.0, carb:31.0,fat:4.5, fiber:2.0,defaultQty:250},
+  'fried rice':       {cal:163,prot:4.0, carb:30.0,fat:3.5, fiber:1.5,defaultQty:200},
+  'jeera rice':       {cal:143,prot:2.8, carb:28.5,fat:2.0, fiber:0.5,defaultQty:200},
+  'dal rice':         {cal:122,prot:5.0, carb:23.0,fat:1.0, fiber:2.0,defaultQty:300},
+  'rajma chawal':     {cal:140,prot:7.0, carb:24.0,fat:1.5, fiber:4.0,defaultQty:300},
+  'chole bhature':    {cal:440,prot:12.0,carb:58.0,fat:18.0,fiber:5.0,defaultQty:250},
+  'pav bhaji':        {cal:225,prot:5.5, carb:35.0,fat:8.0, fiber:3.5,defaultQty:200},
+  'vada pav':         {cal:293,prot:6.5, carb:44.0,fat:10.0,fiber:2.5,defaultQty:150},
+  'dahi vada':        {cal:170,prot:7.5, carb:22.0,fat:5.5, fiber:1.5,defaultQty:150},
+  'palak paneer':     {cal:165,prot:8.5, carb:7.0, fat:11.5,fiber:2.5,defaultQty:200},
+  'paneer butter masala':{cal:200,prot:9.0,carb:9.0,fat:15.0,fiber:1.5,defaultQty:200},
+  'shahi paneer':     {cal:215,prot:9.0, carb:8.5, fat:16.5,fiber:1.0,defaultQty:200},
+  'aloo sabzi':       {cal:110,prot:2.0, carb:18.0,fat:4.0, fiber:2.0,defaultQty:150},
+  'mix veg':          {cal:95, prot:2.5, carb:12.0,fat:4.0, fiber:3.0,defaultQty:150},
+  'raita':            {cal:54, prot:2.5, carb:5.5, fat:2.5, fiber:0.5,defaultQty:100},
+
+  // ── SOUPS & BEVERAGES ────────────────────────────────────────────
+  'tomato soup':      {cal:40, prot:1.5, carb:8.0, fat:0.8, fiber:1.2,defaultQty:200},
+  'dal soup':         {cal:55, prot:3.5, carb:9.0, fat:0.5, fiber:2.5,defaultQty:200},
+  'veg soup':         {cal:35, prot:1.5, carb:7.0, fat:0.5, fiber:1.5,defaultQty:200},
+  'tea':              {cal:5,  prot:0.3, carb:0.7, fat:0.2, fiber:0,  defaultQty:150},
+  'chai':             {cal:35, prot:1.5, carb:4.5, fat:1.2, fiber:0,  defaultQty:150},   // with milk+sugar
+  'milk tea':         {cal:35, prot:1.5, carb:4.5, fat:1.2, fiber:0,  defaultQty:150},
+  'coffee':           {cal:5,  prot:0.3, carb:0.7, fat:0,   fiber:0,  defaultQty:150},
+  'black coffee':     {cal:5,  prot:0.3, carb:0.7, fat:0,   fiber:0,  defaultQty:150},
+  'coconut water':    {cal:19, prot:0.7, carb:3.7, fat:0.2, fiber:1.1,defaultQty:250},
+  'nariyal pani':     {cal:19, prot:0.7, carb:3.7, fat:0.2, fiber:1.1,defaultQty:250},
+  'lemon water':      {cal:5,  prot:0.1, carb:1.5, fat:0,   fiber:0,  defaultQty:250},
+  'nimbu pani':       {cal:5,  prot:0.1, carb:1.5, fat:0,   fiber:0,  defaultQty:250},
+  'juice':            {cal:48, prot:0.5, carb:12.0,fat:0.1, fiber:0.5,defaultQty:200},
+  'protein shake':    {cal:150,prot:25.0,carb:8.0, fat:3.0, fiber:1.0,defaultQty:300},
+  'banana shake':     {cal:140,prot:5.5, carb:25.0,fat:3.0, fiber:1.5,defaultQty:300},
+
+  // ── SNACKS & FRIED FOODS ─────────────────────────────────────────
+  'samosa':           {cal:262,prot:4.5, carb:30.0,fat:13.5,fiber:2.5,defaultQty:80},   // 1 samosa
+  'pakora':           {cal:250,prot:5.5, carb:28.0,fat:13.0,fiber:2.0,defaultQty:100},
+  'bhajiya':          {cal:250,prot:5.5, carb:28.0,fat:13.0,fiber:2.0,defaultQty:100},
+  'chips':            {cal:536,prot:7.0, carb:53.0,fat:34.0,fiber:4.5,defaultQty:30},
+  'biscuit':          {cal:480,prot:7.0, carb:63.0,fat:22.0,fiber:1.5,defaultQty:30},
+  'khakra':           {cal:391,prot:9.5, carb:69.0,fat:8.5, fiber:5.0,defaultQty:30},
+  'murmura':          {cal:325,prot:6.3, carb:73.0,fat:0.5, fiber:1.0,defaultQty:30},
+  'puffed rice':      {cal:325,prot:6.3, carb:73.0,fat:0.5, fiber:1.0,defaultQty:30},
+  'chivda':           {cal:420,prot:8.0, carb:55.0,fat:18.0,fiber:3.0,defaultQty:30},
+  'chakli':           {cal:470,prot:7.5, carb:54.0,fat:25.0,fiber:3.5,defaultQty:30},
+  'popcorn':          {cal:387,prot:12.9,carb:77.8,fat:4.5, fiber:15.1,defaultQty:30},
+  'dark chocolate':   {cal:598,prot:7.8, carb:45.9,fat:42.6,fiber:10.9,defaultQty:25},
+  'chocolate':        {cal:535,prot:7.6, carb:59.4,fat:29.7,fiber:5.3,defaultQty:30},
+
+  // ── SWEETS & DESSERTS ────────────────────────────────────────────
+  'rasgulla':         {cal:186,prot:5.0, carb:35.5,fat:3.5, fiber:0,  defaultQty:60},   // 1 piece
+  'gulab jamun':      {cal:310,prot:5.0, carb:44.0,fat:13.0,fiber:0.5,defaultQty:60},
+  'jalebi':           {cal:430,prot:4.5, carb:80.0,fat:11.0,fiber:0.5,defaultQty:60},
+  'kheer':            {cal:165,prot:4.5, carb:27.0,fat:5.0, fiber:0.5,defaultQty:150},
+  'laddu':            {cal:430,prot:8.0, carb:62.0,fat:17.5,fiber:3.0,defaultQty:50},   // 1 laddu
+  'besan laddu':      {cal:430,prot:8.0, carb:62.0,fat:17.5,fiber:3.0,defaultQty:50},
+  'halwa':            {cal:296,prot:4.5, carb:50.0,fat:9.0, fiber:1.5,defaultQty:100},
+  'suji halwa':       {cal:296,prot:4.5, carb:50.0,fat:9.0, fiber:1.5,defaultQty:100},
+  'gajar ka halwa':   {cal:250,prot:4.0, carb:42.0,fat:8.5, fiber:2.5,defaultQty:100},
+  'barfi':            {cal:408,prot:9.5, carb:60.0,fat:15.0,fiber:0.5,defaultQty:40},
+  'peda':             {cal:380,prot:8.0, carb:59.0,fat:13.0,fiber:0,  defaultQty:30},
+  'kulfi':            {cal:190,prot:5.0, carb:22.0,fat:9.5, fiber:0,  defaultQty:80},
+  'ice cream':        {cal:207,prot:3.5, carb:23.8,fat:11.0,fiber:0.5,defaultQty:100},
+  'sugar':            {cal:400,prot:0,   carb:99.9,fat:0,   fiber:0,  defaultQty:5},
+  'honey':            {cal:304,prot:0.3, carb:82.4,fat:0,   fiber:0.2,defaultQty:15},
+  'sharbat':          {cal:100,prot:0,   carb:25.0,fat:0,   fiber:0,  defaultQty:200},
+
+  // ── NUTS & SEEDS ────────────────────────────────────────────────
+  'peanut':           {cal:567,prot:25.8,carb:16.1,fat:49.2,fiber:8.5,defaultQty:30},
+  'peanuts':          {cal:567,prot:25.8,carb:16.1,fat:49.2,fiber:8.5,defaultQty:30},
+  'peanut butter':    {cal:588,prot:25.1,carb:20.1,fat:50.4,fiber:6.0,defaultQty:16}, // 1 tbsp ~16g
+  'almond':           {cal:579,prot:21.2,carb:21.7,fat:49.9,fiber:12.5,defaultQty:28}, // ~20 almonds
+  'almonds':          {cal:579,prot:21.2,carb:21.7,fat:49.9,fiber:12.5,defaultQty:28},
+  'cashew':           {cal:553,prot:18.2,carb:30.2,fat:43.8,fiber:3.3,defaultQty:28},
+  'cashews':          {cal:553,prot:18.2,carb:30.2,fat:43.8,fiber:3.3,defaultQty:28},
+  'kaju':             {cal:553,prot:18.2,carb:30.2,fat:43.8,fiber:3.3,defaultQty:28},
+  'walnut':           {cal:654,prot:15.2,carb:13.7,fat:65.2,fiber:6.7,defaultQty:28},
+  'walnuts':          {cal:654,prot:15.2,carb:13.7,fat:65.2,fiber:6.7,defaultQty:28},
+  'akhrot':           {cal:654,prot:15.2,carb:13.7,fat:65.2,fiber:6.7,defaultQty:28},
+  'pistachio':        {cal:562,prot:20.2,carb:27.7,fat:45.4,fiber:10.3,defaultQty:28},
+  'pistachios':       {cal:562,prot:20.2,carb:27.7,fat:45.4,fiber:10.3,defaultQty:28},
+  'pista':            {cal:562,prot:20.2,carb:27.7,fat:45.4,fiber:10.3,defaultQty:28},
+  'raisin':           {cal:299,prot:3.1, carb:79.2,fat:0.5,fiber:3.7,defaultQty:30},
+  'kishmish':         {cal:299,prot:3.1, carb:79.2,fat:0.5,fiber:3.7,defaultQty:30},
+  'flaxseed':         {cal:534,prot:18.3,carb:28.9,fat:42.2,fiber:27.3,defaultQty:10},
+  'alsi':             {cal:534,prot:18.3,carb:28.9,fat:42.2,fiber:27.3,defaultQty:10},
+  'chia seeds':       {cal:486,prot:16.5,carb:42.1,fat:30.7,fiber:34.4,defaultQty:10},
+  'sunflower seeds':  {cal:584,prot:20.8,carb:20.0,fat:51.5,fiber:8.6,defaultQty:28},
+  'pumpkin seeds':    {cal:446,prot:18.6,carb:53.8,fat:19.4,fiber:18.4,defaultQty:28},
+
+  // ── OILS & FATS ─────────────────────────────────────────────────
+  'oil':              {cal:884,prot:0,   carb:0,   fat:100.0,fiber:0, defaultQty:10},   // 1 tsp ~5g, tbsp ~14g
+  'mustard oil':      {cal:884,prot:0,   carb:0,   fat:100.0,fiber:0, defaultQty:10},
+  'olive oil':        {cal:884,prot:0,   carb:0,   fat:100.0,fiber:0, defaultQty:10},
+  'coconut oil':      {cal:862,prot:0,   carb:0,   fat:99.1, fiber:0, defaultQty:10},
+  'sunflower oil':    {cal:884,prot:0,   carb:0,   fat:100.0,fiber:0, defaultQty:10},
+  'refined oil':      {cal:884,prot:0,   carb:0,   fat:100.0,fiber:0, defaultQty:10},
+
+  // ── SUPPLEMENTS ─────────────────────────────────────────────────
+  // defaultQty = standard single-serve in grams
+  'whey protein':     {cal:120,prot:24.0,carb:3.0, fat:2.0, fiber:0, defaultQty:30},   // 1 scoop
+  'whey':             {cal:120,prot:24.0,carb:3.0, fat:2.0, fiber:0, defaultQty:30},
+  'casein':           {cal:110,prot:24.0,carb:2.5, fat:1.0, fiber:0, defaultQty:30},
+  'mass gainer':      {cal:350,prot:17.0,carb:65.0,fat:3.0, fiber:1.0,defaultQty:100},
+  'creatine':         {cal:0,  prot:0,   carb:0,   fat:0,   fiber:0, defaultQty:5,    supplement:true},
+  'fish oil':         {cal:45, prot:0,   carb:0,   fat:5.0, fiber:0, defaultQty:5,    supplement:true},
+  'multivitamin':     {cal:0,  prot:0,   carb:0,   fat:0,   fiber:0, defaultQty:1,    supplement:true},
+  'bcaa':             {cal:20, prot:5.0, carb:0,   fat:0,   fiber:0, defaultQty:7},
+  'pre workout':      {cal:25, prot:2.0, carb:5.0, fat:0,   fiber:0, defaultQty:10},
 };
+
+// ================================================================
+// FOOD ALIAS MAP — canonical key ← all spellings/Hindi/typos
+// Aliases resolve to a FOOD_DB key before lookup.
+// ================================================================
+const FOOD_ALIAS = {
+  // EGGS
+  'anda':       'egg', 'ande':      'egg', 'andu':      'egg',
+  'anday':      'egg', 'अंडा':     'egg', 'अंडे':     'egg',
+  'eggs':       'egg', 'boiled eggs':'egg','boiled egg':'boiled egg',
+  'half boil':  'boiled egg', 'half boiled egg':'boiled egg',
+  'sunny side up':'egg', 'fried egg': 'egg',
+
+  // CHICKEN
+  'murgi':      'chicken', 'murga':    'chicken', 'murg':     'chicken',
+  'chicken piece':'chicken', 'chicken fry':'chicken',
+  'boneless chicken':'chicken breast',
+
+  // MILK & DAIRY
+  'doodh':      'milk',  'dudh':     'milk',  'गाय का दूध':'milk',
+  'whole milk': 'full fat milk', 'cow milk':'full fat milk',
+  'toned doodh':'toned milk', 'skimmed doodh':'skimmed milk',
+  'dahi':       'curd',  'yogurt':   'curd',  'yoghurt':  'curd',
+  'fresh curd': 'curd',  'hung curd':'greek yogurt', 'hung dahi':'greek yogurt',
+  'chaas':      'buttermilk', 'chaach':  'buttermilk', 'chhach': 'buttermilk',
+  'छाछ':        'buttermilk', 'मट्ठा': 'buttermilk',
+  'meethi lassi':'sweet lassi', 'namkeen lassi':'lassi',
+  'makkhan':    'butter',  'makhan':  'butter',
+  'white butter':'butter',  'salted butter':'butter',
+  'desi ghee':  'ghee',  'clarified butter':'ghee',
+  'मलाई':       'cream',
+
+  // PANEER
+  'cottage cheese':'paneer', 'fresh paneer':'paneer',
+  'paneer tikka':'paneer', 'पनीर':'paneer',
+
+  // SOYA
+  'soya':       'soya chunks', 'soy chunks':'soya chunks',
+  'nutrela':    'soya chunks', 'meal maker': 'soya chunks',
+  'soy protein':'soya chunks',
+
+  // DALS
+  'lentil':     'dal',    'lentils':  'dal',    'दाल':'dal',
+  'moong':      'moong dal', 'green moong':'moong dal whole',
+  'masoor':     'masoor dal', 'red lentil':'masoor dal',
+  'toor':       'toor dal',  'arhar':    'arhar dal', 'pigeon pea':'toor dal',
+  'urad':       'urad dal',  'black lentil':'urad dal',
+  'chana dal':  'chana dal', 'split chickpea':'chana dal',
+  'yellow dal': 'toor dal',  'mixed dal': 'mixed dal',
+
+  // BEANS
+  'kidney bean':'rajma',  'red kidney bean':'rajma',
+  'rajma chawal':'rajma chawal', // dish entry
+  'kala chana': 'black chana', 'black chickpea':'black chana',
+  'chana':      'kabuli chana','kabuli':'kabuli chana',
+  'safed chana':'white chana', 'छोले':'chole', 'chhole':'chole',
+  'हरी मटर':   'green peas', 'mutter':'green peas', 'fresh peas':'green peas',
+
+  // RICE
+  'chawal':     'rice',   'चावल':    'rice',   'steamed rice':'rice',
+  'plain rice': 'rice',   'cooked rice':'rice',
+  'bhaat':      'rice',   'sona masoori':'rice', 'basmati':'rice',
+  'brown chawal':'brown rice', 'brown basmati':'brown rice',
+
+  // ROTI / CHAPATI
+  'chapatti':   'chapati','chappati': 'chapati','rotti':    'roti',
+  'rotii':      'roti',   'रोटी':    'roti',   'चपाती':   'chapati',
+  'phulka':     'phulka', 'fulka':   'phulka',
+  'wheat roti': 'roti',   'atta roti':'roti',
+  'missi roti': 'roti',
+
+  // BREAD
+  'toast':      'bread',  'white bread':'bread', 'sandwich bread':'bread',
+  'pav':        'bread',  'bun':        'bread',
+
+  // OATS
+  'oatmeal':    'oats',   'rolled oats':'oats', 'instant oats':'oats',
+  'quaker':     'oats',
+
+  // VEGETABLES
+  'aloo':       'potato', 'alu':      'potato', 'aaloo':    'potato', 'आलू':'potato',
+  'sweet aloo': 'sweet potato', 'शकरकंद':'sweet potato',
+  'tamatar':    'tomato', 'टमाटर':   'tomato',
+  'pyaz':       'onion',  'pyaaz':    'onion',  'प्याज':   'onion',
+  'palak':      'spinach','paalak':   'spinach','पालक':    'spinach',
+  'saag':       'spinach',
+  'methi leaves':'methi', 'fenugreek leaves':'methi', 'मेथी':'methi',
+  'lauki':      'bottle gourd','ghiya':'bottle gourd','doodhi':'bottle gourd',
+  'लौकी':       'bottle gourd','घीया':           'bottle gourd',
+  'kaddu':      'pumpkin','kohda':    'pumpkin','कद्दू':   'pumpkin',
+  'sitaphal':   'pumpkin',
+  'baingan':    'brinjal','baigan':   'brinjal','बैंगन':   'brinjal',
+  'eggplant':   'brinjal','aubergine':'brinjal',
+  'gobi':       'cauliflower','gobhi': 'cauliflower','फूलगोभी':'cauliflower',
+  'patta gobi': 'cabbage','band gobi':'cabbage','बंद गोभी':'cabbage',
+  'gajar':      'carrot', 'गाजर':    'carrot',
+  'chukandar':  'beetroot','चुकंदर': 'beetroot','beet':'beetroot',
+  'bhindi':     'lady finger','okra': 'lady finger','भिंडी':'lady finger',
+  'shimla mirch':'capsicum','bell pepper':'capsicum','शिमला मिर्च':'capsicum',
+  'kheera':     'cucumber','khira':  'cucumber','खीरा': 'cucumber',
+  'mooli':      'radish', 'मूली':    'radish',
+  'shalgam':    'turnip', 'शलजम':   'turnip',
+  'karela':     'bitter gourd','bitter melon':'bitter gourd','करेला':'bitter gourd',
+  'turai':      'ridge gourd', 'तोरई':'ridge gourd',
+  'chichinda':  'snake gourd','चिचिंडा':'snake gourd',
+  'mushroom':   'mushroom','dhingri': 'mushroom',
+  'maize':      'corn',   'corn cob':'corn',
+  'arbi':       'colocasia','taro root':'colocasia','अरबी':'colocasia',
+  'sehjan':     'drumstick','moringa':'drumstick', 'sahjan':'drumstick',
+  'adrak':      'ginger', 'अदरक':   'ginger',
+  'lehsun':     'garlic', 'लहसुन':  'garlic',
+
+  // FRUITS
+  'kela':       'banana', 'केला':    'banana', 'kele':     'banana',
+  'bananna':    'banana', 'bnana':   'banana', 'bannana':  'banana', // typos
+  'seb':        'apple',  'सेब':     'apple',
+  'santra':     'orange', 'नारंगी':  'orange', 'narangi':  'orange',
+  'mosambi':    'mosambi','sweet lime':'mosambi',
+  'aam':        'mango',  'आम':      'mango',  'mangoes':  'mango',
+  'papita':     'papaya', 'पपीता':   'papaya',
+  'tarbooz':    'watermelon','ताड़बूज':'watermelon','tarbuj':  'watermelon',
+  'kharbuja':   'muskmelon','खरबूजा':'muskmelon',
+  'amrood':     'guava',  'अमरूद':   'guava',
+  'ananas':     'pineapple','अनानास': 'pineapple',
+  'litchi':     'litchi', 'lychee':  'litchi', 'लीची':     'litchi',
+  'angur':      'grapes', 'अंगूर':   'grapes', 'grape':    'grapes',
+  'nashpati':   'pear',   'नाशपाती': 'pear',
+  'anar':       'pomegranate','अनार': 'pomegranate',
+  'anjeer':     'fig',    'अंजीर':   'fig',
+  'khajoor':    'dates',  'khajur':  'dates',  'खजूर':     'dates',
+  'date':       'dates',
+  'nariyal':    'coconut','nariyel': 'coconut','नारियल':  'coconut',
+
+  // NUTS
+  'mungfali':   'peanut','मूंगफली':  'peanut', 'groundnut': 'peanut',
+  'pb':         'peanut butter',
+  'badam':      'almond','बादाम':    'almond',
+  'kaju':       'cashew','काजू':     'cashew',
+  'akhrot':     'walnut','अखरोट':    'walnut',
+  'pista':      'pistachio','पिस्ता': 'pistachio',
+  'kishmish':   'raisin','किशमिश':   'raisin',
+  'munakka':    'raisin',
+  'alsi':       'flaxseed','तीसी':   'flaxseed',
+
+  // GRAINS
+  'dalia':      'dalia', 'daliya':   'dalia', 'दलिया':    'dalia',
+  'suji':       'suji',  'sooji':    'suji',  'semolina':  'suji',
+  'rava':       'suji',  'सूजी':     'suji',
+  'poha':       'poha',  'pohaa':    'poha',  'pohe':      'poha',  'beaten rice':'poha',
+  'maggi':      'maggi', 'magi':     'maggi', 'instant noodle':'maggi',
+  'bajri':      'bajra', 'बाजरा':   'bajra',
+  'jwaar':      'jowar', 'ज्वार':   'jowar',
+  'nachni':     'ragi',  'mandua':   'ragi',  'रागी':      'ragi',
+
+  // OILS
+  'sarson oil': 'mustard oil','sarson ka tel':'mustard oil',
+  'tel':        'oil',   'cooking oil':'oil',
+  'vanaspati':  'oil',
+
+  // SUPPLEMENTS
+  'whey shake': 'whey protein','protein powder':'whey protein',
+  'scoop whey': 'whey protein', 'scoop protein':'whey protein',
+  'creatine monohydrate':'creatine','creatine powder':'creatine',
+  'omega 3':    'fish oil','omega3': 'fish oil','omega-3':'fish oil',
+  'vitamin':    'multivitamin','multi vitamin':'multivitamin',
+
+  // DISHES
+  'upma':       'upma',  'उपमा':    'upma',
+  'poori':      'poori', 'puri':     'poori',  'पूरी':'poori',
+  'paratha':    'paratha','parotha': 'paratha', 'परांठा':'paratha',
+  'aloo paratha':'aloo paratha','potato paratha':'aloo paratha',
+  'naan':       'naan',  'butter naan':'naan',
+  'idli':       'idli',  'इडली':    'idli',
+  'dosa':       'dosa',  'डोसा':    'dosa',
+  'sambar':     'sambar','सांभर':   'sambar',
+  'khichdi':    'khichdi','khichri': 'khichdi','खिचड़ी':'khichdi',
+  'biryani':    'biryani','biriyani':'biryani','बिरयानी':'chicken biryani',
+  'pulao':      'pulao', 'pilaf':    'pulao',  'पुलाव':'pulao',
+  'chai':       'milk tea','cha':    'milk tea','चाय':'milk tea',
+
+  // SWEETS
+  'gujab jamun':'gulab jamun','gulab jamoon':'gulab jamun',
+  'rasgulla':   'rasgulla', 'rasogolla': 'rasgulla',
+  'gajar halwa':'gajar ka halwa', 'carrot halwa':'gajar ka halwa',
+  'atta halwa': 'halwa', 'sheera':'halwa',
+  'mithai':     'laddu', // fallback
+  'motichoor laddu':'laddu',
+
+  // MISC COMMON
+  'chaach':     'buttermilk', // duplicate kept for easy lookup
+  'panner':     'paneer', 'paneeer': 'paneer', // typos
+  'rotii':      'roti',   'chapatii':'chapati', // typos
+  'brocolli':   'broccoli', 'brocoli':'broccoli', // typos
+  'choclate':   'chocolate','chocolat':'chocolate',
+};
+
+// ── Unit conversion table ────────────────────────────────────────
+// Maps a unit string → grams (or ml, treated same for foods)
+// These multiply the numeric quantity found in text.
+const UNIT_GRAMS = {
+  // Volume
+  'ml':           1,
+  'liter':        1000, 'litre':    1000, 'l':         1000,
+  'glass':        250,  'glasses':  250,
+  'cup':          240,  'cups':     240,
+  'katori':       150,  'katoris':  150, 'bowl': 150, 'bowls': 150,
+  'small bowl':   100,  'large bowl':200,
+  'small katori': 100,  'large katori':200,
+  'tbsp':         15,   'tablespoon':15, 'tablespoons':15,
+  'tsp':          5,    'teaspoon': 5,   'teaspoons':  5,
+  // Weight
+  'g':            1,    'gram':     1,   'grams':      1, 'gm':1,
+  'kg':           1000, 'kilogram': 1000,
+  'oz':           28.35,'ounce':    28.35,
+  // Counts
+  'scoop':        30,   'scoops':   30,
+  'slice':        30,   'slices':   30,
+  'piece':        null, 'pieces':   null, // piece → use defaultQty
+  'pcs':          null,
+  'serving':      null, 'servings': null,
+};
+
+// Fuzzy match: Levenshtein distance ≤ 2 for short words
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  if (m === 0) return n; if (n === 0) return m;
+  const dp = Array.from({length:m+1}, (_,i)=>[i,...Array(n).fill(0)]);
+  for (let j=1;j<=n;j++) dp[0][j]=j;
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] :
+      1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// Resolve a raw food token to a canonical FOOD_DB key
+function resolveFood(token) {
+  token = token.trim().toLowerCase();
+  if (!token || token.length < 2) return null;
+  // 1. Direct DB hit
+  if (FOOD_DB[token]) return token;
+  // 2. Alias map
+  if (FOOD_ALIAS[token]) {
+    const alias = FOOD_ALIAS[token];
+    return FOOD_DB[alias] ? alias : (FOOD_DB[FOOD_ALIAS[alias]] ? FOOD_ALIAS[alias] : null);
+  }
+  // 3. Partial match (token is a substring of a DB key, or key is substring of token)
+  for (const key of Object.keys(FOOD_DB)) {
+    if (key.includes(token) || token.includes(key)) return key;
+  }
+  // 4. Fuzzy match — only for tokens ≥ 4 chars to avoid false positives
+  if (token.length >= 4) {
+    let best = null, bestDist = 9999;
+    const allKeys = [...Object.keys(FOOD_DB), ...Object.keys(FOOD_ALIAS)];
+    for (const k of allKeys) {
+      // Only check single-word DB keys for performance
+      if (k.includes(' ') && !token.includes(' ')) continue;
+      const dist = levenshtein(token, k);
+      const threshold = token.length <= 5 ? 1 : 2;
+      if (dist < bestDist && dist <= threshold) { bestDist = dist; best = k; }
+    }
+    if (best) {
+      const resolved = FOOD_ALIAS[best] || best;
+      return FOOD_DB[resolved] ? resolved : null;
+    }
+  }
+  return null;
+}
 
 // ================================================================
 // STATE
@@ -1562,69 +2156,301 @@ function calcVolume() {
 }
 
 // ================================================================
-// NUTRITION CALC
+// NUTRITION ENGINE v2.0
+// Natural language parser: "2 eggs, 1 katori dal, 250ml milk"
 // ================================================================
-function parseNutrition(text) {
-  if (!text) return {cal:0,prot:0,carb:0,fat:0,fiber:0};
-  const result = {cal:0,prot:0,carb:0,fat:0,fiber:0};
-  const lower = text.toLowerCase();
 
-  Object.entries(FOOD_DB).forEach(([food, macro]) => {
-    const regex = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(?:g|gm|gram|grams|ml|cup|cups|scoop|scoops)?\\s*${food}|${food}\\s+(\\d+(?:\\.\\d+)?)\\s*(?:g|gm|gram|grams|ml|cup|cups|scoop|scoops)?`, 'gi');
-    let match;
-    while ((match = regex.exec(lower)) !== null) {
-      const qty = parseFloat(match[1] || match[2]) || (macro.unit || 100);
-      const per100 = macro.unit ? (qty / macro.unit) : (qty / 100);
-      result.cal  += macro.cal  * per100;
-      result.prot += macro.prot * per100;
-      result.carb += macro.carb * per100;
-      result.fat  += macro.fat  * per100;
-      result.fiber+= macro.fiber* per100;
+/**
+ * parseNutritionText(text)
+ * ─────────────────────────
+ * Tokenises a free-form meal description line by line / comma by comma.
+ * For each token it:
+ *   1. Extracts a leading numeric quantity (optional)
+ *   2. Extracts a unit word (optional)
+ *   3. Resolves the remainder to a FOOD_DB key via aliases + fuzzy match
+ *   4. Converts qty+unit → grams using UNIT_GRAMS
+ *   5. Scales macros from per-100g values
+ * Returns { cal, prot, carb, fat, fiber, items[] }
+ */
+function parseNutritionText(text) {
+  if (!text || !text.trim()) return { cal:0, prot:0, carb:0, fat:0, fiber:0, items:[] };
+
+  const totals = { cal:0, prot:0, carb:0, fat:0, fiber:0 };
+  const items  = [];   // [{name, qty, unit, grams, cal, prot}] for display
+
+  // ── Split on commas, newlines, semicolons, bullets ──────────────
+  const segments = text
+    .replace(/[•\-–—]/g, ',')
+    .split(/[,\n;]+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  for (const seg of segments) {
+    const lower = seg.toLowerCase().replace(/[()]/g, ' ').trim();
+    if (!lower) continue;
+
+    // ── 1. Extract leading number (e.g. "2", "1.5", "½", "1/2") ──
+    let qty = null;
+    let rest = lower;
+
+    // Handle fractions: ½ → 0.5, ¼ → 0.25, ¾ → 0.75
+    const unicodeFrac = { '½':0.5, '¼':0.25, '¾':0.75, '⅓':0.333, '⅔':0.667 };
+    for (const [ch, val] of Object.entries(unicodeFrac)) {
+      if (rest.startsWith(ch)) { qty = val; rest = rest.slice(ch.length).trim(); break; }
     }
-    // Handle plain mention (no quantity)
-    if (lower.includes(food) && !/\d/.test(lower.replace(new RegExp(`\\d+\\s*(?:g|gm|gram|grams)?\\s*${food}|${food}\\s*\\d+\\s*(?:g|gm|gram|grams)?`,'g'),''))) {
-      const qty = macro.unit || 100;
-      const per100 = qty / 100;
-      result.cal  += macro.cal  * per100;
-      result.prot += macro.prot * per100;
-      result.carb += macro.carb * per100;
-      result.fat  += macro.fat  * per100;
-      result.fiber+= macro.fiber* per100;
+    // Written fractions like "1/2"
+    if (qty === null) {
+      const fracM = rest.match(/^(\d+)\/(\d+)\s*/);
+      if (fracM) { qty = parseInt(fracM[1]) / parseInt(fracM[2]); rest = rest.slice(fracM[0].length); }
     }
-  });
+    // Regular number
+    if (qty === null) {
+      const numM = rest.match(/^(\d+(?:\.\d+)?)\s*/);
+      if (numM) { qty = parseFloat(numM[1]); rest = rest.slice(numM[0].length); }
+    }
+
+    // ── 2. Extract unit word ───────────────────────────────────────
+    let unitGrams = null;   // how many grams does 1 unit = ?
+    let unitRaw   = null;
+
+    // Try multi-word units first ("small bowl", "large katori")
+    const multiUnits = ['small bowl','large bowl','small katori','large katori',
+                        'whole milk','full fat','toned milk'];
+    for (const mu of multiUnits) {
+      if (rest.startsWith(mu)) {
+        unitGrams = UNIT_GRAMS[mu] ?? null;
+        unitRaw   = mu;
+        rest = rest.slice(mu.length).trim();
+        break;
+      }
+    }
+    // Single-word unit
+    if (unitRaw === null) {
+      const unitKeys = Object.keys(UNIT_GRAMS).sort((a,b) => b.length - a.length);
+      for (const u of unitKeys) {
+        const pat = new RegExp('^' + u.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b\\s*');
+        if (pat.test(rest)) {
+          unitRaw   = u;
+          unitGrams = UNIT_GRAMS[u];
+          rest = rest.replace(pat, '');
+          break;
+        }
+      }
+    }
+
+    // Strip filler words that are not food names
+    rest = rest
+      .replace(/\b(of|with|and|plus|approx|approximately|about|around|cooked|raw|fresh|boiled|fried|grilled|roasted|steamed|baked|plain|dry|wet|whole)\b/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+
+    if (!rest) continue;
+
+    // ── 3. Resolve food name ───────────────────────────────────────
+    // Try the full remaining string first, then progressively shorter
+    let foodKey = null;
+    const words = rest.split(/\s+/);
+
+    // Try multi-word phrases from longest to shortest (max 4 words)
+    for (let len = Math.min(words.length, 4); len >= 1; len--) {
+      const phrase = words.slice(0, len).join(' ');
+      foodKey = resolveFood(phrase);
+      if (foodKey) break;
+    }
+
+    if (!foodKey) continue;  // unrecognised food — skip silently
+
+    const macro = FOOD_DB[foodKey];
+    if (!macro) continue;
+
+    // ── 4. Calculate grams consumed ────────────────────────────────
+    let gramsConsumed;
+
+    if (qty === null && unitRaw === null) {
+      // No quantity, no unit → use default serving
+      gramsConsumed = macro.defaultQty ?? 100;
+
+    } else if (unitRaw !== null && unitGrams === null) {
+      // Unit is "piece/serving/pcs" → each = defaultQty
+      const count = qty ?? 1;
+      gramsConsumed = count * (macro.defaultQty ?? 100);
+
+    } else if (unitGrams !== null) {
+      // Unit converts to grams directly (ml, cup, tbsp, katori…)
+      const count = qty ?? 1;
+      gramsConsumed = count * unitGrams;
+
+    } else {
+      // Bare number, no unit — interpret based on food type
+      // If defaultQty < 50 it's likely counted in pieces (eggs, roti…), else grams
+      const dq = macro.defaultQty ?? 100;
+      if (dq <= 50) {
+        // Piece-counted food: qty = number of pieces
+        gramsConsumed = qty * dq;
+      } else {
+        // qty in grams directly (e.g. "200 chicken")
+        gramsConsumed = qty;
+      }
+    }
+
+    if (!gramsConsumed || gramsConsumed <= 0) continue;
+
+    // ── 5. Scale macros ────────────────────────────────────────────
+    const scale = gramsConsumed / 100;
+    const itemCal   = macro.cal   * scale;
+    const itemProt  = macro.prot  * scale;
+    const itemCarb  = macro.carb  * scale;
+    const itemFat   = macro.fat   * scale;
+    const itemFiber = macro.fiber * scale;
+
+    totals.cal   += itemCal;
+    totals.prot  += itemProt;
+    totals.carb  += itemCarb;
+    totals.fat   += itemFat;
+    totals.fiber += itemFiber;
+
+    items.push({
+      name:  foodKey,
+      rawText: seg,
+      grams: Math.round(gramsConsumed),
+      cal:   Math.round(itemCal),
+      prot:  Math.round(itemProt),
+      carb:  Math.round(itemCarb),
+      fat:   Math.round(itemFat),
+    });
+  }
 
   return {
-    cal:  Math.round(result.cal),
-    prot: Math.round(result.prot),
-    carb: Math.round(result.carb),
-    fat:  Math.round(result.fat),
-    fiber:Math.round(result.fiber)
+    cal:   Math.round(totals.cal),
+    prot:  Math.round(totals.prot),
+    carb:  Math.round(totals.carb),
+    fat:   Math.round(totals.fat),
+    fiber: Math.round(totals.fiber),
+    items,
   };
 }
 
+// Legacy alias used elsewhere in the codebase
+function parseNutrition(text) {
+  return parseNutritionText(text);
+}
+
+// ── Dynamic nutrition targets from profile ──────────────────────
+function getNutritionTargets() {
+  const p = ls('profile', {});
+  const w = parseFloat(p.weight) || 75;
+  const act = parseFloat(p.activity) || 1.55;
+  const gen = p.gender || 'male';
+  const a   = parseInt(p.age) || 25;
+  const h   = parseFloat(p.height) || 175;
+
+  let bmr;
+  if (gen === 'male') bmr = 10*w + 6.25*h - 5*a + 5;
+  else                bmr = 10*w + 6.25*h - 5*a - 161;
+  const tdee = Math.round(bmr * act);
+
+  // Protein: 2g/kg for muscle gain, 1.6g/kg for maintenance
+  const protTarget  = Math.round(w * 2.0);
+  const calTarget   = tdee;
+  const carbTarget  = Math.round((calTarget * 0.40) / 4);  // 40% from carbs
+  const fatTarget   = Math.round((calTarget * 0.25) / 9);  // 25% from fat
+  const fiberTarget = 35;
+
+  return { cal: calTarget, prot: protTarget, carb: carbTarget, fat: fatTarget, fiber: fiberTarget };
+}
+
+// ── Nutrition Score (/100) ──────────────────────────────────────
+function calcNutritionScore(total, targets) {
+  const calScore   = Math.min(25, Math.round((Math.min(total.cal,  targets.cal)  / targets.cal)  * 25));
+  const protScore  = Math.min(35, Math.round((Math.min(total.prot, targets.prot) / targets.prot) * 35));
+  const carbScore  = Math.min(20, Math.round((Math.min(total.carb, targets.carb) / targets.carb) * 20));
+  const fatScore   = Math.min(10, Math.round((Math.min(total.fat,  targets.fat)  / targets.fat)  * 10));
+  const fiberScore = Math.min(10, Math.round((Math.min(total.fiber,targets.fiber)/ targets.fiber) * 10));
+  return calScore + protScore + carbScore + fatScore + fiberScore;
+}
+
+// ── Muscle Gain Score (/10) ────────────────────────────────────
+function calcMuscleScore(total, targets) {
+  const protRatio = total.prot / targets.prot;
+  const calRatio  = total.cal  / targets.cal;
+  let score = 0;
+  if (protRatio >= 1.0) score += 5;
+  else score += Math.round(protRatio * 5);
+  if (calRatio >= 0.9 && calRatio <= 1.15) score += 3;
+  else if (calRatio >= 0.75) score += 1;
+  if (total.fiber >= 20) score += 2;
+  return Math.min(10, score);
+}
+
+// ── Smart Suggestions ─────────────────────────────────────────
+function getNutritionSuggestions(total, targets) {
+  const tips = [];
+  const protRemain = targets.prot - total.prot;
+  const calRemain  = targets.cal  - total.cal;
+  const waterDone  = parseFloat(document.getElementById('d_water')?.value) || 0;
+
+  if (protRemain > 20)
+    tips.push(`🥩 Need ${protRemain}g more protein — add paneer, eggs, or whey.`);
+  else if (protRemain > 0)
+    tips.push(`✅ Almost at protein goal! ${protRemain}g left.`);
+  else
+    tips.push(`🎯 Protein goal crushed! ${Math.abs(protRemain)}g over target.`);
+
+  if (calRemain > 300)
+    tips.push(`🔥 ${calRemain} kcal remaining — eat a proper meal.`);
+  else if (calRemain > 0)
+    tips.push(`⚡ ${calRemain} kcal remaining — a small snack will complete it.`);
+  else
+    tips.push(`⚠️ ${Math.abs(calRemain)} kcal over target today.`);
+
+  if (total.fiber < 15)
+    tips.push(`🥬 Low fiber (${total.fiber}g) — add dal, veggies or fruit.`);
+
+  if (waterDone < 2.5)
+    tips.push(`💧 Drink more water. Currently at ${waterDone}L.`);
+
+  if (total.fat > targets.fat * 1.3)
+    tips.push(`⚠️ Fat intake high (${total.fat}g vs ${targets.fat}g target).`);
+
+  return tips;
+}
+
+// ── Main calcNutrition — called on every input change ──────────
 function calcNutrition() {
-  const texts = [
-    document.getElementById('d_breakfast').value,
-    document.getElementById('d_lunch').value,
-    document.getElementById('d_dinner').value,
-    document.getElementById('d_snacks').value,
-    document.getElementById('d_fruits').value,
-  ];
+  const meals = {
+    breakfast: document.getElementById('d_breakfast').value,
+    lunch:     document.getElementById('d_lunch').value,
+    dinner:    document.getElementById('d_dinner').value,
+    snacks:    document.getElementById('d_snacks').value,
+    fruits:    document.getElementById('d_fruits').value,
+  };
 
-  let total = {cal:0,prot:0,carb:0,fat:0,fiber:0};
-  texts.forEach(t => {
-    const n = parseNutrition(t);
-    total.cal  += n.cal;
-    total.prot += n.prot;
-    total.carb += n.carb;
-    total.fat  += n.fat;
-    total.fiber+= n.fiber;
-  });
+  const total = { cal:0, prot:0, carb:0, fat:0, fiber:0, items:[] };
 
+  for (const [meal, text] of Object.entries(meals)) {
+    if (!text.trim()) continue;
+    const parsed = parseNutritionText(text);
+    total.cal   += parsed.cal;
+    total.prot  += parsed.prot;
+    total.carb  += parsed.carb;
+    total.fat   += parsed.fat;
+    total.fiber += parsed.fiber;
+    total.items.push(...(parsed.items || []));
+  }
+
+  const targets = getNutritionTargets();
+  const nutScore    = calcNutritionScore(total, targets);
+  const muscleScore = calcMuscleScore(total, targets);
+  const suggestions = getNutritionSuggestions(total, targets);
+
+  // ── Update stat chips ─────────────────────────────────────────
   if (total.cal === 0) {
-    ['cal','prot','carb','fat','fiber'].forEach(k => {
-      document.getElementById(`nc_${k}`)?.setAttribute && (document.getElementById(`nc_${k}`).textContent = '—');
+    ['cal','prot','carb','fat'].forEach(k => {
+      const el = document.getElementById(`nc_${k}`);
+      if (el) el.textContent = '—';
     });
+    const fe = document.getElementById('nc_fiber');
+    if (fe) fe.textContent = '—';
     document.getElementById('macroBars').style.display = 'none';
   } else {
     document.getElementById('nc_cal').textContent   = total.cal;
@@ -1633,19 +2459,79 @@ function calcNutrition() {
     document.getElementById('nc_fat').textContent   = total.fat;
     document.getElementById('nc_fiber').textContent = total.fiber;
 
-    // Bars
     document.getElementById('macroBars').style.display = 'block';
-    const targets = {cal:2000, prot:150, carb:250, fat:65, fiber:30};
     ['cal','prot','carb','fat','fiber'].forEach(k => {
       const pct = Math.min(100, Math.round((total[k] / targets[k]) * 100));
-      document.getElementById(`bar_${k}`).style.width = pct + '%';
-      document.getElementById(`bv_${k}`).textContent = k === 'cal' ? total[k] : total[k] + 'g';
+      const bar = document.getElementById(`bar_${k}`);
+      const bv  = document.getElementById(`bv_${k}`);
+      if (bar) bar.style.width = pct + '%';
+      if (bv)  bv.textContent = k === 'cal' ? total[k] : total[k] + 'g';
     });
   }
 
-  // Save
+  // ── Smart Nutrition Panel ─────────────────────────────────────
+  let panel = document.getElementById('nutPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'nutPanel';
+    panel.style.cssText = 'margin-top:14px';
+    const macroBars = document.getElementById('macroBars');
+    if (macroBars && macroBars.parentNode)
+      macroBars.parentNode.insertBefore(panel, macroBars.nextSibling);
+  }
+
+  if (total.cal > 0) {
+    const calRem  = Math.max(0, targets.cal  - total.cal);
+    const protRem = Math.max(0, targets.prot - total.prot);
+    const tipsHtml = suggestions.map(t =>
+      `<div style="font-size:12px;color:var(--text-2);padding:4px 0;border-bottom:1px solid rgba(42,47,69,0.4)">${t}</div>`
+    ).join('');
+
+    panel.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div style="background:rgba(91,141,238,0.1);border:1px solid rgba(91,141,238,0.25);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">${calRem}</div>
+          <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">kcal left</div>
+        </div>
+        <div style="background:rgba(62,207,142,0.1);border:1px solid rgba(62,207,142,0.25);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:700;color:var(--green);font-family:var(--font-mono)">${protRem}g</div>
+          <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">protein left</div>
+        </div>
+        <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:700;color:var(--purple);font-family:var(--font-mono)">${nutScore}</div>
+          <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">nut score</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-lift);border:1px solid var(--border);border-radius:8px;padding:10px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);margin-bottom:6px">💡 Suggestions</div>
+        ${tipsHtml}
+      </div>
+      <div style="background:var(--bg-lift);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);margin-bottom:6px">🏋️ Muscle Gain Score: ${muscleScore}/10</div>
+        <div style="height:8px;background:var(--bg-deep);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${muscleScore*10}%;background:linear-gradient(90deg,var(--green),var(--accent));border-radius:4px;transition:width .4s ease"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:6px">Target: ${targets.prot}g protein · ${targets.cal} kcal · ${targets.fiber}g fiber</div>
+      </div>
+    `;
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+
+  // ── Save to day data ──────────────────────────────────────────
   const data = getDayData(todayKey);
-  data.nutrition = total;
+  data.nutrition = {
+    cal:   total.cal,
+    prot:  total.prot,
+    carb:  total.carb,
+    fat:   total.fat,
+    fiber: total.fiber,
+    nutScore,
+    muscleScore,
+    calTarget:  targets.cal,
+    protTarget: targets.prot,
+  };
   saveDayData(todayKey, data);
 }
 
@@ -2091,106 +2977,148 @@ function drawChart(canvasId, labels, data, color, label) {
 // REPORT
 // ================================================================
 function generateReport() {
-  const data = getDayData(todayKey);
-  const p    = ls('profile', {});
+  const data    = getDayData(todayKey);
+  const p       = ls('profile', {});
   const gymDays = ls('gymDays', {});
-  const keys7 = getDaysInRange(new Date(), 7);
+  const keys7   = getDaysInRange(new Date(), 7);
   const gymThis = keys7.filter(k => gymDays[k]).length;
 
-  const checks   = data.checks || {};
-  const workout  = data.workout || [];
-  const n        = data.nutrition || {};
+  const checks  = data.checks || {};
+  const workout = data.workout || [];
+  const n       = data.nutrition || {};
+  const targets = getNutritionTargets();
 
   const checkLine = (id) => checks[id] ? '✓' : '✗';
-  const supplements = CHECKS.filter(c => ['fishoil','mbvite','creatine','whey'].includes(c.id))
+
+  const supplements = CHECKS
+    .filter(c => ['fishoil','mbvite','creatine','whey'].includes(c.id))
     .map(c => `${c.label}: ${checkLine(c.id)}`).join('  ');
 
-  const workoutStr = workout.length
-    ? workout.filter(e => e.name).map(e => `${e.name} ${e.sets}×${e.reps} @ ${e.weight}kg`).join(', ')
-    : 'Rest day';
+  const workoutLines = workout.filter(e => e.name)
+    .map(e => `  • ${e.name.padEnd(20)} ${e.sets}×${e.reps} @ ${e.weight}kg  [${(+e.sets * +e.reps * +e.weight).toLocaleString()} kg vol]`)
+    .join('\n') || '  Rest day';
 
   const todayStr = formatDate(todayKey);
+  const score    = data.score || 0;
 
-  const score = data.score || 0;
   let grade;
-  if (score >= 90) grade = 'S — Elite';
-  else if (score >= 75) grade = 'A — Great';
-  else if (score >= 60) grade = 'B — Good';
-  else if (score >= 40) grade = 'C — Average';
-  else grade = 'D — Needs Work';
+  if (score >= 90)      grade = 'S ★ ELITE';
+  else if (score >= 75) grade = 'A ✦ GREAT';
+  else if (score >= 60) grade = 'B ✔ GOOD';
+  else if (score >= 40) grade = 'C ~ AVERAGE';
+  else                  grade = 'D ✘ NEEDS WORK';
+
+  const calRem  = Math.max(0, targets.cal  - (n.cal  || 0));
+  const protRem = Math.max(0, targets.prot - (n.prot || 0));
+  const carbRem = Math.max(0, targets.carb - (n.carb || 0));
+  const fatRem  = Math.max(0, targets.fat  - (n.fat  || 0));
+  const nutScore    = n.nutScore    || 0;
+  const muscleScore = n.muscleScore || 0;
+
+  // Weekly averages
+  const weekDatas = keys7.map(k => getDayData(k));
+  const avgWeight = (() => {
+    const ws = weekDatas.map(d => parseFloat(d.weight)).filter(v => !isNaN(v));
+    return ws.length ? (ws.reduce((a,b)=>a+b,0)/ws.length).toFixed(1) : '—';
+  })();
+  const avgSleep = (() => {
+    const ss = weekDatas.map(d => parseFloat(d.sleep)).filter(v => !isNaN(v));
+    return ss.length ? (ss.reduce((a,b)=>a+b,0)/ss.length).toFixed(1) : '—';
+  })();
+  const avgProtein = (() => {
+    const ps = weekDatas.map(d => d.nutrition?.prot || 0).filter(v => v > 0);
+    return ps.length ? Math.round(ps.reduce((a,b)=>a+b,0)/ps.length) : '—';
+  })();
 
   const report = `===== BODY TRANSFORMATION DAILY REPORT =====
 
 Date:            ${todayStr}
 Name:            ${p.name || '—'}
+Height:          ${p.height || '—'} cm   |  Goal Weight: ${p.goalWeight || '—'} kg
 
-────────────────────────────────────────────
+════════════════════════════════════════════
 
-📊 METRICS
+📊 DAILY METRICS
+────────────────
 Weight:          ${data.weight || '—'} kg
-Sleep:           ${data.sleep || '—'} hrs
-Water:           ${data.water || '—'} L
-Steps:           ${data.steps || '—'}
-Mood:            ${data.mood || '—'} / 10
+Sleep:           ${data.sleep  || '—'} hrs
+Water:           ${data.water  || '—'} L
+Steps:           ${data.steps  || '—'}
+Mood:            ${data.mood   || '—'} / 10
 Energy:          ${data.energy || '—'} / 10
 Stress:          ${data.stress || '—'} / 10
 
-────────────────────────────────────────────
+════════════════════════════════════════════
 
 🏋️ TRAINING
-Gym:             ${checkLine('gym')}  Running: ${checkLine('running')}  Stretching: ${checkLine('stretch')}
-Workout:         ${workoutStr}
-Volume:          ${data.workoutVolume ? data.workoutVolume.toLocaleString() + ' kg' : '—'}
+────────────────
+Gym:             ${checkLine('gym')}   Running: ${checkLine('running')}   Stretching: ${checkLine('stretch')}
+Total Volume:    ${data.workoutVolume ? data.workoutVolume.toLocaleString() + ' kg' : '—'}
 
-────────────────────────────────────────────
+Exercises:
+${workoutLines}
 
-🥗 NUTRITION
+════════════════════════════════════════════
+
+🥗 NUTRITION INTAKE
+────────────────
 Breakfast:       ${data.breakfast || '—'}
-Lunch:           ${data.lunch || '—'}
-Dinner:          ${data.dinner || '—'}
-Snacks:          ${data.snacks || '—'}
-Fruits:          ${data.fruits || '—'}
+Lunch:           ${data.lunch     || '—'}
+Dinner:          ${data.dinner    || '—'}
+Snacks:          ${data.snacks    || '—'}
+Fruits:          ${data.fruits    || '—'}
 
-Calories:        ${n.cal || '—'} kcal
-Protein:         ${n.prot || '—'} g
-Carbs:           ${n.carb || '—'} g
-Fat:             ${n.fat || '—'} g
-Fiber:           ${n.fiber || '—'} g
+════════════════════════════════════════════
 
-Protein Goal:    ${checkLine('protein')}
-Calories Goal:   ${checkLine('calories')}
+🔢 MACROS (Calculated vs Target)
+────────────────
+Calories:        ${n.cal  || 0} kcal  /  ${targets.cal}  kcal target  [${calRem} remaining]
+Protein:         ${n.prot || 0}g      /  ${targets.prot}g target       [${protRem}g remaining]
+Carbs:           ${n.carb || 0}g      /  ${targets.carb}g target       [${carbRem}g remaining]
+Fat:             ${n.fat  || 0}g      /  ${targets.fat}g target        [${fatRem}g remaining]
+Fiber:           ${n.fiber|| 0}g      /  ${targets.fiber}g target
 
-────────────────────────────────────────────
+Nutrition Score: ${nutScore} / 100
+Muscle Score:    ${muscleScore} / 10
+
+════════════════════════════════════════════
 
 💊 SUPPLEMENTS
+────────────────
 ${supplements}
 
-────────────────────────────────────────────
+════════════════════════════════════════════
 
 🧠 MINDSET & HABITS
+────────────────
 Meditation:      ${checkLine('meditate')}
 Voice Practice:  ${checkLine('voice')}
 Eye Contact:     ${checkLine('eye')}
 
-────────────────────────────────────────────
+════════════════════════════════════════════
 
 📝 NOTES
+────────────────
 ${data.notes || '—'}
 
-────────────────────────────────────────────
+════════════════════════════════════════════
 
-📈 WEEKLY PROGRESS
-Gym days this week: ${gymThis} / 7
+📈 WEEKLY SUMMARY (Last 7 Days)
+────────────────
+Gym sessions:    ${gymThis} / 7
+Avg weight:      ${avgWeight} kg
+Avg sleep:       ${avgSleep} hrs
+Avg protein:     ${avgProtein}g / day
 
-────────────────────────────────────────────
+════════════════════════════════════════════
 
 🎯 TODAY'S SCORE
+────────────────
 Score:           ${score} / 100
 Grade:           ${grade}
+Checklist:       ${Object.values(checks).filter(Boolean).length} / ${CHECKS.length} done
 
-Checklist:       ${Object.values(checks).filter(Boolean).length} / ${CHECKS.length} completed
-
-=====================================`;
+═══════════════════════════════════════════`;
 
   document.getElementById('reportBox').textContent = report;
   showToast('Report generated ✓','green');
